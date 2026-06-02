@@ -19,6 +19,9 @@ from .inst_scheduler import (
     InstructionScheduler, parse_instructions, machine_instrs_from_scheduled,
 )
 from .inst_select_ext import ExtendedInstructionSelector
+from .cycle_estimator import (
+    PipelineCycleEstimator, PipelineConfig, CycleStats,
+)
 
 __all__ = [
     # machine types
@@ -28,6 +31,8 @@ __all__ = [
     # shared asm parser
     "ParsedAsmLine", "parse_line", "parse_asm", "lines_to_asm",
     "classify_def_use",
+    # cycle estimator
+    "PipelineCycleEstimator", "PipelineConfig", "CycleStats",
     # passes
     "InstructionSelector", "RegisterAllocator", "AsmEmitter",
     "beautify_asm", "count_instructions",

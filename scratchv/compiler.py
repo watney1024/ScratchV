@@ -50,6 +50,9 @@ class CompilerConfig:
         const_merge:    Run constant-load merge pass.
         schedule:       Run instruction scheduler.
         count_instr:    Print instruction count statistics.
+        cycle_stats:    Run 5-stage pipeline cycle estimation (detailed).
+        enable_forwarding:  Enable forwarding in cycle estimator.
+        branch_predictor:   Branch predictor mode for cycle estimator.
     """
 
     backend: str = "riscv"
@@ -67,6 +70,9 @@ class CompilerConfig:
     const_merge: bool = False
     schedule: bool = False
     count_instr: bool = False
+    cycle_stats: bool = False
+    enable_forwarding: bool = True
+    branch_predictor: str = "always_not_taken"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -283,7 +289,25 @@ class CompilerDriver:
         # --- 5. Post-codegen passes ---
         asm_text = self._run_asm_passes(asm_text, warnings)
 
-        # --- 6. Write output ---
+        # --- 6. Cycle estimation ---
+        cycle_report = ""
+        if self.config.cycle_stats:
+            from scratchv.backend.cycle_estimator import (
+                PipelineCycleEstimator, PipelineConfig,
+            )
+            pconfig = PipelineConfig(
+                enable_forwarding=self.config.enable_forwarding,
+                branch_predictor=self.config.branch_predictor,
+            )
+            estimator = PipelineCycleEstimator(pconfig)
+            try:
+                cstats = estimator.estimate(asm_text)
+                cycle_report = estimator.report(cstats)
+                warnings.append(estimator.report_short(cstats))
+            except Exception as e:
+                warnings.append(f"Cycle estimation failed: {e}")
+
+        # --- 7. Write output ---
         with open(output_path, "w") as f:
             f.write(asm_text)
 
@@ -292,7 +316,7 @@ class CompilerDriver:
             output_text=asm_text,
             output_path=output_path,
             ir_dump=ir_dump,
-            stats={"opt_message": opt_message},
+            stats={"opt_message": opt_message, "cycle_report": cycle_report},
             warnings=warnings,
         )
 

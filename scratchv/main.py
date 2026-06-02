@@ -105,6 +105,21 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Use extended instruction selector with fp64/sqrt/min/max/abs support (Topic 28)",
     )
 
+    # ── Cycle estimation ──────────────────────────────────────────────
+    parser.add_argument(
+        "--cycle-stats", action="store_true",
+        help="Run 5-stage pipeline cycle estimator with detailed breakdown",
+    )
+    parser.add_argument(
+        "--no-forwarding", action="store_true",
+        help="Disable forwarding in cycle estimator (default: forwarding on)",
+    )
+    parser.add_argument(
+        "--branch-predictor", choices=["always_taken", "always_not_taken", "btb"],
+        default="always_not_taken",
+        help="Branch predictor mode for cycle estimator (default: always_not_taken)",
+    )
+
     # ── Meta ────────────────────────────────────────────────────────────
     parser.add_argument(
         "--version", action="version",
@@ -135,6 +150,9 @@ def args_to_config(args: argparse.Namespace) -> CompilerConfig:
         const_merge=args.const_merge,
         schedule=args.schedule,
         count_instr=args.count_instr,
+        cycle_stats=args.cycle_stats,
+        enable_forwarding=not args.no_forwarding,
+        branch_predictor=args.branch_predictor,
     )
 
 
@@ -235,6 +253,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  note: {w}", file=sys.stderr)
         if result.stats.get("opt_message"):
             print(f"  optimizer: {result.stats['opt_message']}", file=sys.stderr)
+        if result.stats.get("cycle_report"):
+            print(result.stats["cycle_report"], file=sys.stderr)
 
         # Verification
         if args.verify:
