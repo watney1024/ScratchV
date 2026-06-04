@@ -844,6 +844,8 @@ def main() -> int:
                     "dynamic_instructions": {k: getattr(llvm_est, k) for k in
                         ["total", "alu_i", "alu_r", "shift", "load", "store",
                          "branch", "jump", "upper", "fp"]},
+                    "cache_embedded": {"icache": llvm_ic_emb, "dcache": llvm_dc_emb},
+                    "cache_application": {"icache": llvm_ic_app, "dcache": llvm_dc_app},
                     "cycles": llvm_cycles,
                 },
                 "scratchv": {
@@ -851,6 +853,8 @@ def main() -> int:
                     "dynamic_instructions": {k: getattr(scratchv_est, k) for k in
                         ["total", "alu_i", "alu_r", "shift", "load", "store",
                          "branch", "jump", "upper", "fp"]},
+                    "cache_embedded": {"icache": sv_ic_emb, "dcache": sv_dc_emb},
+                    "cache_application": {"icache": sv_ic_app, "dcache": sv_dc_app},
                     "cycles": scratchv_cycles,
                 },
             }, f, indent=2)
