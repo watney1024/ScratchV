@@ -20,7 +20,8 @@ def collect(): return (
 
 def _f(n,d=0):
     if not n: return "—"
-    return f"{n:,.{d}f}" if isinstance(n,float) and d else f"{n:,}"
+    if isinstance(n,float): n=int(n)
+    return f"{n:,}"
 def _p(a,b):
     if not b: return "—"
     return f"{a/b*100:.1f}%"
