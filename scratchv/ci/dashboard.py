@@ -299,14 +299,19 @@ def main() -> int:
     a = p.parse_args()
 
     ld = None; td = None
-    if a.llvm_json:
+    if a.llvm_json and os.path.exists(a.llvm_json):
         with open(a.llvm_json) as f: ld = json.load(f)
-    if a.tinyfive_json:
+    if a.tinyfive_json and os.path.exists(a.tinyfive_json):
         with open(a.tinyfive_json) as f: td = json.load(f)
 
     if a.run or (ld is None and td is None):
         print("Collecting fresh data...", file=sys.stderr)
         ld, td = collect_all()
+
+    if ld is None:
+        ld = {}
+    if td is None:
+        td = {}
 
     html = generate(ld, td)
     os.makedirs(os.path.dirname(a.output) or ".", exist_ok=True)

@@ -819,8 +819,11 @@ def main() -> int:
     # ── 1. Static analysis of both assembly files ──
     print("\n[1] Static analysis of assembly files...", file=sys.stderr)
 
-    llvm_full = analyze_llvm_static("output/cnn_llvm_rv64fd_O3.s")
-    scratchv_full = analyze_scratchv_static("output/cnn_scratchv.s")
+    import os as _os
+    llvm_asm_path = "output/cnn_llvm_rv64fd_O3.s"
+    scratchv_asm_path = "output/cnn_scratchv.s"
+    llvm_full = analyze_llvm_static(llvm_asm_path) if _os.path.exists(llvm_asm_path) else {"total_static": 0, "code_bytes": 0, "load": 0, "store": 0, "mul": 0, "add": 0, "madd": 0, "branch": 0, "x_reg_count": 0, "f_reg_count": 0, "x_regs_used": [], "f_regs_used": []}
+    scratchv_full = analyze_scratchv_static(scratchv_asm_path) if _os.path.exists(scratchv_asm_path) else {"total_static": 0, "code_bytes": 0, "load": 0, "store": 0, "mul": 0, "add": 0, "madd": 0, "branch": 0, "x_reg_count": 0, "f_reg_count": 0, "x_regs_used": [], "f_regs_used": []}
 
     print(f"  LLVM (RV64FD):    {llvm_full['total_static']} static insns, "
           f"{llvm_full['x_reg_count']} x-regs, {llvm_full['f_reg_count']} f-regs",
@@ -857,11 +860,16 @@ def main() -> int:
 
     # ── 5. Also simulate full converted ScratchV code ──
     print("\n[4] Converting full ScratchV code...", file=sys.stderr)
-    with open("output/cnn_scratchv.s") as f:
-        scratchv_asm = f.readlines()
-    sv_converted, sv_conv_stats = convert_scratchv_to_rv32im(scratchv_asm)
-    print(f"  Converted: {len(sv_converted)} lines", file=sys.stderr)
-    print(f"  Pseudo expansion: {sv_conv_stats}", file=sys.stderr)
+    sv_converted = []
+    sv_conv_stats = {}
+    if _os.path.exists(scratchv_asm_path):
+        with open(scratchv_asm_path) as f:
+            scratchv_asm = f.readlines()
+        sv_converted, sv_conv_stats = convert_scratchv_to_rv32im(scratchv_asm)
+        print(f"  Converted: {len(sv_converted)} lines", file=sys.stderr)
+        print(f"  Pseudo expansion: {sv_conv_stats}", file=sys.stderr)
+    else:
+        print(f"  Skipped: {scratchv_asm_path} not found", file=sys.stderr)
 
     # ── 6. Generate report ──
     print("\n[5] Generating report...", file=sys.stderr)
