@@ -28,6 +28,9 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 # ── Import cache model ─────────────────────────────────────────────────────
+import sys, os
+_sd = os.path.dirname(os.path.abspath(__file__))
+if _sd not in sys.path: sys.path.insert(0, _sd)
 from cache_model import CacheSim, create_cache_pair, CACHE_CONFIGS
 
 

@@ -1,23 +1,38 @@
 """Performance comparison — LLVM baseline vs ScratchV."""
 
 from __future__ import annotations
-import json, os, subprocess, sys, tempfile
+import json, os, subprocess, sys
 from pathlib import Path
 from datetime import datetime, timezone
 
 PROJ = Path(__file__).resolve().parent.parent.parent
 
 def _run(script, args):
-    tmp = tempfile.mktemp(suffix=".json")
-    subprocess.run([sys.executable,str(PROJ/script)]+args, capture_output=True, cwd=str(PROJ), timeout=60)
+    """Run tool, return parsed JSON. Reads from the --json-output path in args."""
+    tmp = None
+    for i, a in enumerate(args):
+        if a == "--json-output" and i+1 < len(args):
+            tmp = args[i+1]
+            break
+        if a == "--json" and i+1 < len(args) and not args[i+1].startswith("--"):
+            tmp = args[i+1]
+            break
+    if not tmp:
+        tmp = "/tmp/_bench_tmp.json"
+        args = args + ["--json-output", tmp]
+    subprocess.run([sys.executable, str(PROJ/script)] + args,
+                   capture_output=True, cwd=str(PROJ), timeout=60)
     if os.path.exists(tmp):
         with open(tmp) as f: return json.load(f)
     return {}
 
+
 def collect():
+    llvm_path = "/tmp/_llvm_bench.json"
+    tf_path   = "/tmp/_tf_bench.json"
     return (
-        _run("scratchv/standalone/llvm_cache_compare.py", ["--json-output","/tmp/_llvm.json"]),
-        _run("scratchv/standalone/tinyfive_compare.py", ["--json","/tmp/_tf.json"]),
+        _run("scratchv/standalone/llvm_cache_compare.py", ["--json-output", llvm_path]),
+        _run("scratchv/standalone/tinyfive_compare.py", ["--json", tf_path]),
     )
 
 def _f(n):
@@ -208,7 +223,15 @@ def generate(ld=None, td=None):
 </div></body></html>"""
     return h
 
-def generate_dashboard_html(*a, **kw): return generate()
+def generate_dashboard_html(json_path="", json_data=None, embed_json=False, title="ScratchV"):
+    """Backward-compatible entry point called by ci_benchmark.py."""
+    ld = td = None
+    if json_data and isinstance(json_data, dict):
+        data = json_data
+        ld = {"llvm": data} if "llvm" in data or "dynamic_instructions" in data else data
+    elif json_path and os.path.exists(json_path):
+        with open(json_path) as f: ld = json.load(f)
+    return generate(ld, td)
 
 def main():
     import argparse
