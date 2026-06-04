@@ -73,16 +73,27 @@ jobs:
             echo "models/graph/cnn.onnx not found, skipping CNN benchmark"
           fi
 
-      # ── 3.4 LLVM vs ScratchV + TinyFive 对比（纯分析，无需编译）──────
-      - name: LLVM vs ScratchV comparison (analytical)
+      # ── 3.4 LLVM vs ScratchV + TinyFive + Dashboard ──────────────────
+      - name: LLVM vs ScratchV comparison
         run: |
           mkdir -p benchmark_reports
           python3.12 scratchv/standalone/llvm_cache_compare.py \
             --json-output benchmark_reports/llvm_vs_scratchv.json \
-            --markdown benchmark_reports/llvm_vs_scratchv.md 2>&1 | tail -20
+            --markdown benchmark_reports/llvm_vs_scratchv.md \
+            || echo "WARNING: llvm_cache_compare failed"
           python3.12 scratchv/standalone/tinyfive_compare.py \
             --json benchmark_reports/tinyfive_compare.json \
-            --markdown benchmark_reports/tinyfive_compare.md 2>&1 | tail -15
+            --markdown benchmark_reports/tinyfive_compare.md \
+            || echo "WARNING: tinyfive_compare failed"
+
+      # ── 3.5 生成仪表盘 HTML ──────────────────────────────────────────
+      - name: Generate dashboard
+        run: |
+          python3.12 scratchv/ci/dashboard.py \
+            --llvm-json benchmark_reports/llvm_vs_scratchv.json \
+            --tinyfive-json benchmark_reports/tinyfive_compare.json \
+            -o benchmark_reports/dashboard.html \
+            || echo "WARNING: dashboard generation failed"
 
       # ── 上报 ──────────────────────────────────────────────────────────
       - name: Upload benchmark reports
@@ -92,15 +103,7 @@ jobs:
           path: benchmark_reports/
           retention-days: 30
 
-      # ── 生成仪表盘 HTML + 上传 Pages 产物 ─────────────────────────────
-      - name: Generate dashboard for Pages
-        if: github.ref == 'refs/heads/main'
-        run: |
-          python3.12 scratchv/ci/dashboard.py \
-            --llvm-json benchmark_reports/llvm_vs_scratchv.json \
-            --tinyfive-json benchmark_reports/tinyfive_compare.json \
-            -o benchmark_reports/dashboard.html 2>&1
-
+      # ── 上传 Pages 产物 ──────────────────────────────────────────────
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
