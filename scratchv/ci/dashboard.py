@@ -120,10 +120,14 @@ tr:hover td{background:#3a4556}
 def generate(ld: dict | None = None, td: dict | None = None) -> str:
     if ld is None or td is None:
         ld, td = collect_all()
+    if ld is None: ld = {}
+    if td is None: td = {}
 
-    L = ld["llvm"]; S = ld["scratchv"]
-    Ld = L["dynamic_instructions"]; Sd = S["dynamic_instructions"]
-    Lc = L["cycles"]; Sc = S["cycles"]
+    L = ld.get("llvm", {}); S = ld.get("scratchv", {})
+    Ld = L.get("dynamic_instructions", {})
+    Sd = S.get("dynamic_instructions", {})
+    Lc = L.get("cycles", {})
+    Sc = S.get("cycles", {})
     LIe = L.get("cache_embedded",{}).get("icache",{})
     LDe = L.get("cache_embedded",{}).get("dcache",{})
     SIe = S.get("cache_embedded",{}).get("icache",{})
@@ -136,14 +140,14 @@ def generate(ld: dict | None = None, td: dict | None = None) -> str:
     tls = td.get("llvm_static",{}); tss = td.get("scratchv_static",{})
     tlo = td.get("llvm_tinyfive",{}); tso = td.get("scratchv_tinyfive",{})
 
-    L_total = Ld["total"]; S_total = Sd["total"]
+    L_total = Ld.get("total",0); S_total = Sd.get("total",0)
     L_cpi = Lc.get("rv64fd-basic",{}).get("cpi",0)
     S_cpi = Sc.get("rv32im-basic",{}).get("cpi",0)
     L_t100 = Lc.get("rv64fd-basic",{}).get("est_hw_100mhz_s",0)
     S_t100 = Sc.get("rv32im-basic",{}).get("est_hw_100mhz_s",0)
     sp = S_t100/max(L_t100,.001)
 
-    L_mem = Ld["load"]+Ld["store"]; S_mem = Sd["load"]+Sd["store"]
+    L_mem = Ld.get("load",0)+Ld.get("store",0); S_mem = Sd.get("load",0)+Sd.get("store",0)
 
     h = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ScratchV Performance Dashboard</title><style>{CSS}</style></head><body><div class="container">
@@ -170,8 +174,8 @@ def generate(ld: dict | None = None, td: dict | None = None) -> str:
 
     h+=f"""<tr class="hl"><td><b>TOTAL</b></td><td class='n'><b>{_f(L_total)}</b></td><td class='n'><b>100%</b></td><td class='n'><b>{_f(S_total)}</b></td><td class='n'><b>100%</b></td><td class='n'><b>{_r(S_total,L_total)}</b></td></tr></table>
 <div class="insight"><h4>Memory Access</h4><table style="margin-top:6px"><tr><th></th><th class="n">LLVM</th><th class="n">ScratchV</th><th class="n">Ratio</th></tr>
-<tr><td>Loads</td><td class='n'>{_f(Ld["load"])}</td><td class='n'>{_f(Sd["load"])}</td><td class='n'>{_r(Sd["load"],Ld["load"])}</td></tr>
-<tr><td>Stores</td><td class='n'>{_f(Ld["store"])}</td><td class='n'>{_f(Sd["store"])}</td><td class='n'>{_r(Sd["store"],Ld["store"])}</td></tr>
+<tr><td>Loads</td><td class='n'>{_f(Ld.get("load",0))}</td><td class='n'>{_f(Sd.get("load",0))}</td><td class='n'>{_r(Sd.get("load",0),Ld.get("load",0))}</td></tr>
+<tr><td>Stores</td><td class='n'>{_f(Ld.get("store",0))}</td><td class='n'>{_f(Sd.get("store",0))}</td><td class='n'>{_r(Sd.get("store",0),Ld.get("store",0))}</td></tr>
 <tr><td>Total Memory Ops</td><td class='n'><b>{_f(L_mem)}</b></td><td class='n'><b>{_f(S_mem)}</b></td><td class='n'><b>{_r(S_mem,L_mem)}</b></td></tr>
 </table></div></div>
 
