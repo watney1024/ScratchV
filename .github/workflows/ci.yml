@@ -135,7 +135,7 @@ jobs:
       # ── 优化历史页面 ──────────────────────────────────────────────────
       - name: Generate optimization history page
         if: github.ref == 'refs/heads/main'
-        run: python scratchv/ci/history_page.py -o benchmark_reports/history.html
+        run: python3.12 scratchv/ci/history_page.py -o benchmark_reports/history.html
 
       # ── 测试可视化页面 ────────────────────────────────────────────────
       - name: Generate test visualization page
