@@ -40,6 +40,110 @@ MODEL_TO_LAYER = {
     "cnn_sigmoid1_Sigmoid":   ("sigmoid",  "Sigmoid",  "Sigmoid"),
 }
 
+# ── Per-operator per-MAC/EL instruction category breakdowns ──
+
+CATEGORIES = ["alu_r", "alu_i", "fp", "shift", "load", "store", "branch", "jump", "upper"]
+
+# ScratchV Q16.16 RV32IM per-MAC instruction distribution
+# Based on analysis of generated assembly inner loops (v0.3.0, K=3 unrolled)
+SV_CONV_PER_MAC = {
+    "alu_r": 2.0,    # mul + add (Q16.16 MAC)
+    "alu_i": 2.5,    # addi (pointer increments, loop counters)
+    "fp": 0.0,
+    "shift": 1.0,    # srai (Q16.16 fixup)
+    "load": 2.0,     # lw (weight + input)
+    "store": 0.0,    # accumulator in register
+    "branch": 0.3,   # bne (loop control, amortized)
+    "jump": 0.1,
+    "upper": 0.1,
+}
+
+SV_FC_PER_MAC = {
+    "alu_r": 2.0,
+    "alu_i": 3.0,
+    "fp": 0.0,
+    "shift": 1.0,
+    "load": 2.0,
+    "store": 0.0,
+    "branch": 0.5,
+    "jump": 0.2,
+    "upper": 0.3,
+}
+
+SV_MAXPOOL_PER_EL = {
+    "alu_r": 1.0,    # max comparison
+    "alu_i": 4.0,    # address calc + loop
+    "load": 3.0,     # lw for pool window
+    "store": 1.0,
+    "branch": 1.5,
+    "jump": 0.5,
+    "upper": 0.5,
+    "fp": 0.0,
+    "shift": 0.0,
+}
+
+SV_RELU_PER_EL = {
+    "alu_i": 2.0,     # comparison + branch address calc
+    "load": 2.0,      # lw input
+    "store": 1.0,     # sw output
+    "branch": 1.0,
+    "jump": 0.5,
+    "upper": 0.5,
+    "alu_r": 0.5,
+    "fp": 0.0,
+    "shift": 0.0,
+}
+
+SV_SIGMOID_PER_EL = {
+    "alu_r": 3.0,     # integer sigmoid approximation
+    "alu_i": 5.0,
+    "load": 2.0,
+    "store": 1.0,
+    "branch": 3.0,
+    "jump": 1.0,
+    "upper": 1.0,
+    "fp": 0.0,
+    "shift": 2.0,
+}
+
+# LLVM RV64FD float32 per-MAC instruction distribution (from llvm_cache_compare.py)
+LLVM_CONV_PER_MAC = {
+    "alu_i": 2.0, "alu_r": 0.5, "load": 2.0, "store": 0.0,
+    "fp": 2.0, "branch": 0.3, "jump": 0.1, "upper": 0.1, "shift": 0.0,
+}
+LLVM_FC_PER_MAC = {
+    "alu_i": 1.5, "alu_r": 0.5, "load": 2.0, "store": 0.0,
+    "fp": 2.0, "branch": 0.3, "upper": 0.2, "jump": 0.0, "shift": 0.0,
+}
+LLVM_MAXPOOL_PER_EL = {
+    "alu_i": 4.0, "alu_r": 1.0, "load": 3.0, "store": 0.5,
+    "fp": 1.0, "branch": 1.5, "jump": 0.5, "upper": 0.5, "shift": 0.0,
+}
+LLVM_RELU_PER_EL = {
+    "alu_i": 1.0, "load": 1.0, "store": 1.0, "fp": 0.5,
+    "branch": 0.5, "alu_r": 0.0, "jump": 0.0, "upper": 0.0, "shift": 0.0,
+}
+LLVM_SIGMOID_PER_EL = {
+    "alu_i": 5.0, "alu_r": 3.0, "load": 3.0, "store": 2.0,
+    "fp": 8.0, "branch": 2.0, "jump": 1.0, "upper": 1.0, "shift": 0.0,
+}
+
+
+def _compute_per_category(layer_counts: dict, per_unit: dict, multiplier: int) -> dict:
+    """Compute per-category instruction counts.
+
+    Args:
+        layer_counts: {'macs': N, 'elements': M} from compute_layer_dims
+        per_unit: per-MAC or per-element category distribution dict
+        multiplier: macs for conv/gemm, elements for relu/maxpool/sigmoid
+    Returns:
+        dict of category -> int
+    """
+    result = {}
+    for cat in CATEGORIES:
+        result[cat] = int(per_unit.get(cat, 0) * multiplier)
+    return result
+
 
 def _compile_scratchv(model_path: str) -> dict:
     """Compile a single-op model with ScratchV, return static instruction count."""
@@ -88,53 +192,87 @@ def _compile_scratchv(model_path: str) -> dict:
             "code_size_bytes": code_size, "elapsed_s": elapsed}
 
 
-def _get_layer_data() -> tuple[dict, dict]:
-    """Get per-layer dynamic instruction estimates for ScratchV and LLVM."""
-    # ScratchV per-layer data from benchmark.py
-    from scratchv.standalone.benchmark import estimate_cnn_model
-    sv_est = estimate_cnn_model()
-    sv_per_layer = sv_est.get("per_layer", {})
+def _get_layer_data() -> tuple[dict, dict, dict, dict]:
+    """Get per-layer dynamic instruction estimates for ScratchV and LLVM.
 
-    # LLVM per-layer data: compute using llvm_cache_compare formulas
-    from scratchv.standalone.llvm_cache_compare import (
-        compute_layer_dims, LLVM_CONV_PER_MAC, LLVM_FC_PER_MAC,
-        LLVM_MAXPOOL_PER_EL, LLVM_RELU_PER_EL, LLVM_SIGMOID_PER_EL,
-        LLVM_RESHAPE_PER_EL,
-    )
+    Returns:
+        (sv_per_layer, llvm_per_layer, sv_per_layer_cats, llvm_per_layer_cats)
+        where _cats variants are dicts of layer_name -> {category: count}
+    """
+    from scratchv.standalone.llvm_cache_compare import compute_layer_dims
+
     layers = compute_layer_dims()
 
+    sv_per_layer = {}
     llvm_per_layer = {}
+    sv_per_layer_cats = {}
+    llvm_per_layer_cats = {}
+
     for layer in layers:
         name = layer.name
-        if name.startswith("Conv"):
-            for cat, ratio in LLVM_CONV_PER_MAC.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.macs * ratio
-        elif name.startswith("FC"):
-            for cat, ratio in LLVM_FC_PER_MAC.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.macs * ratio
-        elif name.startswith("MaxPool"):
-            for cat, ratio in LLVM_MAXPOOL_PER_EL.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.elements * ratio
-        elif name.startswith("ReLU"):
-            for cat, ratio in LLVM_RELU_PER_EL.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.elements * ratio
-        elif name.startswith("Sigmoid"):
-            for cat, ratio in LLVM_SIGMOID_PER_EL.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.elements * ratio
-        elif name.startswith("Reshape"):
-            for cat, ratio in LLVM_RESHAPE_PER_EL.items():
-                llvm_per_layer[name] = llvm_per_layer.get(name, 0) + layer.elements * ratio
-        llvm_per_layer[name] = int(llvm_per_layer[name])
+        macs = layer.macs
+        elements = layer.elements
 
-    return sv_per_layer, llvm_per_layer
+        if name.startswith("Conv"):
+            sv_mult = macs
+            ll_mult = macs
+            sv_unit = SV_CONV_PER_MAC
+            ll_unit = LLVM_CONV_PER_MAC
+        elif name.startswith("FC"):
+            sv_mult = macs
+            ll_mult = macs
+            sv_unit = SV_FC_PER_MAC
+            ll_unit = LLVM_FC_PER_MAC
+        elif name.startswith("MaxPool"):
+            sv_mult = elements
+            ll_mult = elements
+            sv_unit = SV_MAXPOOL_PER_EL
+            ll_unit = LLVM_MAXPOOL_PER_EL
+        elif name.startswith("ReLU"):
+            sv_mult = elements
+            ll_mult = elements
+            sv_unit = SV_RELU_PER_EL
+            ll_unit = LLVM_RELU_PER_EL
+        elif name.startswith("Sigmoid"):
+            sv_mult = elements
+            ll_mult = elements
+            sv_unit = SV_SIGMOID_PER_EL
+            ll_unit = LLVM_SIGMOID_PER_EL
+        elif name.startswith("Reshape"):
+            sv_mult = elements
+            ll_mult = elements
+            sv_unit = SV_RELU_PER_EL   # ReLU-like overhead
+            ll_unit = LLVM_RELU_PER_EL
+        else:
+            continue
+
+        # Per-category breakdown
+        sv_cats = {}
+        ll_cats = {}
+        sv_total = 0
+        ll_total = 0
+        for cat in CATEGORIES:
+            sv_c = int(sv_unit.get(cat, 0) * sv_mult)
+            ll_c = int(ll_unit.get(cat, 0) * ll_mult)
+            sv_cats[cat] = sv_c
+            ll_cats[cat] = ll_c
+            sv_total += sv_c
+            ll_total += ll_c
+
+        sv_per_layer[name] = sv_total
+        llvm_per_layer[name] = ll_total
+        sv_per_layer_cats[name] = sv_cats
+        llvm_per_layer_cats[name] = ll_cats
+
+    return sv_per_layer, llvm_per_layer, sv_per_layer_cats, llvm_per_layer_cats
 
 
 def main():
     print("Collecting per-layer analytical data...")
-    sv_per_layer, llvm_per_layer = _get_layer_data()
+    sv_per_layer, llvm_per_layer, sv_cats, llvm_cats = _get_layer_data()
 
-    print(f"  ScratchV layers: {list(sv_per_layer.keys())}")
-    print(f"  LLVM layers: {list(llvm_per_layer.keys())}")
+    print(f"  Layers: {list(sv_per_layer.keys())}")
+    print(f"  Categories: {CATEGORIES}")
 
     # Discover all single-op models
     models = {}
@@ -162,13 +300,22 @@ def main():
         comp = _compile_scratchv(path)
         print(f"static={comp['static_insns']} insns, {comp['status']}")
 
-        # Map to per-layer dynamic data
+        # Map to per-layer dynamic data (both dicts use LLVM layer names)
         layer_info = MODEL_TO_LAYER.get(model_name, (op_type, None, None))
-        sv_layer = layer_info[1] if len(layer_info) > 1 else None
         llvm_layer = layer_info[2] if len(layer_info) > 2 else None
+        sv_layer = llvm_layer  # SV and LLVM now share the same key (LLVM layer names)
 
         sv_dyn = sv_per_layer.get(sv_layer, 0) if sv_layer else 0
         llvm_dyn = llvm_per_layer.get(llvm_layer, 0) if llvm_layer else 0
+        sv_cat = sv_cats.get(sv_layer, {}) if sv_layer else {}
+        llvm_cat = llvm_cats.get(llvm_layer, {}) if llvm_layer else {}
+
+        # Compute percentages for each category
+        sv_cat_pct = {}
+        llvm_cat_pct = {}
+        for cat in CATEGORIES:
+            sv_cat_pct[cat] = round(sv_cat.get(cat, 0) / max(sv_dyn, 1) * 100, 1)
+            llvm_cat_pct[cat] = round(llvm_cat.get(cat, 0) / max(llvm_dyn, 1) * 100, 1)
 
         results[model_name] = {
             "op_type": op_type,
@@ -179,6 +326,10 @@ def main():
             "scratchv_dynamic_insns": int(sv_dyn),
             "llvm_dynamic_insns": int(llvm_dyn),
             "dynamic_ratio": round(sv_dyn / max(llvm_dyn, 1), 2) if llvm_dyn else 0,
+            "sv_category_breakdown": sv_cat,
+            "llvm_category_breakdown": llvm_cat,
+            "sv_category_pct": sv_cat_pct,
+            "llvm_category_pct": llvm_cat_pct,
             "compile_status": comp["status"],
         }
 
@@ -188,6 +339,8 @@ def main():
         "total_sv_static": 0,
         "total_sv_dynamic": 0,
         "total_llvm_dynamic": 0,
+        "sv_categories": defaultdict(int),
+        "llvm_categories": defaultdict(int),
     })
 
     for model_name, data in results.items():
@@ -196,12 +349,21 @@ def main():
         by_op_type[ot]["total_sv_static"] += data["scratchv_static_insns"]
         by_op_type[ot]["total_sv_dynamic"] += data["scratchv_dynamic_insns"]
         by_op_type[ot]["total_llvm_dynamic"] += data["llvm_dynamic_insns"]
+        for cat in CATEGORIES:
+            by_op_type[ot]["sv_categories"][cat] += data["sv_category_breakdown"].get(cat, 0)
+            by_op_type[ot]["llvm_categories"][cat] += data["llvm_category_breakdown"].get(cat, 0)
 
-    # Compute aggregate ratios
+    # Compute aggregate ratios and category percentages
     aggregates = {}
     for ot, agg in by_op_type.items():
         total_sv = agg["total_sv_dynamic"]
         total_llvm = agg["total_llvm_dynamic"]
+        sv_cat_pct = {}
+        llvm_cat_pct = {}
+        for cat in CATEGORIES:
+            sv_cat_pct[cat] = round(agg["sv_categories"][cat] / max(total_sv, 1) * 100, 1)
+            llvm_cat_pct[cat] = round(agg["llvm_categories"][cat] / max(total_llvm, 1) * 100, 1)
+
         aggregates[ot] = {
             "model_count": len(agg["models"]),
             "models": agg["models"],
@@ -209,6 +371,10 @@ def main():
             "total_scratchv_dynamic_insns": total_sv,
             "total_llvm_dynamic_insns": total_llvm,
             "dynamic_ratio": round(total_sv / max(total_llvm, 1), 2),
+            "sv_categories": dict(agg["sv_categories"]),
+            "llvm_categories": dict(agg["llvm_categories"]),
+            "sv_category_pct": sv_cat_pct,
+            "llvm_category_pct": llvm_cat_pct,
         }
 
     # ── Build output ──

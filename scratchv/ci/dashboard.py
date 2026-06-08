@@ -249,6 +249,66 @@ def _version_progress_chart(milestones: list, baseline_dyn: int) -> str:
     return svg
 
 
+CATEGORIES = ["alu_r", "alu_i", "fp", "shift", "load", "store", "branch", "jump", "upper"]
+
+CAT_LABELS = {
+    "alu_r": "ALU R", "alu_i": "ALU I", "fp": "FP", "shift": "Shift",
+    "load": "Load", "store": "Store", "branch": "Branch", "jump": "Jump",
+    "upper": "Upper",
+}
+
+
+def _op_category_table(aggregates: dict) -> str:
+    """Generate per-operator instruction category breakdown with SVG % bars.
+
+    Shows the top categories for each operator type, with percentages for
+    both compilers side-by-side.
+    """
+    if not aggregates:
+        return ""
+
+    h = '<div style="margin-top:20px"><h3 style="font-size:.82rem;font-weight:700;color:#f1f5f9;margin-bottom:12px">Per-Operator Instruction Type Breakdown</h3>'
+    h += '<div class="sec-sub">Category distribution (% of total dynamic instructions) per operator type — compare compiler instruction mix patterns</div>'
+
+    for op_name in ["conv", "gemm", "maxpool", "relu", "sigmoid"]:
+        agg = aggregates.get(op_name)
+        if not agg:
+            continue
+
+        sv_pct = agg.get("sv_category_pct", {})
+        llvm_pct = agg.get("llvm_category_pct", {})
+
+        # Top categories by SV %
+        top_cats = sorted(sv_pct.keys(), key=lambda c: max(sv_pct.get(c, 0), llvm_pct.get(c, 0)), reverse=True)[:5]
+
+        h += f'<details style="margin-bottom:10px"><summary style="cursor:pointer;font-size:.75rem;font-weight:600;color:#e2e8f0;padding:6px 10px;background:#0f172a;border-radius:6px">{op_name} ({agg.get("model_count", 0)} ops, ratio: {agg.get("dynamic_ratio", 0):.2f}x)</summary>'
+        h += '<div style="padding:8px 0"><table class="detail-table"><tr><th>Category</th><th class="n">SV %</th><th>SV bar</th><th class="n">LLVM %</th><th>LLVM bar</th></tr>'
+
+        for cat in sorted(CATEGORIES, key=lambda c: max(sv_pct.get(c, 0), llvm_pct.get(c, 0)), reverse=True):
+            sv_v = sv_pct.get(cat, 0)
+            ll_v = llvm_pct.get(cat, 0)
+            if sv_v == 0 and ll_v == 0:
+                continue
+            label = CAT_LABELS.get(cat, cat)
+            max_w = 120
+            sv_w = max(1, int(sv_v / 50 * max_w)) if sv_v > 0 else 0
+            ll_w = max(1, int(ll_v / 50 * max_w)) if ll_v > 0 else 0
+            sv_color = "#f59e0b" if sv_v > ll_v else "#22c55e"
+            ll_color = "#3b82f6"
+            h += f'<tr><td>{label}</td>'
+            h += f'<td class="n">{sv_v:.1f}%</td>'
+            h += f'<td><svg width="{max_w}" height="14"><rect x="0" y="2" width="{sv_w}" height="10" rx="2" fill="{sv_color}" opacity="0.7"/></svg></td>'
+            h += f'<td class="n">{ll_v:.1f}%</td>'
+            h += f'<td><svg width="{max_w}" height="14"><rect x="0" y="2" width="{ll_w}" height="10" rx="2" fill="{ll_color}" opacity="0.7"/></svg></td>'
+            h += '</tr>'
+
+        h += '</table></div></details>'
+
+    h += '<div style="font-size:.65rem;color:#64748b;margin-top:6px">Orange = ScratchV dominant · Green = SV lower · Blue = LLVM. Longer bar = higher % of total instructions.</div>'
+    h += '</div>'
+    return h
+
+
 # ── SVG Operator Bar Chart ──────────────────────────────────────────────
 
 
@@ -379,8 +439,8 @@ def generate(ld=None, single_op_data=None, history_data=None):
     # ── Section 2: Dynamic Instruction Distribution ──
     h += """
 <div class="sec"><h2>2. Dynamic Instruction Distribution · 指令粒度</h2>
-<div class="sec-sub">Per-category breakdown — identifies compilation instruction bottlenecks (e.g., excessive loads for address calc, branch overhead)</div><table>
-<tr><th>Category</th><th class="n">LLVM (baseline)</th><th class="n">ScratchV</th><th class="n">ScratchV / LLVM</th></tr>"""
+<div class="sec-sub">Per-category breakdown with percentages — identifies compilation instruction bottlenecks</div><table>
+<tr><th>Category</th><th class="n">LLVM</th><th class="n">LLVM %</th><th class="n">ScratchV</th><th class="n">SV %</th><th class="n">SV/LLVM</th></tr>"""
 
     rows = [
         ("ALU R-type", "alu_r", "alu_r"),
@@ -402,9 +462,11 @@ def generate(ld=None, single_op_data=None, history_data=None):
             r_float = _ratio_float(sv, lv) if lv else 0
             if r_float > max_ratio_cat[1]:
                 max_ratio_cat = (name, r_float)
-            h += f"<tr><td>{name}</td><td class='n'><span class='ll'>{_f(lv)}</span></td><td class='n'>{_f(sv)}</td><td class='n'>{_badge(r)}</td></tr>"
+            lv_pct = lv / max(Lt, 1) * 100
+            sv_pct = sv / max(St, 1) * 100
+            h += f"<tr><td>{name}</td><td class='n'><span class='ll'>{_f(lv)}</span></td><td class='n'>{lv_pct:.1f}%</td><td class='n'>{_f(sv)}</td><td class='n'>{sv_pct:.1f}%</td><td class='n'>{_badge(r)}</td></tr>"
 
-    h += f"""<tr class="hl"><td><b>Total</b></td><td class='n'><b class='ll'>{_f(Lt)}</b></td><td class='n'><b>{_f(St)}</b></td><td class='n'><b>{_badge(R_insn)}</b></td></tr></table>
+    h += f"""<tr class="hl"><td><b>Total</b></td><td class='n'><b class='ll'>{_f(Lt)}</b></td><td class='n'>100%</td><td class='n'><b>{_f(St)}</b></td><td class='n'>100%</td><td class='n'><b>{_badge(R_insn)}</b></td></tr></table>
 <div class="note"><b>Biggest bottleneck:</b> {max_ratio_cat[0]} ({max_ratio_cat[1]:.2f}x vs LLVM). "
 Store ratio {_ratio(Sd.get('store', 0), Ld.get('store', 0))}: LLVM keeps accumulators in FP registers (few stores). ScratchV spills to stack every MAC due to limited registers.</div></div>"""
 
@@ -423,6 +485,9 @@ Store ratio {_ratio(Sd.get('store', 0), Ld.get('store', 0))}: LLVM keeps accumul
     if single_op_data:
         aggregates = single_op_data.get("aggregates", {})
         h += _op_bar_chart(aggregates)
+
+        # Per-operator instruction type breakdown
+        h += _op_category_table(aggregates)
 
         # Add per-model breakdown table
         models = single_op_data.get("models", {})
