@@ -159,6 +159,96 @@ def _history_html() -> str:
         return ""
 
 
+# ── SVG Version vs LLVM Progress Chart ──────────────────────────────────
+
+OPTIMIZATION_HISTORY = PROJ / "benchmark_reports" / "optimization_history.json"
+
+
+def _version_progress_chart(milestones: list, baseline_dyn: int) -> str:
+    """Generate SVG horizontal bar chart showing each version's ratio vs LLVM.
+
+    The goal is to show progress toward the LLVM baseline (1.0x).
+    Each version gets a bar proportional to its vs_llvm_ratio.
+    """
+    if not milestones:
+        return '<div class="note">No version data available in optimization_history.json.</div>'
+
+    W, H = 720, 50 + len(milestones) * 50
+    ML, MR, MT, MB = 110, 130, 10, 20
+    PW = W - ML - MR
+    bar_h = 26
+    gap = 24
+
+    ratios = [m.get("vs_llvm_ratio", 1) for m in milestones]
+    max_ratio = max(ratios)
+    chart_max = max(max_ratio * 1.15, 2.0)
+
+    svg = f'<svg viewBox="0 0 {W} {H}" width="100%" height="auto" style="max-width:{W}px;font-family:system-ui,sans-serif">'
+
+    # LLVM baseline at 1.0x
+    baseline_x = ML + (1.0 / chart_max) * PW
+    svg += f'\n  <line x1="{baseline_x:.0f}" y1="{MT}" x2="{baseline_x:.0f}" y2="{MT + len(milestones) * (bar_h + gap)}" stroke="#22c55e" stroke-dasharray="8,4" stroke-width="2" opacity="0.7"/>'
+    svg += f'\n  <text x="{baseline_x:.0f}" y="{MT - 6}" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="700">LLVM 1.0x</text>'
+
+    # Target arrow at bottom right
+    svg += f'\n  <text x="{baseline_x + 4:.0f}" y="{MT + len(milestones) * (bar_h + gap) + 14}" fill="#22c55e" font-size="10">🎯 LLVM baseline (目标)</text>'
+
+    y = MT
+    first_ratio = milestones[0].get("vs_llvm_ratio", 1)
+    last_ratio = milestones[-1].get("vs_llvm_ratio", 1)
+
+    for i, m in enumerate(milestones):
+        ratio = m.get("vs_llvm_ratio", 1)
+        bar_w = max(ratio / chart_max * PW, 3)
+
+        # Color
+        if ratio <= 1.5:
+            color = "#22c55e"
+        elif ratio <= 4:
+            color = "#f59e0b"
+        else:
+            color = "#ef4444"
+
+        # Version label
+        ver = m.get("version", f"v{i}")
+        svg += f'\n  <text x="{ML - 8}" y="{y + bar_h - 9}" text-anchor="end" fill="#e2e8f0" font-size="13" font-weight="600">{ver}</text>'
+
+        # Bar with gradient look (lighter fill)
+        svg += f'\n  <rect x="{ML}" y="{y}" width="{bar_w:.0f}" height="{bar_h}" rx="4" fill="{color}" opacity="0.8"/>'
+
+        # Ratio text
+        svg += f'\n  <text x="{ML + bar_w + 8:.0f}" y="{y + bar_h - 9}" fill="{color}" font-size="13" font-weight="700">{ratio:.2f}x</text>'
+
+        # Dynamic insns on right
+        dyn = m.get("dynamic_insns", 0)
+        svg += f'\n  <text x="{ML + PW + 4}" y="{y + bar_h - 9}" fill="#64748b" font-size="11">{_f(dyn)}</text>'
+
+        # Delta from previous version
+        if i > 0:
+            prev_ratio = milestones[i - 1].get("vs_llvm_ratio", 1)
+            delta = prev_ratio - ratio
+            if delta > 0:
+                delta_str = f"-{delta:.2f}x"
+                delta_color = "#22c55e"
+            else:
+                delta_str = f"+{-delta:.2f}x"
+                delta_color = "#ef4444"
+            svg += f'\n  <text x="{ML + bar_w + 80:.0f}" y="{y + bar_h - 9}" fill="{delta_color}" font-size="11">{delta_str}</text>'
+
+        y += bar_h + gap
+
+    # Progress summary
+    total_reduction = first_ratio - last_ratio
+    pct_done = (first_ratio - last_ratio) / max(first_ratio - 1.0, 0.01) * 100
+    gap_remaining = last_ratio - 1.0
+
+    ly = y + 4
+    svg += f'\n  <text x="{ML}" y="{ly}" fill="#94a3b8" font-size="11">Progress: {first_ratio:.1f}x → {last_ratio:.1f}x ({total_reduction:+.1f}x, {pct_done:.0f}% toward LLVM) · Gap remaining: {gap_remaining:.1f}x</text>'
+
+    svg += '\n</svg>'
+    return svg
+
+
 # ── SVG Operator Bar Chart ──────────────────────────────────────────────
 
 
@@ -232,7 +322,7 @@ def _op_bar_chart(aggregates: dict) -> str:
 # ═══════════════════════════════════════════════════════════════════════
 
 
-def generate(ld=None, single_op_data=None):
+def generate(ld=None, single_op_data=None, history_data=None):
     if ld is None:
         ld = collect()
     ld = ld or {}
@@ -247,7 +337,7 @@ def generate(ld=None, single_op_data=None):
     St = Sd.get("total", 0)
 
     # Static instruction counts
-    Ls = L.get("static_insns", 0)  # may be in comparison data
+    Ls = L.get("static_insns", 0)
     Ss = S.get("static_insns", 0)
 
     R_insn = _ratio(St, Lt)
@@ -256,21 +346,39 @@ def generate(ld=None, single_op_data=None):
     # History
     _update_history({"insn": R_insn, "static": R_static})
 
+    # Load history data for version progress
+    if history_data is None and OPTIMIZATION_HISTORY.exists():
+        try:
+            history_data = json.loads(OPTIMIZATION_HISTORY.read_text())
+        except Exception:
+            history_data = None
+
+    milestones = history_data.get("milestones", []) if history_data else []
+    baseline_dyn = history_data.get("baseline", {}).get("dynamic_insns", 0) if history_data else 0
+
     # ── Build HTML ──
     h = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ScratchV · Dashboard</title><style>{CSS}</style></head><body><div class="wrap">
-<div class="hdr"><h1>ScratchV vs LLVM &nbsp;·&nbsp; cnn.onnx &nbsp;·&nbsp; 3×Conv + 3×MaxPool + 2×FC</h1>
-<div class="sub"><b>LLVM RV64FD (float32)</b> — baseline &nbsp;|&nbsp; <b>ScratchV RV32IM (Q16.16)</b> — target</div></div>
+<div class="hdr"><h1>ScratchV vs LLVM — 追赶 LLVM 进度</h1>
+<div class="sub"><b>LLVM RV64FD (float32)</b> — baseline (target ≤1.0x) &nbsp;|&nbsp; <b>ScratchV RV32IM (Q16.16)</b> — {R_insn} current</div></div>
 
 <div class="grid2">
-<div class="kpi"><div class="v{" g" if _ratio_float(St, Lt) <= 1.5 else (" y" if _ratio_float(St, Lt) <= 4 else " r")}">{R_insn}</div><div class="l">Dynamic Instructions</div><div class="d">LLVM {_f(Lt)} · ScratchV {_f(St)}</div></div>
+<div class="kpi"><div class="v{" g" if _ratio_float(St, Lt) <= 1.5 else (" y" if _ratio_float(St, Lt) <= 4 else " r")}">{R_insn}</div><div class="l">Current Dynamic Ratio</div><div class="d">LLVM {_f(Lt)} · ScratchV {_f(St)}</div></div>
 <div class="kpi"><div class="v y">{R_static}</div><div class="l">Static Instructions</div><div class="d">LLVM {_f(Ls)} · ScratchV {_f(Ss)}</div></div>
 </div>
 {_history_html()}"""
 
-    # ── Section 1: Dynamic Instruction Distribution ──
+    # ── Section 1: Version vs LLVM Progress ──
+    if milestones:
+        h += """
+<div class="sec"><h2>1. Version vs LLVM Progress · 版本追赶进度</h2>
+<div class="sec-sub">Each version's dynamic instruction ratio vs LLVM baseline (1.0x = LLVM). Goal: ≤1.0x (beat LLVM).</div>"""
+        h += _version_progress_chart(milestones, baseline_dyn)
+        h += "</div>"
+
+    # ── Section 2: Dynamic Instruction Distribution ──
     h += """
-<div class="sec"><h2>1. Dynamic Instruction Distribution · 指令粒度</h2>
+<div class="sec"><h2>2. Dynamic Instruction Distribution · 指令粒度</h2>
 <div class="sec-sub">Per-category breakdown — identifies compilation instruction bottlenecks (e.g., excessive loads for address calc, branch overhead)</div><table>
 <tr><th>Category</th><th class="n">LLVM (baseline)</th><th class="n">ScratchV</th><th class="n">ScratchV / LLVM</th></tr>"""
 
@@ -300,9 +408,9 @@ def generate(ld=None, single_op_data=None):
 <div class="note"><b>Biggest bottleneck:</b> {max_ratio_cat[0]} ({max_ratio_cat[1]:.2f}x vs LLVM). "
 Store ratio {_ratio(Sd.get('store', 0), Ld.get('store', 0))}: LLVM keeps accumulators in FP registers (few stores). ScratchV spills to stack every MAC due to limited registers.</div></div>"""
 
-    # ── Section 2: Operator Granularity ──
+    # ── Section 3: Operator Granularity ──
     h += """
-<div class="sec"><h2>2. Operator Comparison · 算子粒度</h2>
+<div class="sec"><h2>3. Operator Comparison · 算子粒度</h2>
 <div class="sec-sub">Per-operator-type dynamic instruction ratio (ScratchV / LLVM) — identifies which operator types have the most optimization headroom</div>"""
 
     # Load single-op benchmark data
@@ -342,6 +450,7 @@ def generate_dashboard_html(json_path="", json_data=None, embed_json=False, titl
     """Backward-compatible entry point called by ci_benchmark.py."""
     ld = None
     single_op_data = None
+    history_data = None
 
     if json_data and isinstance(json_data, dict):
         ld = json_data
@@ -356,7 +465,14 @@ def generate_dashboard_html(json_path="", json_data=None, embed_json=False, titl
         except Exception:
             pass
 
-    return generate(ld, single_op_data)
+    # Load optimization history
+    if OPTIMIZATION_HISTORY.exists():
+        try:
+            history_data = json.loads(OPTIMIZATION_HISTORY.read_text())
+        except Exception:
+            pass
+
+    return generate(ld, single_op_data, history_data)
 
 
 def main():
@@ -365,6 +481,8 @@ def main():
     p.add_argument("--llvm-json", help="Path to llvm_cache_compare JSON output")
     p.add_argument("--single-op-json", default=str(SINGLE_OP_BENCH),
                    help="Path to single_op_bench.json")
+    p.add_argument("--history-json", default=str(OPTIMIZATION_HISTORY),
+                   help="Path to optimization_history.json")
     p.add_argument("-o", "--output", default="benchmark_reports/dashboard.html")
     p.add_argument("--run", action="store_true",
                    help="Auto-collect data via subprocess calls")
@@ -372,6 +490,7 @@ def main():
 
     ld = None
     single_op_data = None
+    history_data = None
 
     if a.llvm_json and os.path.exists(a.llvm_json):
         with open(a.llvm_json) as f:
@@ -383,11 +502,17 @@ def main():
         except Exception:
             pass
 
+    if os.path.exists(a.history_json):
+        try:
+            history_data = json.loads(open(a.history_json).read())
+        except Exception:
+            pass
+
     if a.run or ld is None:
         print("collecting data...", file=sys.stderr)
         ld = collect()
 
-    html = generate(ld, single_op_data)
+    html = generate(ld, single_op_data, history_data)
     os.makedirs(os.path.dirname(a.output) or ".", exist_ok=True)
     with open(a.output, "w") as f:
         f.write(html)

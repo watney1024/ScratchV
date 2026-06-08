@@ -111,12 +111,24 @@ jobs:
             --scratchv-asm benchmark_reports/cnn_scratchv.s \
             || echo "WARNING: tinyfive_compare failed"
 
-      # ── 3.5 生成仪表盘 HTML ──────────────────────────────────────────
+      # ── 3.5 ONNX 模型拆分为单算子 ────────────────────────────────────
+      - name: Split CNN model into single operators
+        run: |
+          python3.12 scripts/split_cnn_to_single_ops.py \
+            || echo "WARNING: split_cnn_to_single_ops failed"
+
+      # ── 3.6 单算子 benchmark ────────────────────────────────────────
+      - name: Single-operator benchmarks
+        run: |
+          python3.12 scripts/bench_single_ops.py \
+            || echo "WARNING: bench_single_ops failed"
+
+      # ── 3.7 生成仪表盘 HTML (版本vsLLVM + 指令分类 + 算子对比) ─────
       - name: Generate dashboard
         run: |
           python3.12 scratchv/ci/dashboard.py \
             --llvm-json benchmark_reports/llvm_vs_scratchv.json \
-            --tinyfive-json benchmark_reports/tinyfive_compare.json \
+            --history-json benchmark_reports/optimization_history.json \
             -o benchmark_reports/dashboard.html \
             || echo "WARNING: dashboard generation failed"
 
