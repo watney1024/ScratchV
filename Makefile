@@ -36,12 +36,6 @@ bench-tinyfive:
 		-o /tmp/cnn_riscv.bin --estimate --tinyfive --tinyfive-max-instr 200000
 	@echo "TinyFive simulation complete."
 
-# ── 优化历史页面 (GitHub Pages) ──────────────────────────────────────────
-
-bench-history:
-	python3 scratchv/ci/history_page.py -o benchmark_reports/history.html
-	@echo "History page: benchmark_reports/history.html"
-
 # ── CI Benchmark (LLVM + TinyFive + 可视化仪表盘) ──────────────────────────
 
 bench-ci:
@@ -58,6 +52,35 @@ bench-ci:
 	@echo "Dashboard: benchmark_reports/dashboard.html"
 	@echo "JSON data: benchmark_reports/ci_data.json"
 	@echo "GitHub summary: benchmark_reports/github_summary.md"
+
+# ── ONNX 模型拆分 ────────────────────────────────────────────────────────
+
+split-models:
+	python3 scripts/split_cnn_to_single_ops.py
+	@echo "Single-op models: models/single_op/"
+
+# ── 单算子 Benchmark ─────────────────────────────────────────────────────
+
+bench-single-ops: split-models
+	python3 scripts/bench_single_ops.py
+	@echo "Single-op benchmark: benchmark_reports/single_op_bench.json"
+
+# ── Dashboard (仅指令集维度 + 算子粒度) ──────────────────────────────────
+
+bench-dashboard:
+	python3 scratchv/ci/dashboard.py --run -o benchmark_reports/dashboard.html
+	@echo "Dashboard: benchmark_reports/dashboard.html"
+
+# ── 优化历史页面 ─────────────────────────────────────────────────────────
+
+bench-history:
+	python3 scratchv/ci/history_page.py -o benchmark_reports/history.html
+	@echo "History page: benchmark_reports/history.html"
+
+# ── 全量报告 (dashboard + history) ───────────────────────────────────────
+
+bench-reports: bench-dashboard bench-history
+	@echo "All reports generated in benchmark_reports/"
 
 # ── Clean ─────────────────────────────────────────────────────────────────
 

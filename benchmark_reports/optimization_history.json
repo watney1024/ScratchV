@@ -25,7 +25,44 @@
       "vs_llvm_ratio": 7.37,
       "time_100mhz_s": 78.0,
       "per_mac_insns": 30,
-      "tag": "baseline"
+      "tag": "baseline",
+      "instruction_breakdown": {
+        "static_insns": 785,
+        "dynamic_insns": 7802187284,
+        "categories": {
+          "alu_r": 2494913893,
+          "alu_i": 2474639598,
+          "shift": 684718265,
+          "load": 1417287924,
+          "store": 18332219,
+          "branch": 712295383,
+          "jump": 0,
+          "upper": 0,
+          "fp": 0
+        },
+        "per_operator": {
+          "conv": {
+            "dynamic_insns": 5463470179,
+            "ratio": 3.07
+          },
+          "gemm": {
+            "dynamic_insns": 277347034,
+            "ratio": 6.19
+          },
+          "maxpool": {
+            "dynamic_insns": 85655275,
+            "ratio": 10.73
+          },
+          "relu": {
+            "dynamic_insns": 57267031,
+            "ratio": 5.37
+          },
+          "sigmoid": {
+            "dynamic_insns": 53,
+            "ratio": 2.15
+          }
+        }
+      }
     },
     {
       "date": "2026-06-05",
@@ -43,7 +80,44 @@
       "vs_llvm_ratio": 3.04,
       "time_100mhz_s": 32.2,
       "per_mac_insns": 12,
-      "tag": "optimized"
+      "tag": "optimized",
+      "instruction_breakdown": {
+        "static_insns": 749,
+        "dynamic_insns": 3221687828,
+        "categories": {
+          "alu_r": 1030202612,
+          "alu_i": 1021830927,
+          "shift": 282734625,
+          "load": 585228102,
+          "store": 7569760,
+          "branch": 294121799,
+          "jump": 0,
+          "upper": 0,
+          "fp": 0
+        },
+        "per_operator": {
+          "conv": {
+            "dynamic_insns": 2255982166,
+            "ratio": 1.27
+          },
+          "gemm": {
+            "dynamic_insns": 114522445,
+            "ratio": 2.56
+          },
+          "maxpool": {
+            "dynamic_insns": 35368871,
+            "ratio": 4.43
+          },
+          "relu": {
+            "dynamic_insns": 23646766,
+            "ratio": 2.22
+          },
+          "sigmoid": {
+            "dynamic_insns": 22,
+            "ratio": 0.89
+          }
+        }
+      }
     },
     {
       "date": "2026-06-08",
@@ -60,7 +134,44 @@
       "vs_llvm_ratio": 2.08,
       "time_100mhz_s": 22.0,
       "per_mac_insns": 8,
-      "tag": "optimized"
+      "tag": "optimized",
+      "instruction_breakdown": {
+        "static_insns": 887,
+        "dynamic_insns": 2203799060,
+        "categories": {
+          "alu_r": 704711216,
+          "alu_i": 698984556,
+          "shift": 193404927,
+          "load": 400325919,
+          "store": 5178102,
+          "branch": 201194336,
+          "jump": 0,
+          "upper": 0,
+          "fp": 0
+        },
+        "per_operator": {
+          "conv": {
+            "dynamic_insns": 1543207053,
+            "ratio": 0.87
+          },
+          "gemm": {
+            "dynamic_insns": 78339203,
+            "ratio": 1.75
+          },
+          "maxpool": {
+            "dynamic_insns": 24194114,
+            "ratio": 3.03
+          },
+          "relu": {
+            "dynamic_insns": 16175596,
+            "ratio": 1.52
+          },
+          "sigmoid": {
+            "dynamic_insns": 15,
+            "ratio": 0.61
+          }
+        }
+      }
     }
   ]
 }
