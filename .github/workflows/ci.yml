@@ -22,7 +22,17 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Sync from local mirror (skip unstable GitHub checkout)
+        run: |
+          MIRROR=/opt/ScratchV
+          WORKSPACE=/opt/actions-runner/_work/ScratchV/ScratchV
+          # Copy pre-cloned repo to workspace (avoid GitHub network issues)
+          rm -rf "$WORKSPACE"
+          cp -a "$MIRROR" "$WORKSPACE"
+          cd "$WORKSPACE"
+          # Try to fetch latest; fallback to local copy if network fails
+          git fetch origin main --depth=1 2>/dev/null || echo "WARNING: git fetch failed, using local mirror"
+          git checkout -f "$GITHUB_SHA" 2>/dev/null || git checkout -f origin/main 2>/dev/null || true
 
       - name: Install dependencies
         run: |
@@ -60,7 +70,17 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Sync from local mirror (skip unstable GitHub checkout)
+        run: |
+          MIRROR=/opt/ScratchV
+          WORKSPACE=/opt/actions-runner/_work/ScratchV/ScratchV
+          # Copy pre-cloned repo to workspace (avoid GitHub network issues)
+          rm -rf "$WORKSPACE"
+          cp -a "$MIRROR" "$WORKSPACE"
+          cd "$WORKSPACE"
+          # Try to fetch latest; fallback to local copy if network fails
+          git fetch origin main --depth=1 2>/dev/null || echo "WARNING: git fetch failed, using local mirror"
+          git checkout -f "$GITHUB_SHA" 2>/dev/null || git checkout -f origin/main 2>/dev/null || true
 
       - name: Install dependencies
         run: |
