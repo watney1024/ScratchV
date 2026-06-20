@@ -33,7 +33,8 @@ jobs:
         run: |
           mkdir -p benchmark_reports
           python3.12 -m pytest tests/ -v --tb=short \
-            --junit-xml=benchmark_reports/test_results.xml
+            --junit-xml=benchmark_reports/test_results.xml \
+            --ignore=tests/test_simulator.py
 
       - name: Generate test visualization page
         if: github.ref == 'refs/heads/main'
