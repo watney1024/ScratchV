@@ -6,8 +6,11 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/ScratchV-Compiler/ScratchV/actions/workflows/ci.yml/badge.svg)](https://github.com/ScratchV-Compiler/ScratchV/actions)
 [![Docs](https://img.shields.io/badge/docs-课程站点-blue)](https://scratchv-compiler.github.io/ScratchV/docs/)
+[![Poster](https://img.shields.io/badge/📢-项目海报-orange)](docs/ScratchV.html)
 
 ---
+
+> 📢 **[查看项目海报](docs/ScratchV.html)** — 了解项目招募信息、3个月学习路线、课题精选
 
 ## 🚀 我是新手，从哪开始？
 
@@ -101,6 +104,7 @@ ONNX 模型 (.onnx)
 | [📖 文档导航](docs/INDEX.md) | 全部 Markdown 文档索引 |
 | [🏗️ 架构总览](docs/ARCHITECTURE.md) | ONNX→RISC-V 双路径详解 |
 | [📊 性能仪表盘](https://scratchv-compiler.github.io/ScratchV/dashboard.html) | LLVM vs ScratchV 对比 |
+| [📢 项目海报](docs/ScratchV.html) | 招募信息 + 3个月学习路线 + 课题精选 |
 
 ---
 
