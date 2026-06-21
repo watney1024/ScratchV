@@ -437,22 +437,22 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-28">Topic 28 — 完善后端指令选择（扩展）</h1>
+      <h1>Topic 28 — 完善后端指令选择（扩展）</h1>
 <blockquote>
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/backend/inst_select_ext.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>扩展指令选择器（<code>inst_select_ext.py</code>）在基础 <code>InstructionSelector</code> 之上增加了更多 RISC-V 操作的支持：平方根、绝对值、分支无 min/max、float64（D 扩展）等。</p>
 <hr />
-<h2 id="_2">为什么？</h2>
-<p>基础指令选择器覆盖了 RV32IM 的核心指令。但实际应用需要：<br />
-- <strong>数学函数</strong>: <code>sqrt</code>, <code>abs</code>（某些激活函数需要）<br />
-- <strong>float64</strong>: 双精度浮点（TensorFlow 模型可能用 float64）<br />
+<h2 id="为什么">为什么？
+<p>基础指令选择器覆盖了 RV32IM 的核心指令。但实际应用需要：
+- <strong>数学函数</strong>: <code>sqrt</code>, <code>abs</code>（某些激活函数需要）
+- <strong>float64</strong>: 双精度浮点（TensorFlow 模型可能用 float64）
 - <strong>更多优化</strong>: <code>min</code>/<code>max</code> 的分支无实现</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">新增操作</h3>
+<h2 id="核心概念">核心概念
+<h3 id="新增操作">新增操作
 <table>
 <thead>
 <tr>
@@ -489,7 +489,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="min">分支无 min 实现</h3>
+<h3 id="分支无-min-实现">分支无 min 实现
 <div class="codehilite"><pre><span></span><code><span class="nf">slt</span><span class="w"> </span><span class="no">tmp</span><span class="p">,</span><span class="w"> </span><span class="no">a</span><span class="p">,</span><span class="w"> </span><span class="no">b</span><span class="w">       </span><span class="c1"># tmp = (a &lt; b) ? 1 : 0</span>
 <span class="nf">sub</span><span class="w"> </span><span class="no">diff</span><span class="p">,</span><span class="w"> </span><span class="no">b</span><span class="p">,</span><span class="w"> </span><span class="no">a</span><span class="w">      </span><span class="c1"># diff = b - a</span>
 <span class="nf">and</span><span class="w"> </span><span class="no">tmp</span><span class="p">,</span><span class="w"> </span><span class="no">tmp</span><span class="p">,</span><span class="w"> </span><span class="no">diff</span><span class="w">  </span><span class="c1"># mask = tmp &amp; diff</span>
@@ -497,7 +497,7 @@ body {
 </code></pre></div>
 
 <p>原理：如果 <code>a &lt; b</code>，<code>mask = b - a</code>，<code>dst = a + (b - a) = b</code>。如果 <code>a &gt;= b</code>，<code>mask = 0</code>，<code>dst = a</code>。</p>
-<h3 id="float64d">Float64（D 扩展）</h3>
+<h3 id="Float64D-扩展">Float64（D 扩展）
 <p>当 <code>enable_fp64=True</code>，自动对 float64 类型使用 D 扩展指令：</p>
 <table>
 <thead>
@@ -529,10 +529,10 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="machineop20">新增 MachineOp（20+ 个）</h3>
+<h3 id="新增-MachineOp20-个">新增 MachineOp（20+ 个）
 <p><code>SQRT_S, SQRT_D, FMIN_D, FMAX_D, FABS_D, FNEG_D, FADD_D, FSUB_D, FMUL_D, FDIV_D, FLT_D, FEQ_D, FCVT_S_D, FCVT_D_S, FLD, FSD, SRAI, XOR, AND, SLT, REM</code></p>
 <hr />
-<h2 id="_5">一步步</h2>
+<h2 id="一步步">一步步
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.inst_select_ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtendedInstructionSelector</span>
 
 <span class="c1"># 启用 float64</span>
@@ -545,8 +545,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_6">代码走读</h2>
-<h3 id="abs">分支无 abs</h3>
+<h2 id="代码走读">代码走读
+<h3 id="分支无-abs">分支无 abs
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_select_abs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instr</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;abs(x) = (x ^ (x &gt;&gt; 31)) - (x &gt;&gt; 31)&quot;&quot;&quot;</span>
     <span class="c1"># srai 31: 提取符号位（全0=正，全1=负）</span>
@@ -559,7 +559,7 @@ body {
     <span class="p">]</span>
 </code></pre></div>
 
-<h3 id="_7">类型驱动的指令选择</h3>
+<h3 id="类型驱动的指令选择">类型驱动的指令选择
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_select_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instr</span><span class="p">):</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">instr</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">instr</span><span class="o">.</span><span class="n">dest</span> <span class="k">else</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT32</span>
     <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT64</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_fp64</span><span class="p">:</span>
@@ -571,13 +571,13 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_8">动手练习</h2>
-<h3 id="1-fneg">练习 1: 添加 <code>fneg</code> 支持</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-添加-codefnegcode-支持">练习 1: 添加 <code>fneg</code> 支持
 <p><code>fneg.s rd, rs</code> = <code>fsgnjn.s rd, rs, rs</code>（RISC-V 无单独的 fneg 指令，用符号注入模拟）。</p>
-<h3 id="2-float64">练习 2: 测试 float64 路径</h3>
+<h3 id="练习-2-测试-float64-路径">练习 2: 测试 float64 路径
 <p>写一个含有 float64 运算的 IR，用 <code>ExtendedInstructionSelector</code> 生成代码，对比和基础选择器的差异。</p>
 <hr />
-<h2 id="_9">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -601,7 +601,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="_10">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li>RISC-V F/D 扩展规范：<a href="https://github.com/riscv/riscv-isa-manual" target="_blank" rel="noopener">RISC-V ISA Manual Vol. 1, Ch. 11-12</a></li>
 <li>分支无编程技巧：<a href="https://graphics.stanford.edu/~seander/bithacks.html" target="_blank" rel="noopener">Bit Twiddling Hacks</a></li>

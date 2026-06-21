@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-12-risc-v">Topic 12 — RISC-V 后端指令计数统计器</h1>
+      <h1>Topic 12 — RISC-V 后端指令计数统计器</h1>
 <blockquote>
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/backend/inst_counter.py</code> | <strong>行数</strong>: ~608</p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>指令计数统计器（<code>inst_counter.py</code>）解析 RISC-V 汇编文件，按<strong>类别</strong>统计指令数量，并生成文本表格、matplotlib 图表和 HTML 报告。</p>
 <p>统计类别：</p>
 <table>
@@ -487,7 +487,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <p>编译器优化的核心指标之一就是<strong>指令数</strong>。你需要知道：</p>
 <ol>
 <li><strong>各类指令占比</strong>：ALU 多 = 计算密集，MEM 多 = 数据密集</li>
@@ -496,8 +496,8 @@ body {
 </ol>
 <p>没有这个工具，你只能手动数——费时还容易出错。</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="1">1. 指令分类字典</h3>
+<h2 id="核心概念">核心概念
+<h3 id="指令分类字典">1. 指令分类字典
 <div class="codehilite"><pre><span></span><code><span class="n">_OPCODE_CATEGORIES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="s2">&quot;ALU&quot;</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="s2">&quot;ALU&quot;</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">:</span> <span class="s2">&quot;ALU&quot;</span><span class="p">,</span> <span class="o">...</span>
     <span class="s2">&quot;lw&quot;</span><span class="p">:</span> <span class="s2">&quot;MEM&quot;</span><span class="p">,</span> <span class="s2">&quot;sw&quot;</span><span class="p">:</span> <span class="s2">&quot;MEM&quot;</span><span class="p">,</span> <span class="o">...</span>
@@ -508,7 +508,7 @@ body {
 </code></pre></div>
 
 <p>每条 RISC-V 操作码（opcode）映射到一个类别。</p>
-<h3 id="2">2. 三类输出格式</h3>
+<h3 id="三类输出格式">2. 三类输出格式
 <table>
 <thead>
 <tr>
@@ -535,7 +535,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="3">3. 多文件对比</h3>
+<h3 id="多文件对比">3. 多文件对比
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.inst_counter</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare_files</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">compare_files</span><span class="p">([</span><span class="s2">&quot;scratchv_output.s&quot;</span><span class="p">,</span> <span class="s2">&quot;llvm_output.s&quot;</span><span class="p">])</span>
@@ -543,8 +543,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1">Step 1: 统计单个文件</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-统计单个文件">Step 1: 统计单个文件
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.inst_counter</span><span class="w"> </span><span class="kn">import</span> <span class="n">count_instructions_file</span><span class="p">,</span> <span class="n">format_table</span>
 
 <span class="n">counts</span> <span class="o">=</span> <span class="n">count_instructions_file</span><span class="p">(</span><span class="s2">&quot;output.s&quot;</span><span class="p">)</span>
@@ -567,7 +567,7 @@ MISC              24       3.2% #
 TOTAL            749
 </code></pre></div>
 
-<h3 id="step-2-html">Step 2: 生成图表和 HTML 报告</h3>
+<h3 id="Step-2-生成图表和-HTML-报告">Step 2: 生成图表和 HTML 报告
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.inst_counter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">count_instructions_file</span><span class="p">,</span> <span class="n">generate_chart</span><span class="p">,</span> <span class="n">generate_html_report</span>
 <span class="p">)</span>
@@ -577,7 +577,7 @@ TOTAL            749
 <span class="n">generate_html_report</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="s2">&quot;inst_report.html&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CNN Model Instructions&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="step-3">Step 3: 命令行使用</h3>
+<h3 id="Step-3-命令行使用">Step 3: 命令行使用
 <div class="codehilite"><pre><span></span><code><span class="c1"># 统计单个文件</span>
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_counter<span class="w"> </span>output.s
 
@@ -591,7 +591,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_co
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_counter<span class="w"> </span>scratchv.s<span class="w"> </span>llvm.s<span class="w"> </span>--compare
 </code></pre></div>
 
-<h3 id="step-4-scratchv-vs-llvm">Step 4: 对比 ScratchV vs LLVM</h3>
+<h3 id="Step-4-对比-ScratchV-vs-LLVM">Step 4: 对比 ScratchV vs LLVM
 <div class="codehilite"><pre><span></span><code><span class="c1"># 生成两份汇编</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--asm<span class="w"> </span>scratchv.s
@@ -603,8 +603,8 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_co
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="_6">指令提取</h3>
+<h2 id="代码走读">代码走读
+<h3 id="指令提取">指令提取
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_extract_opcode</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">stripped</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="c1"># 跳过空行和注释</span>
@@ -624,12 +624,12 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_co
     <span class="k">return</span> <span class="n">first</span>
 </code></pre></div>
 
-<h3 id="_7">分类逻辑</h3>
+<h3 id="分类逻辑">分类逻辑
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_classify_opcode</span><span class="p">(</span><span class="n">opcode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">_OPCODE_CATEGORIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opcode</span><span class="p">,</span> <span class="s2">&quot;MISC&quot;</span><span class="p">)</span>  <span class="c1"># 未知 → MISC</span>
 </code></pre></div>
 
-<h3 id="_8">对比功能</h3>
+<h3 id="对比功能">对比功能
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compare_files</span><span class="p">(</span><span class="n">filepaths</span><span class="p">):</span>
     <span class="c1"># 以第一个文件为 baseline</span>
     <span class="n">baseline</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
@@ -641,15 +641,15 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_co
 </code></pre></div>
 
 <hr />
-<h2 id="_9">动手练习</h2>
-<h3 id="1-cnn">练习 1: 分析 CNN 模型的指令分布</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-分析-CNN-模型的指令分布">练习 1: 分析 CNN 模型的指令分布
 <p>用 <code>make bench-cnn</code> 生成汇编，统计各类指令占比。哪类最多？为什么？</p>
-<h3 id="2_1">练习 2: 优化前后对比</h3>
+<h3 id="练习-2-优化前后对比">练习 2: 优化前后对比
 <p>对同一段代码，分别统计优化前和优化后的指令分布，计算减少了多少条、哪些类别变化最大。</p>
-<h3 id="3_1">练习 3: 添加新的指令分类</h3>
+<h3 id="练习-3-添加新的指令分类">练习 3: 添加新的指令分类
 <p>在 <code>_OPCODE_CATEGORIES</code> 中添加 RISC-V F/D 扩展（浮点）指令的映射。</p>
 <hr />
-<h2 id="_10">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -677,7 +677,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_co
 </tbody>
 </table>
 <hr />
-<h2 id="_11">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读指令分布数据指导优化</li>
 <li>RISC-V 指令集手册：<a href="https://github.com/riscv/riscv-isa-manual/releases" target="_blank" rel="noopener">Volume 1: Unprivileged ISA</a></li>

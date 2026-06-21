@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-27-rv32-benchmark">Topic 27 — RV32 全量 Benchmark</h1>
+      <h1>Topic 27 — RV32 全量 Benchmark</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/standalone/rv32_bench.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>RV32 全量 Benchmark（<code>rv32_bench.py</code>）将 ScratchV 和 LLVM <strong>统一到 RV32IMF 目标</strong>进行公平对比。流程：</p>
 <div class="codehilite"><pre><span></span><code>ONNX 模型
     │
@@ -457,15 +457,15 @@ body {
 
 <p>与 <code>llvm_cache_compare.py</code> 的不同：这里<strong>两边都通过 TinyFive 真实执行</strong>，零分析估算——所有指标都来自 TinyFive 的 ops 计数器。</p>
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <ul>
 <li><strong>公平对比</strong>：之前的对比是 "RV32IM Q16.16 vs RV64FD float32"——ISA 不同、数值格式不同。这里统一到<strong>同一个 RV32IMF 目标</strong></li>
 <li><strong>零估算</strong>：所有指标来自 TinyFive 真实仿真，不是分析公式</li>
 <li><strong>发现真实差距</strong>：消除 ISA 差异后，ScratchV 和 LLVM 的差距到底有多大？</li>
 </ul>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">四步流水线</h3>
+<h2 id="核心概念">核心概念
+<h3 id="四步流水线">四步流水线
 <table>
 <thead>
 <tr>
@@ -497,22 +497,22 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="tinyfive-ops">TinyFive ops 计数器</h3>
-<p>TinyFive 的 <code>ProfiledMachine</code> 提供精确的指令分类：<br />
-- <code>total</code>: 总执行指令数<br />
-- <code>load</code>: 内存读次数<br />
-- <code>store</code>: 内存写次数<br />
-- <code>mul</code>: 乘法指令次数<br />
-- <code>add</code>: 加法/ALU 指令次数<br />
-- <code>madd</code>: 融合乘加次数（RV32IMF 的 <code>fmadd.s</code>）<br />
+<h3 id="TinyFive-ops-计数器">TinyFive ops 计数器
+<p>TinyFive 的 <code>ProfiledMachine</code> 提供精确的指令分类：
+- <code>total</code>: 总执行指令数
+- <code>load</code>: 内存读次数
+- <code>store</code>: 内存写次数
+- <code>mul</code>: 乘法指令次数
+- <code>add</code>: 加法/ALU 指令次数
+- <code>madd</code>: 融合乘加次数（RV32IMF 的 <code>fmadd.s</code>）
 - <code>branch</code>: 分支/跳转次数</p>
-<h3 id="_5">统一对比的意义</h3>
-<p>在相同 ISA 下对比，差距主要来自：<br />
-1. <strong>数值格式</strong>：Q16.16 定点 vs float32（~12 vs ~2 指令/MAC）<br />
-2. <strong>代码生成质量</strong>：手工内联循环 vs LLVM 的循环结构<br />
+<h3 id="统一对比的意义">统一对比的意义
+<p>在相同 ISA 下对比，差距主要来自：
+1. <strong>数值格式</strong>：Q16.16 定点 vs float32（~12 vs ~2 指令/MAC）
+2. <strong>代码生成质量</strong>：手工内联循环 vs LLVM 的循环结构
 3. <strong>地址计算</strong>：手动 MUL+ADD vs GEP</p>
 <hr />
-<h2 id="_6">一步步</h2>
+<h2 id="一步步">一步步
 <div class="codehilite"><pre><span></span><code><span class="c1"># 运行全量 RV32 Benchmark</span>
 python<span class="w"> </span>scratchv/standalone/rv32_bench.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--output-dir<span class="w"> </span>benchmark_reports/<span class="w"> </span><span class="se">\</span>
@@ -523,7 +523,7 @@ python<span class="w"> </span>scratchv/standalone/rv32_bench.py<span class="w"> 
 cat<span class="w"> </span>benchmark_reports/report.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>json.tool<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-50
 </code></pre></div>
 
-<h3 id="python-api">Python API</h3>
+<h3 id="Python-API">Python API
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.standalone.rv32_bench</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_scratchv</span><span class="p">,</span> <span class="n">compile_llvm_rv32</span>
 
 <span class="c1"># 编译 ScratchV</span>
@@ -544,8 +544,8 @@ cat<span class="w"> </span>benchmark_reports/report.json<span class="w"> </span>
 </code></pre></div>
 
 <hr />
-<h2 id="_7">代码走读</h2>
-<h3 id="scratchv">ScratchV 编译</h3>
+<h2 id="代码走读">代码走读
+<h3 id="ScratchV-编译">ScratchV 编译
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compile_scratchv</span><span class="p">(</span><span class="n">onnx_path</span><span class="p">,</span> <span class="n">output_bin</span><span class="p">,</span> <span class="n">output_asm</span><span class="p">):</span>
     <span class="n">rc</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">_run_py</span><span class="p">([</span>
         <span class="s2">&quot;scratchv/standalone/onnx_to_riscv_standalone.py&quot;</span><span class="p">,</span>
@@ -561,7 +561,7 @@ cat<span class="w"> </span>benchmark_reports/report.json<span class="w"> </span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;code_size&quot;</span><span class="p">:</span> <span class="n">code_size</span><span class="p">,</span> <span class="s2">&quot;static_insns&quot;</span><span class="p">:</span> <span class="n">static_insns</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
 </code></pre></div>
 
-<h3 id="llvm-rv32imf-llvmlite">LLVM RV32IMF 编译（通过 llvmlite）</h3>
+<h3 id="LLVM-RV32IMF-编译通过-llvmlite">LLVM RV32IMF 编译（通过 llvmlite）
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compile_llvm_rv32</span><span class="p">(</span><span class="n">onnx_path</span><span class="p">,</span> <span class="n">output_asm</span><span class="p">):</span>
     <span class="c1"># 1. 生成 LLVM IR</span>
     <span class="n">_run_py</span><span class="p">([</span><span class="s2">&quot;scratchv/standalone/onnx_to_llvm_standalone.py&quot;</span><span class="p">,</span>
@@ -583,15 +583,15 @@ cat<span class="w"> </span>benchmark_reports/report.json<span class="w"> </span>
 </code></pre></div>
 
 <hr />
-<h2 id="_8">动手练习</h2>
-<h3 id="1">练习 1: 运行统一对比</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-运行统一对比">练习 1: 运行统一对比
 <p>运行 <code>rv32_bench.py</code>，对比同一 ISA 下 ScratchV 和 LLVM 的指令数差距。</p>
-<h3 id="2">练习 2: 分析差距来源</h3>
+<h3 id="练习-2-分析差距来源">练习 2: 分析差距来源
 <p>从 TinyFive ops 统计中找出 ScratchV 的 <code>mul</code>/<code>add</code>/<code>load</code> 分别比 LLVM 多多少，定位最大瓶颈。</p>
-<h3 id="3-llvm">练习 3: 调整 LLVM 优化级别</h3>
+<h3 id="练习-3-调整-LLVM-优化级别">练习 3: 调整 LLVM 优化级别
 <p>把 <code>--opt-level</code> 从 2 改为 0 和 3，对比不同优化级别下 LLVM 的指令数变化。</p>
 <hr />
-<h2 id="_9">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -615,7 +615,7 @@ cat<span class="w"> </span>benchmark_reports/report.json<span class="w"> </span>
 </tbody>
 </table>
 <hr />
-<h2 id="_10">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — 双路径架构</li>
 <li><a href="https://llvmlite.readthedocs.io/" target="_blank" rel="noopener">llvmlite 文档</a></li>

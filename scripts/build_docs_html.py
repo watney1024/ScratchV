@@ -785,13 +785,27 @@ def md_to_html(md_text: str) -> str:
             "fenced_code",
             "tables",
             "codehilite",
-            "toc",
-            "nl2br",
         ],
     )
 
     # Post-process: add target="_blank" to external links
     html = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', html)
+
+    # Post-process: add id attributes to headings that lack them
+    # Generate URL-safe slugs from heading text for deep-linking
+    def _add_heading_id(m: re.Match) -> str:
+        tag = m.group(1)
+        text = m.group(2)
+        # Generate slug: keep Chinese chars URL-encoded, ASCII as-is
+        slug = text.strip()
+        # Remove numbering prefix like "1. " or "2. "
+        slug = re.sub(r'^\d+\.\s*', '', slug)
+        # Replace spaces with hyphens, remove most punctuation
+        slug = re.sub(r'[^\w一-鿿\s-]', '', slug)
+        slug = re.sub(r'\s+', '-', slug)
+        return f'<{tag} id="{slug}">{text}'
+
+    html = re.sub(r'<(h[234])>(.*?)</\1>', _add_heading_id, html)
 
     # Fix internal .md links → correct .html using the COURSE mapping
     # Also clean up the link text (remove .md extension from display text)

@@ -437,21 +437,21 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-19-standalone-risc-v">Topic 19 — Standalone RISC-V 编译器</h1>
+      <h1>Topic 19 — Standalone RISC-V 编译器</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/standalone/onnx_to_riscv_standalone.py</code> | <strong>行数</strong>: ~2800</p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>Standalone RISC-V 编译器是 ScratchV 的<strong>核心产物</strong>——一个完全自包含的 ONNX→RISC-V 编译器，零外部依赖（只用 Python 标准库）。</p>
-<p>它手工实现了：<br />
-- <strong>Protobuf 解析器</strong>（不需 <code>protobuf</code> 包）<br />
-- <strong>ONNX 模型加载</strong>（不需 <code>onnx</code> 包）<br />
-- <strong>内存规划 + Q16.16 定点转换</strong><br />
-- <strong>CNN 算子 RISC-V 代码生成</strong>（内联循环）<br />
+<p>它手工实现了：
+- <strong>Protobuf 解析器</strong>（不需 <code>protobuf</code> 包）
+- <strong>ONNX 模型加载</strong>（不需 <code>onnx</code> 包）
+- <strong>内存规划 + Q16.16 定点转换</strong>
+- <strong>CNN 算子 RISC-V 代码生成</strong>（内联循环）
 - <strong>RV32IM 指令编码</strong>（两遍扫描 + label fixup）</p>
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <p>为什么要"重新发明轮子"而不是直接用 <code>onnx</code> 包 + <code>llvmlite</code>？</p>
 <ol>
 <li><strong>零依赖 = 零门槛</strong>：任何装了 Python 3 的机器都能跑</li>
@@ -460,8 +460,8 @@ body {
 <li><strong>RV32IM 定点优化</strong>：LLVM 不支持 Q16.16 定点运算，必须自己实现</li>
 </ol>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="1">1. 五大组件</h3>
+<h2 id="核心概念">核心概念
+<h3 id="五大组件">1. 五大组件
 <div class="codehilite"><pre><span></span><code><span class="n">onnx_to_riscv_standalone</span><span class="p">.</span><span class="n">py</span>
 <span class="err">├──</span><span class="w"> </span><span class="n">ProtoReader</span><span class="w">          </span><span class="err">←</span><span class="w"> </span><span class="err">手工</span><span class="w"> </span><span class="n">protobuf</span><span class="w"> </span><span class="kt">wire</span><span class="o">-</span><span class="n">format</span><span class="w"> </span><span class="err">解析器</span>
 <span class="err">├──</span><span class="w"> </span><span class="n">ONNXModel</span><span class="w">            </span><span class="err">←</span><span class="w"> </span><span class="err">提取计算图、权重、形状</span>
@@ -470,7 +470,7 @@ body {
 <span class="err">└──</span><span class="w"> </span><span class="n">RISCVEmitter</span><span class="w">         </span><span class="err">←</span><span class="w"> </span><span class="n">RV32IM</span><span class="w"> </span><span class="err">指令编码</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="n">fixup</span>
 </code></pre></div>
 
-<h3 id="2-q1616">2. Q16.16 定点运算</h3>
+<h3 id="Q1616-定点运算">2. Q16.16 定点运算
 <div class="codehilite"><pre><span></span><code><span class="mf">32</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">整数的高</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="n">位</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">整数部分</span>
 <span class="mf">32</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">整数的低</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="n">位</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">小数部分</span>
 
@@ -479,7 +479,7 @@ body {
 <span class="n">Q16</span><span class="mf">.16</span><span class="w"> </span><span class="n">加法</span><span class="p">:</span><span class="w"> </span><span class="n">ADD</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="p">(</span><span class="n">直接加</span><span class="err">，</span><span class="n">小数点已对齐</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="3-conv2d">3. Conv2D 代码生成</h3>
+<h3 id="Conv2D-代码生成">3. Conv2D 代码生成
 <p>6 层嵌套循环的 RISC-V 内联代码：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="n">oh</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mf">0.</span><span class="p">.</span><span class="nl">OH</span><span class="p">:</span><span class="w">           </span><span class="err">←</span><span class="w"> </span><span class="n">输出高度</span>
 <span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="n">ow</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="mf">0.</span><span class="p">.</span><span class="nl">OW</span><span class="p">:</span><span class="w">         </span><span class="err">←</span><span class="w"> </span><span class="n">输出宽度</span>
@@ -494,8 +494,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1-cnn">Step 1: 编译 CNN 模型</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-编译-CNN-模型">Step 1: 编译 CNN 模型
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>output.bin<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--asm<span class="w"> </span>output.s<span class="w"> </span><span class="se">\</span>
@@ -503,21 +503,21 @@ body {
 <span class="w">    </span>--report
 </code></pre></div>
 
-<h3 id="step-2">Step 2: 只用估算，不仿真</h3>
+<h3 id="Step-2-只用估算不仿真">Step 2: 只用估算，不仿真
 <div class="codehilite"><pre><span></span><code><span class="c1"># --estimate: 瞬间完成，给出动态指令估算</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>output.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
 </code></pre></div>
 
-<h3 id="step-3-tinyfive">Step 3: 使用 TinyFive 仿真验证</h3>
+<h3 id="Step-3-使用-TinyFive-仿真验证">Step 3: 使用 TinyFive 仿真验证
 <div class="codehilite"><pre><span></span><code><span class="c1"># --tinyfive: 用 TinyFive 仿真器实际执行（慢但准确）</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>output.bin<span class="w"> </span>--tinyfive<span class="w"> </span>--tinyfive-max-instr<span class="w"> </span><span class="m">200000</span>
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="protoreader-protobuf">ProtoReader — 手工 Protobuf 解析</h3>
+<h2 id="代码走读">代码走读
+<h3 id="ProtoReader-手工-Protobuf-解析">ProtoReader — 手工 Protobuf 解析
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ProtoReader</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">read_varint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;读取 varint 编码的无符号整数&quot;&quot;&quot;</span>
@@ -540,7 +540,7 @@ python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<sp
         <span class="c1"># ... 根据 wire_type 读取不同格式的数据 ...</span>
 </code></pre></div>
 
-<h3 id="cnnriscvgenerator-conv2d">CNNRISCVGenerator — Conv2D 代码生成</h3>
+<h3 id="CNNRISCVGenerator-Conv2D-代码生成">CNNRISCVGenerator — Conv2D 代码生成
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CNNRISCVGenerator</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_gen_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">memory_plan</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;生成 Conv2D 的 RISC-V 内联代码&quot;&quot;&quot;</span>
@@ -565,21 +565,21 @@ python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<sp
                     <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;sw&quot;</span><span class="p">,</span> <span class="n">acc_reg</span><span class="p">,</span> <span class="n">out_ptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="riscvemitter">RISCVEmitter — 两遍扫描</h3>
+<h3 id="RISCVEmitter-两遍扫描">RISCVEmitter — 两遍扫描
 <div class="codehilite"><pre><span></span><code>第一遍：emit 所有指令，记录每个 label 的位置
 第二遍：回填分支/跳转指令的偏移量（label 位置已知了）
 </code></pre></div>
 
 <hr />
-<h2 id="_6">动手练习</h2>
-<h3 id="1-onnx">练习 1: 编译一个简单 ONNX 模型</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-编译一个简单-ONNX-模型">练习 1: 编译一个简单 ONNX 模型
 <p>用 <code>make bench-cnn</code> 编译 CNN 模型，阅读生成的报告和汇编。</p>
-<h3 id="2">练习 2: 分析生成的汇编</h3>
+<h3 id="练习-2-分析生成的汇编">练习 2: 分析生成的汇编
 <p>打开 <code>output.s</code>，找到 Conv2D 最内层循环的指令序列。数一数每个 MAC（乘加）需要多少条指令。</p>
-<h3 id="3-q1616">练习 3: 修改 Q16.16 精度</h3>
+<h3 id="练习-3-修改-Q1616-精度">练习 3: 修改 Q16.16 精度
 <p>在 <code>MemoryPlan</code> 中找到 <code>float32_to_q16</code> 函数，尝试改用 Q8.8（乘以 256 而不是 65536），观察对动态指令数和精度的影响。</p>
 <hr />
-<h2 id="_7">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -607,7 +607,7 @@ python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<sp
 </tbody>
 </table>
 <hr />
-<h2 id="_8">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — 完整架构文档，包含双路径对比</li>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读动态指令数和缓存指标</li>

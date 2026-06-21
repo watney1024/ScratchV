@@ -437,21 +437,21 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-07">Topic 07 — 编译器日志增强器</h1>
+      <h1>Topic 07 — 编译器日志增强器</h1>
 <blockquote>
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/utils/logger.py</code> | <strong>行数</strong>: ~269</p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>日志增强器（<code>logger.py</code>）为 ScratchV 编译器提供了<strong>统一的结构化日志系统</strong>，替代散落在各处的 <code>print()</code> 调用。</p>
-<p>核心功能：<br />
-- <strong>彩色终端输出</strong>：不同级别用不同颜色（DEBUG 灰、INFO 绿、WARNING 黄、ERROR 红）<br />
-- <strong>级别过滤</strong>：开发时看 DEBUG，正式跑只看 INFO<br />
-- <strong>文件输出</strong>：同时写日志文件（无颜色，纯文本）<br />
-- <strong>阶段计时</strong>：自动记录每个编译阶段的耗时<br />
+<p>核心功能：
+- <strong>彩色终端输出</strong>：不同级别用不同颜色（DEBUG 灰、INFO 绿、WARNING 黄、ERROR 红）
+- <strong>级别过滤</strong>：开发时看 DEBUG，正式跑只看 INFO
+- <strong>文件输出</strong>：同时写日志文件（无颜色，纯文本）
+- <strong>阶段计时</strong>：自动记录每个编译阶段的耗时
 - <strong>进度显示</strong>：长任务显示 <code>[当前/总数] 百分比</code></p>
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <p>编译器是一个多阶段流水线（解析 → 优化 → 代码生成 → ...）。每个阶段都可能出问题。如果只是到处 <code>print("ok")</code> 和 <code>print("error")</code>：</p>
 <ol>
 <li><strong>找不到问题</strong>：不知道哪个阶段报的错、花了多少时间</li>
@@ -460,8 +460,8 @@ body {
 </ol>
 <p>统一日志系统让调试效率大幅提升。</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">日志级别（从低到高）</h3>
+<h2 id="核心概念">核心概念
+<h3 id="日志级别从低到高">日志级别（从低到高）
 <table>
 <thead>
 <tr>
@@ -504,7 +504,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="log_phase"><code>log_phase</code> 上下文管理器</h3>
+<h3 id="codelog_phasecode-上下文管理器"><code>log_phase</code> 上下文管理器
 <p>自动记录一个阶段的开始和结束时间：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">with</span> <span class="n">log_phase</span><span class="p">(</span><span class="s2">&quot;parse&quot;</span><span class="p">,</span> <span class="s2">&quot;Parsing DSL input&quot;</span><span class="p">):</span>
     <span class="n">program</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
@@ -515,8 +515,8 @@ body {
 
 <p>如果阶段抛异常，会自动输出 <code>FAILED</code>。</p>
 <hr />
-<h2 id="_5">一步步</h2>
-<h3 id="step-1">Step 1: 初始化日志系统</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-初始化日志系统">Step 1: 初始化日志系统
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_logger</span><span class="p">,</span> <span class="n">get_logger</span>
 
 <span class="c1"># 初始化（通常在编译器入口点调用一次）</span>
@@ -527,7 +527,7 @@ body {
 <span class="p">)</span>
 </code></pre></div>
 
-<h3 id="step-2">Step 2: 获取日志器并使用</h3>
+<h3 id="Step-2-获取日志器并使用">Step 2: 获取日志器并使用
 <div class="codehilite"><pre><span></span><code><span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;scratchv.parser&quot;</span><span class="p">)</span>  <span class="c1"># 按模块命名</span>
 
 <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Tokenizing line </span><span class="si">%d</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
@@ -536,7 +536,7 @@ body {
 <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Syntax error at line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="step-3">Step 3: 使用阶段计时</h3>
+<h3 id="Step-3-使用阶段计时">Step 3: 使用阶段计时
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_phase</span>
 
 <span class="k">with</span> <span class="n">log_phase</span><span class="p">(</span><span class="s2">&quot;optimize&quot;</span><span class="p">,</span> <span class="s2">&quot;Running optimization passes&quot;</span><span class="p">):</span>
@@ -548,7 +548,7 @@ body {
 <span class="c1"># INFO [scratchv.optimize] Running optimization passes... done (0.156s)</span>
 </code></pre></div>
 
-<h3 id="step-4">Step 4: 运行时切换日志级别</h3>
+<h3 id="Step-4-运行时切换日志级别">Step 4: 运行时切换日志级别
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.utils.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_level</span>
 
 <span class="n">set_level</span><span class="p">(</span><span class="s2">&quot;WARNING&quot;</span><span class="p">)</span>   <span class="c1"># 只看警告和错误</span>
@@ -556,8 +556,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_6">代码走读</h2>
-<h3 id="_7">核心设计：单例 + 层级命名</h3>
+<h2 id="代码走读">代码走读
+<h3 id="核心设计单例-层级命名">核心设计：单例 + 层级命名
 <div class="codehilite"><pre><span></span><code><span class="n">_root_logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># 全局根日志器</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">init_logger</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">use_color</span><span class="p">):</span>
@@ -573,7 +573,7 @@ body {
 </code></pre></div>
 
 <p>所有 <code>scratchv.xxx</code> 日志器都继承根日志器的 handlers 和级别。</p>
-<h3 id="_8">彩色格式化器</h3>
+<h3 id="彩色格式化器">彩色格式化器
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">_ColorFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">_COLORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">levelname</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -582,15 +582,15 @@ body {
 
 <p>核心就是用 ANSI 转义码包裹日志级别名。<code>\033[32m</code> = 绿色开始，<code>\033[0m</code> = 重置。</p>
 <hr />
-<h2 id="_9">动手练习</h2>
-<h3 id="1">练习 1: 给一个模块加日志</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-给一个模块加日志">练习 1: 给一个模块加日志
 <p>找一个你正在开发的模块（比如优化 pass），把里面的 <code>print()</code> 替换成 <code>log.debug()</code> / <code>log.info()</code>。</p>
-<h3 id="2">练习 2: 比较不同日志级别</h3>
+<h3 id="练习-2-比较不同日志级别">练习 2: 比较不同日志级别
 <p>分别用 <code>DEBUG</code>、<code>INFO</code>、<code>WARNING</code> 级别运行同一个编译任务，观察输出量的差异。</p>
-<h3 id="3-log_phase">练习 3: 添加 log_phase</h3>
+<h3 id="练习-3-添加-log_phase">练习 3: 添加 log_phase
 <p>给编译器的某个阶段加上 <code>log_phase</code>，看看这个阶段实际耗时多少。</p>
 <hr />
-<h2 id="_10">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -618,7 +618,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="_11">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li>Python logging 官方文档：<a href="https://docs.python.org/3/library/logging.html" target="_blank" rel="noopener">logging — Logging facility for Python</a></li>
 <li>ANSI 颜色码参考：<a href="https://en.wikipedia.org/wiki/ANSI_escape_code" target="_blank" rel="noopener">ANSI escape code</a></li>

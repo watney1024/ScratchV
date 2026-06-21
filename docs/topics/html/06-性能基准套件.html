@@ -437,29 +437,29 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-06">Topic 06 — 编译器性能测试套件</h1>
+      <h1>Topic 06 — 编译器性能测试套件</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>benchmarks/bench_runner.py</code>, <code>benchmarks/cases/</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>性能基准套件（Benchmark Suite）自动化测试 ScratchV 编译器的<strong>正确性</strong>和<strong>性能</strong>。它收集了 23 个 DSL 测试用例，覆盖算术、神经网络算子、控制流等各类场景，每次运行自动生成 JSON/HTML/Markdown 报告。</p>
 <hr />
-<h2 id="_2">为什么？</h2>
-<p>编译器每次改动都可能引入 bug 或性能衰退。手工测试既不全面也不可靠。自动化的基准测试套件让你：<br />
-- <strong>回归检测</strong>：改了代码后跑一遍，立即知道有没有破坏现有功能<br />
-- <strong>性能追踪</strong>：记录每次运行的时间，发现性能衰退<br />
+<h2 id="为什么">为什么？
+<p>编译器每次改动都可能引入 bug 或性能衰退。手工测试既不全面也不可靠。自动化的基准测试套件让你：
+- <strong>回归检测</strong>：改了代码后跑一遍，立即知道有没有破坏现有功能
+- <strong>性能追踪</strong>：记录每次运行的时间，发现性能衰退
 - <strong>CI 集成</strong>：每次 push 自动运行，阻止有问题的代码合入</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">测试用例格式</h3>
+<h2 id="核心概念">核心概念
+<h3 id="测试用例格式">测试用例格式
 <p>每个测试用例最多 3 个文件（放在 <code>benchmarks/cases/</code>）：</p>
 <div class="codehilite"><pre><span></span><code><span class="mf">001</span><span class="n">_simple_add</span><span class="mf">.</span><span class="n">dsl</span><span class="w">        </span><span class="err">←</span><span class="w"> </span><span class="n">DSL</span><span class="w"> </span><span class="n">源代码</span><span class="err">（</span><span class="n">必需</span><span class="err">）</span>
 <span class="mf">001</span><span class="n">_simple_add</span><span class="mf">.</span><span class="nb">exp</span><span class="n">ected</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">期望输出</span><span class="err">（</span><span class="n">可选</span><span class="err">）</span>
 <span class="mf">001</span><span class="n">_simple_add</span><span class="mf">.</span><span class="n">desc</span><span class="w">       </span><span class="err">←</span><span class="w"> </span><span class="n">简短描述</span><span class="err">（</span><span class="n">可选</span><span class="err">）</span>
 </code></pre></div>
 
-<h3 id="23">23 个用例覆盖范围</h3>
+<h3 id="23-个用例覆盖范围">23 个用例覆盖范围
 <table>
 <thead>
 <tr>
@@ -496,7 +496,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="_5">报告格式</h3>
+<h3 id="报告格式">报告格式
 <table>
 <thead>
 <tr>
@@ -524,8 +524,8 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="_6">一步步</h2>
-<h3 id="_7">运行全部测试</h3>
+<h2 id="一步步">一步步
+<h3 id="运行全部测试">运行全部测试
 <div class="codehilite"><pre><span></span><code><span class="c1"># 基础运行</span>
 python<span class="w"> </span>benchmarks/bench_runner.py
 
@@ -541,11 +541,11 @@ python<span class="w"> </span>benchmarks/bench_runner.py<span class="w"> </span>
 python<span class="w"> </span>benchmarks/bench_runner.py<span class="w"> </span>--repeat<span class="w"> </span><span class="m">3</span>
 </code></pre></div>
 
-<h3 id="makefile">用 Makefile 一键运行</h3>
+<h3 id="用-Makefile-一键运行">用 Makefile 一键运行
 <div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench<span class="w">    </span><span class="c1"># 等价于上面的完整流程</span>
 </code></pre></div>
 
-<h3 id="_8">添加新测试用例</h3>
+<h3 id="添加新测试用例">添加新测试用例
 <div class="codehilite"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>benchmarks/cases/024_my_test.dsl<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
 <span class="s">a = const(10)</span>
 <span class="s">b = const(20)</span>
@@ -561,8 +561,8 @@ python<span class="w"> </span>benchmarks/bench_runner.py
 </code></pre></div>
 
 <hr />
-<h2 id="_9">代码走读</h2>
-<h3 id="benchmarkrunner">BenchmarkRunner 核心</h3>
+<h2 id="代码走读">代码走读
+<h3 id="BenchmarkRunner-核心">BenchmarkRunner 核心
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BenchmarkRunner</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">discover_cases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;扫描目录，找到所有 .dsl 文件&quot;&quot;&quot;</span>
@@ -597,7 +597,7 @@ python<span class="w"> </span>benchmarks/bench_runner.py
         <span class="k">return</span> <span class="n">result</span>
 </code></pre></div>
 
-<h3 id="ci">CI 回归检测</h3>
+<h3 id="CI-回归检测">CI 回归检测
 <div class="codehilite"><pre><span></span><code><span class="c1"># 生成 baseline</span>
 <span class="n">baseline</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;baseline.json&quot;</span><span class="p">))</span>
 <span class="n">current</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;current.json&quot;</span><span class="p">))</span>
@@ -608,15 +608,15 @@ python<span class="w"> </span>benchmarks/bench_runner.py
 </code></pre></div>
 
 <hr />
-<h2 id="_10">动手练习</h2>
-<h3 id="1">练习 1: 添加一个新测试用例</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-添加一个新测试用例">练习 1: 添加一个新测试用例
 <p>为你正在开发的编译器功能写一个测试用例，跑通并确认通过。</p>
-<h3 id="2-bug">练习 2: 故意引入 bug</h3>
+<h3 id="练习-2-故意引入-bug">练习 2: 故意引入 bug
 <p>修改代码引入一个 bug（比如把 <code>ADD</code> 映射成 <code>SUB</code>），跑 benchmark 看看哪些测试会失败。</p>
-<h3 id="3">练习 3: 分析性能趋势</h3>
+<h3 id="练习-3-分析性能趋势">练习 3: 分析性能趋势
 <p>连续跑 3 次 benchmark，对比 JSON 输出，看编译时间是否有波动。</p>
 <hr />
-<h2 id="_11">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -640,7 +640,7 @@ python<span class="w"> </span>benchmarks/bench_runner.py
 </tbody>
 </table>
 <hr />
-<h2 id="_12">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读 benchmark 数据</li>
 <li>pytest 文档：<a href="https://docs.pytest.org/" target="_blank" rel="noopener">pytest</a> — Python 测试框架</li>

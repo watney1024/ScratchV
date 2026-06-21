@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-16-llvm">Topic 16 — LLVM 代码生成后端</h1>
+      <h1>Topic 16 — LLVM 代码生成后端</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/backend/llvm_codegen.py</code>, <code>scratchv/standalone/onnx_to_llvm_standalone.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>LLVM 代码生成器将 ScratchV IR / ONNX 模型翻译为 <strong>LLVM IR 文本</strong>（<code>.ll</code> 文件）。这是 ScratchV 的 <strong>float32 路径</strong>，与 Q16.16 定点路径互补，生成的 LLVM IR 可以接入 LLVM 全套工具链（<code>opt</code>、<code>llc</code>、<code>lli</code>）。</p>
 <div class="codehilite"><pre><span></span><code>ONNX 模型
     │
@@ -453,15 +453,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <ol>
 <li><strong>基准对比</strong>: LLVM 路径使用 float32 + 硬件浮点指令（<code>fmul</code>, <code>fadd</code>），每条 MAC ~2 条指令；原生路径使用 Q16.16，每条 MAC ~12 条。对比两边的差距，找到优化方向</li>
 <li><strong>LLVM 全套优化</strong>: 生成的 <code>.ll</code> 可以接 <code>opt -O3</code> 享受 LLVM 的循环展开、向量化、指令合并等</li>
 <li><strong>多目标</strong>: LLVM IR 可以编译到 RV64、x86-64、ARM 等多个平台</li>
 </ol>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="llvm">两条 LLVM 路径</h3>
+<h2 id="核心概念">核心概念
+<h3 id="两条-LLVM-路径">两条 LLVM 路径
 <table>
 <thead>
 <tr>
@@ -493,7 +493,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="llvm-ir">LLVM IR 关键特性</h3>
+<h3 id="LLVM-IR-关键特性">LLVM IR 关键特性
 <p>与 ScratchV 原生路径的差异：</p>
 <table>
 <thead>
@@ -531,7 +531,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="llvm-ir-conv2d">LLVM IR 示例：Conv2D 内层循环</h3>
+<h3 id="LLVM-IR-示例Conv2D-内层循环">LLVM IR 示例：Conv2D 内层循环
 <div class="codehilite"><pre><span></span><code><span class="k">define</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@conv2d</span><span class="p">(</span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%input</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%weight</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%bias</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%output</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="nl">entry:</span>
 <span class="w">  </span><span class="k">br</span><span class="w"> </span><span class="kt">label</span><span class="w"> </span><span class="nv">%oh_loop</span>
@@ -556,8 +556,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1-llvm-ir">Step 1: 生成 LLVM IR</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-生成-LLVM-IR">Step 1: 生成 LLVM IR
 <div class="codehilite"><pre><span></span><code><span class="c1"># 使用 Standalone 路径（推荐，完整 float32）</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_llvm_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>output.ll<span class="w"> </span>--compare
@@ -565,7 +565,7 @@ python<span class="w"> </span>scratchv/standalone/onnx_to_llvm_standalone.py<spa
 <span class="c1"># --compare 会估算 LLVM 和 ScratchV 的动态指令数差距</span>
 </code></pre></div>
 
-<h3 id="step-2-llvm-ir">Step 2: 优化 LLVM IR</h3>
+<h3 id="Step-2-优化-LLVM-IR">Step 2: 优化 LLVM IR
 <div class="codehilite"><pre><span></span><code><span class="c1"># 用 LLVM 优化器</span>
 opt<span class="w"> </span>-O3<span class="w"> </span>output.ll<span class="w"> </span>-o<span class="w"> </span>optimized.ll
 
@@ -573,7 +573,7 @@ opt<span class="w"> </span>-O3<span class="w"> </span>output.ll<span class="w"> 
 diff<span class="w"> </span>&lt;<span class="o">(</span>wc<span class="w"> </span>-l<span class="w"> </span>output.ll<span class="o">)</span><span class="w"> </span>&lt;<span class="o">(</span>wc<span class="w"> </span>-l<span class="w"> </span>optimized.ll<span class="o">)</span>
 </code></pre></div>
 
-<h3 id="step-3-risc-v">Step 3: 编译为 RISC-V 汇编</h3>
+<h3 id="Step-3-编译为-RISC-V-汇编">Step 3: 编译为 RISC-V 汇编
 <div class="codehilite"><pre><span></span><code><span class="c1"># 静态编译</span>
 llc<span class="w"> </span>-O3<span class="w"> </span>-march<span class="o">=</span>rv64fd<span class="w"> </span>-mattr<span class="o">=</span>+d,+f<span class="w"> </span>optimized.ll<span class="w"> </span>-o<span class="w"> </span>output_llvm.s
 
@@ -581,7 +581,7 @@ llc<span class="w"> </span>-O3<span class="w"> </span>-march<span class="o">=</s
 lli<span class="w"> </span>output.ll
 </code></pre></div>
 
-<h3 id="step-4">Step 4: 完整对比流程</h3>
+<h3 id="Step-4-完整对比流程">Step 4: 完整对比流程
 <div class="codehilite"><pre><span></span><code><span class="c1"># 一键生成对比数据</span>
 python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--json-output<span class="w"> </span>output/llvm_vs_scratchv.json
@@ -591,8 +591,8 @@ python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="llvmirbuilder">LLVMIRBuilder 辅助类</h3>
+<h2 id="代码走读">代码走读
+<h3 id="LLVMIRBuilder-辅助类">LLVMIRBuilder 辅助类
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LLVMIRBuilder</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reg_counter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -622,10 +622,10 @@ python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--
         <span class="p">])</span>
 </code></pre></div>
 
-<h3 id="conv2d-llvm-ir">Conv2D 的 LLVM IR 生成</h3>
-<p>与原生路径的差异：<br />
-- 用 <code>phi</code> 节点实现循环（无需手动 <code>br</code> + label）<br />
-- 用 <code>getelementptr</code> 做地址计算（替代 MUL+ADD 链）<br />
+<h3 id="Conv2D-的-LLVM-IR-生成">Conv2D 的 LLVM IR 生成
+<p>与原生路径的差异：
+- 用 <code>phi</code> 节点实现循环（无需手动 <code>br</code> + label）
+- 用 <code>getelementptr</code> 做地址计算（替代 MUL+ADD 链）
 - 用 <code>fmul</code>/<code>fadd</code> 做浮点乘加（替代 Q16.16 的 MUL+SRAI）</p>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gen_conv2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
     <span class="c1"># 外层循环用 phi 节点</span>
@@ -642,15 +642,15 @@ python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--
 </code></pre></div>
 
 <hr />
-<h2 id="_6">动手练习</h2>
-<h3 id="1-llvm-ir">练习 1: 阅读 LLVM IR</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-阅读-LLVM-IR">练习 1: 阅读 LLVM IR
 <p>生成 CNN 模型的 LLVM IR，找到 Conv2D 的最内层循环代码，和 Q16.16 版本对比指令数。</p>
-<h3 id="2-opt-o3">练习 2: 体验 opt -O3 的效果</h3>
+<h3 id="练习-2-体验-opt--O3-的效果">练习 2: 体验 opt -O3 的效果
 <p>对一个 LLVM IR 文件分别用 <code>-O0</code>、<code>-O2</code>、<code>-O3</code> 优化，用 <code>diff</code> 对比优化后的 IR 有什么不同。</p>
-<h3 id="3">练习 3: 多目标编译</h3>
+<h3 id="练习-3-多目标编译">练习 3: 多目标编译
 <p>用 <code>llc -march=x86-64</code> 把 LLVM IR 编译为 x86 汇编，看看和 RISC-V 版本有什么不同。</p>
 <hr />
-<h2 id="_7">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -678,7 +678,7 @@ python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--
 </tbody>
 </table>
 <hr />
-<h2 id="_8">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="https://llvm.org/docs/LangRef.html" target="_blank" rel="noopener">LLVM Language Reference</a> — LLVM IR 完整语法</li>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — 双路径对比详解</li>

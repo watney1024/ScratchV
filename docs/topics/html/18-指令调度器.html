@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-18">Topic 18 — 指令调度器（基本块内列表调度）</h1>
+      <h1>Topic 18 — 指令调度器（基本块内列表调度）</h1>
 <blockquote>
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/backend/inst_scheduler.py</code> | <strong>行数</strong>: ~552</p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>指令调度器（<code>inst_scheduler.py</code>）重新排列一个基本块内的指令顺序，以减少 CPU 流水线停顿（pipeline stall）。</p>
 <p>核心思想：如果指令 B 依赖指令 A 的结果，而 A 需要 3 个周期才能算完，那么只要不破坏依赖关系，可以把不相关的指令 C/D/E 插入到 A 和 B 之间。</p>
 <div class="codehilite"><pre><span></span><code>调度前（有空泡）:           调度后（填满空泡）:
@@ -453,7 +453,7 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <p>现代 CPU 使用<strong>流水线</strong>技术并行处理多条指令。但数据依赖会导致"气泡"——后续指令必须等前面指令的结果。</p>
 <div class="codehilite"><pre><span></span><code><span class="n">时间</span><span class="w"> </span><span class="err">→</span>
 <span class="nl">取指</span><span class="p">:</span><span class="w"> </span><span class="o">[</span><span class="n">mul</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">add</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">气泡</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">气泡</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">lw</span><span class="o">]</span><span class="w"> </span><span class="p">...</span>
@@ -464,8 +464,8 @@ body {
 
 <p>指令调度的目标就是把气泡填满，让每个时钟周期都有指令在执行。</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="1">1. 指令延迟模型</h3>
+<h2 id="核心概念">核心概念
+<h3 id="指令延迟模型">1. 指令延迟模型
 <p>不同指令的执行周期不同：</p>
 <table>
 <thead>
@@ -513,7 +513,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="2-dag">2. 数据依赖 DAG</h3>
+<h3 id="数据依赖-DAG">2. 数据依赖 DAG
 <p>调度器首先构建一个<strong>有向无环图（DAG）</strong>，节点是指令，边表示依赖：</p>
 <div class="codehilite"><pre><span></span><code>A: mul t0, a0, a1     ┌───┐
 B: add t1, t0, a2     │ A │ (写 t0, 延迟 3)
@@ -527,7 +527,7 @@ D: addi sp, sp, -16      │ (B 读 t0)
                        └───┘   └───┘
 </code></pre></div>
 
-<h3 id="3">3. 列表调度算法</h3>
+<h3 id="列表调度算法">3. 列表调度算法
 <div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">构建依赖</span><span class="w"> </span><span class="n">DAG</span><span class="err">，</span><span class="n">计算每个节点的优先级</span><span class="err">（</span><span class="n">关键路径长度</span><span class="err">）</span>
 <span class="mf">2.</span><span class="w"> </span><span class="n">重复直到所有节点都调度完毕</span><span class="err">：</span>
 <span class="w">   </span><span class="n">a</span><span class="mf">.</span><span class="w"> </span><span class="n">找出所有</span><span class="s">&quot;就绪&quot;</span><span class="n">节点</span><span class="err">（</span><span class="n">所有前置依赖已调度完</span><span class="err">）</span>
@@ -537,8 +537,8 @@ D: addi sp, sp, -16      │ (B 读 t0)
 </code></pre></div>
 
 <hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1">Step 1: 基本使用</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-基本使用">Step 1: 基本使用
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.inst_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">InstructionScheduler</span><span class="p">,</span> <span class="n">parse_instructions</span>
 <span class="p">)</span>
@@ -562,11 +562,11 @@ D: addi sp, sp, -16      │ (B 读 t0)
 <span class="nb">print</span><span class="p">(</span><span class="n">sched</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">instructions</span><span class="p">,</span> <span class="n">scheduled</span><span class="p">))</span>
 </code></pre></div>
 
-<h3 id="step-2">Step 2: 命令行使用</h3>
+<h3 id="Step-2-命令行使用">Step 2: 命令行使用
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.inst_scheduler<span class="w"> </span>input.s<span class="w"> </span>-o<span class="w"> </span>scheduled.s<span class="w"> </span>--report
 </code></pre></div>
 
-<h3 id="step-3">Step 3: 自定义延迟模型</h3>
+<h3 id="Step-3-自定义延迟模型">Step 3: 自定义延迟模型
 <div class="codehilite"><pre><span></span><code><span class="n">my_latency</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">&quot;mul&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>     <span class="c1"># 假设你的 CPU 乘法是 5 周期</span>
@@ -577,8 +577,8 @@ D: addi sp, sp, -16      │ (B 读 t0)
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="dag">DAG 构建（核心）</h3>
+<h2 id="代码走读">代码走读
+<h3 id="DAG-构建核心">DAG 构建（核心）
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instructions</span><span class="p">):</span>
     <span class="n">last_def</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># 每个寄存器最后一次被谁定义</span>
     <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">instructions</span><span class="p">:</span>
@@ -593,7 +593,7 @@ D: addi sp, sp, -16      │ (B 读 t0)
             <span class="n">last_def</span><span class="p">[</span><span class="n">def_reg</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span>
 </code></pre></div>
 
-<h3 id="_6">优先级计算（关键路径）</h3>
+<h3 id="优先级计算关键路径">优先级计算（关键路径）
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_compute_priorities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c1"># 从叶子节点向根节点反向遍历</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">topo_order</span><span class="p">):</span>
@@ -604,7 +604,7 @@ D: addi sp, sp, -16      │ (B 读 t0)
 </code></pre></div>
 
 <p>优先级 = 从该节点到任意叶节点的最长路径（按延迟加权）。优先级越高的指令越要先调度——因为它在关键路径上。</p>
-<h3 id="_7">列表调度主循环</h3>
+<h3 id="列表调度主循环">列表调度主循环
 <div class="codehilite"><pre><span></span><code><span class="k">while</span> <span class="n">remaining</span><span class="p">:</span>
     <span class="c1"># 收集就绪节点</span>
     <span class="n">ready</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">remaining</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">scheduled</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">predecessors</span><span class="p">)]</span>
@@ -617,15 +617,15 @@ D: addi sp, sp, -16      │ (B 读 t0)
 </code></pre></div>
 
 <hr />
-<h2 id="_8">动手练习</h2>
-<h3 id="1_1">练习 1: 手写一个需要调度的例子</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-手写一个需要调度的例子">练习 1: 手写一个需要调度的例子
 <p>写 5-6 条有数据依赖的指令，手动画出依赖 DAG，然后手动调度。最后用代码验证你的调度结果。</p>
-<h3 id="2">练习 2: 比较调度前后的周期数</h3>
+<h3 id="练习-2-比较调度前后的周期数">练习 2: 比较调度前后的周期数
 <p>用 <code>sched.report()</code> 查看调度前后的估算周期差异。对于简单的基本块，调度能有多大提升？</p>
-<h3 id="3_1">练习 3: 调整延迟模型</h3>
+<h3 id="练习-3-调整延迟模型">练习 3: 调整延迟模型
 <p>把乘法延迟从 3 改为 10，观察调度结果的变化。延迟越长，调度空间越大还是越小？</p>
 <hr />
-<h2 id="_9">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -657,7 +657,7 @@ D: addi sp, sp, -16      │ (B 读 t0)
 </tbody>
 </table>
 <hr />
-<h2 id="_10">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li>龙书第 10.3 节：Instruction Scheduling</li>
 <li>Hennessy &amp; Patterson: Computer Architecture — 附录 C：Pipelining</li>

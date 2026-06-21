@@ -437,27 +437,27 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-25-llvm-vs-scratchv">Topic 25 — LLVM vs ScratchV 缓存对比工具</h1>
+      <h1>Topic 25 — LLVM vs ScratchV 缓存对比工具</h1>
 <blockquote>
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/standalone/llvm_cache_compare.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p><code>llvm_cache_compare.py</code> 是 ScratchV 的<strong>核心对比分析工具</strong>——它对 LLVM 生成的 RV64FD 汇编和 ScratchV 生成的 RV32IM 汇编做<strong>并排分析</strong>，计算两者在动态指令数、缓存行为、访存模式上的差异。</p>
-<p>因为无法在 Python 内运行完整的 RV64FD 仿真，它使用<strong>分析估算法</strong>：<br />
-1. 从 LLVM 汇编中提取内层循环体的静态指令<br />
-2. 基于 CNN 层维度计算动态执行次数<br />
-3. 将访存模式输入 cache 模型估算命中率<br />
+<p>因为无法在 Python 内运行完整的 RV64FD 仿真，它使用<strong>分析估算法</strong>：
+1. 从 LLVM 汇编中提取内层循环体的静态指令
+2. 基于 CNN 层维度计算动态执行次数
+3. 将访存模式输入 cache 模型估算命中率
 4. 生成并排对比表</p>
 <hr />
-<h2 id="_2">为什么？</h2>
-<p>这是 ScratchV <strong>最重要的性能分析工具</strong>——它告诉你：<br />
-- ScratchV 和 LLVM 的<strong>差距到底在哪里</strong>（哪个算子？哪类指令？）<br />
-- 每次优化后的<strong>实际效果</strong>（量化对比）<br />
+<h2 id="为什么">为什么？
+<p>这是 ScratchV <strong>最重要的性能分析工具</strong>——它告诉你：
+- ScratchV 和 LLVM 的<strong>差距到底在哪里</strong>（哪个算子？哪类指令？）
+- 每次优化后的<strong>实际效果</strong>（量化对比）
 - Cache 层面的<strong>深层瓶颈</strong>（不仅仅是指令数）</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">分析流程</h3>
+<h2 id="核心概念">核心概念
+<h3 id="分析流程">分析流程
 <div class="codehilite"><pre><span></span><code>LLVM .s 汇编                    ScratchV .s 汇编
     │                                │
     ▼                                ▼
@@ -476,7 +476,7 @@ Cache 模型 (I$/D$)             Cache 模型 (I$/D$)
        并排对比表 + JSON 输出
 </code></pre></div>
 
-<h3 id="cnn">CNN 层维度计算</h3>
+<h3 id="CNN-层维度计算">CNN 层维度计算
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_layer_dims</span><span class="p">():</span>
     <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># Conv1: 3→32, 3×3, stride=1, pad=0</span>
@@ -489,7 +489,7 @@ Cache 模型 (I$/D$)             Cache 模型 (I$/D$)
     <span class="k">return</span> <span class="n">layers</span>
 </code></pre></div>
 
-<h3 id="_5">对比维度</h3>
+<h3 id="对比维度">对比维度
 <table>
 <thead>
 <tr>
@@ -527,8 +527,8 @@ Cache 模型 (I$/D$)             Cache 模型 (I$/D$)
 </tbody>
 </table>
 <hr />
-<h2 id="_6">一步步</h2>
-<h3 id="_7">运行对比</h3>
+<h2 id="一步步">一步步
+<h3 id="运行对比">运行对比
 <div class="codehilite"><pre><span></span><code><span class="c1"># 生成 JSON 对比数据</span>
 python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--json-output<span class="w"> </span>output/llvm_vs_scratchv.json
@@ -539,7 +539,7 @@ python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span cla
 <span class="w">    </span>--markdown<span class="w"> </span>output/llvm_vs_scratchv.md
 </code></pre></div>
 
-<h3 id="_8">查看结果</h3>
+<h3 id="查看结果">查看结果
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output/llvm_vs_scratchv.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -560,13 +560,13 @@ python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span cla
 <span class="p">}</span>
 </code></pre></div>
 
-<h3 id="ci">在 CI 中使用</h3>
+<h3 id="在-CI-中使用">在 CI 中使用
 <div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench-ci<span class="w">    </span><span class="c1"># 自动调用 llvm_cache_compare.py → dashboard.py</span>
 </code></pre></div>
 
 <hr />
-<h2 id="_9">代码走读</h2>
-<h3 id="_10">内层循环指令提取</h3>
+<h2 id="代码走读">代码走读
+<h3 id="内层循环指令提取">内层循环指令提取
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_inner_loop</span><span class="p">(</span><span class="n">asm_text</span><span class="p">,</span> <span class="n">op_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;从汇编中识别并提取指定算子的最内层循环指令&quot;&quot;&quot;</span>
     <span class="c1"># 1. 找到算子标签（如 &quot;conv2d_loop_ic:&quot;）</span>
@@ -586,7 +586,7 @@ python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span cla
     <span class="k">return</span> <span class="n">inner_loop</span>
 </code></pre></div>
 
-<h3 id="_11">动态指令数估算</h3>
+<h3 id="动态指令数估算">动态指令数估算
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">estimate_dynamic</span><span class="p">(</span><span class="n">inner_loop_insns</span><span class="p">,</span> <span class="n">layer_dims</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;内层循环指令数 × 循环迭代次数 = 动态指令数&quot;&quot;&quot;</span>
     <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
@@ -599,15 +599,15 @@ python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span cla
 </code></pre></div>
 
 <hr />
-<h2 id="_12">动手练习</h2>
-<h3 id="1">练习 1: 运行对比</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-运行对比">练习 1: 运行对比
 <p>运行 <code>llvm_cache_compare.py</code>，查看 JSON 输出，找出差距最大的指令类别。</p>
-<h3 id="2">练习 2: 添加新的对比维度</h3>
+<h3 id="练习-2-添加新的对比维度">练习 2: 添加新的对比维度
 <p>在对比脚本中添加"每 MAC 的 Load 指令数"指标，比较两种路径的数据复用效率。</p>
-<h3 id="3">练习 3: 对比不同模型</h3>
+<h3 id="练习-3-对比不同模型">练习 3: 对比不同模型
 <p>如果有多个 ONNX 模型（不同大小/层数），分别运行对比，看差距是否随模型规模变化。</p>
 <hr />
-<h2 id="_13">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -631,7 +631,7 @@ python<span class="w"> </span>scratchv/standalone/llvm_cache_compare.py<span cla
 </tbody>
 </table>
 <hr />
-<h2 id="_14">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读对比数据</li>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — 双路径对比详解</li>

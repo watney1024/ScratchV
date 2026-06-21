@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-20">Topic 20 — 项目代码规范与格式化</h1>
+      <h1>Topic 20 — 项目代码规范与格式化</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>.pre-commit-config.yaml</code>, <code>docs/CODING_STANDARDS.md</code>, <code>scripts/lint_check.sh</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>代码规范体系确保 ScratchV 项目的所有代码风格一致、类型安全、无低级错误。包含自动化工具链：</p>
 <table>
 <thead>
@@ -481,19 +481,19 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <ul>
 <li><strong>一致性</strong>：10 个贡献者的代码看起来像一个人写的</li>
 <li><strong>减少 review 负担</strong>：格式化问题自动修复，reviewer 只需关注逻辑</li>
 <li><strong>提前发现 bug</strong>：类型检查和 lint 在 commit 之前就拦下低级错误</li>
 </ul>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="pre-commit">pre-commit 钩子</h3>
-<p>每次 <code>git commit</code> 时自动运行配置的检查工具。如果有问题：<br />
-- Black/isort/Ruff → 自动修复并阻止 commit（需要重新 add + commit）<br />
+<h2 id="核心概念">核心概念
+<h3 id="pre-commit-钩子">pre-commit 钩子
+<p>每次 <code>git commit</code> 时自动运行配置的检查工具。如果有问题：
+- Black/isort/Ruff → 自动修复并阻止 commit（需要重新 add + commit）
 - mypy → 报告类型错误，需要手动修复</p>
-<h3 id="_4">配置要点</h3>
+<h3 id="配置要点">配置要点
 <div class="codehilite"><pre><span></span><code><span class="c1"># .pre-commit-config.yaml</span>
 <span class="nt">repos</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/psf/black</span>
@@ -510,13 +510,13 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_5">一步步</h2>
-<h3 id="_6">安装</h3>
+<h2 id="一步步">一步步
+<h3 id="安装">安装
 <div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
 pre-commit<span class="w"> </span>install
 </code></pre></div>
 
-<h3 id="_7">手动运行</h3>
+<h3 id="手动运行">手动运行
 <div class="codehilite"><pre><span></span><code><span class="c1"># 对所有文件运行所有检查</span>
 pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 
@@ -529,7 +529,7 @@ bash<span class="w"> </span>scripts/lint_check.sh<span class="w"> </span>--fix<s
 bash<span class="w"> </span>scripts/lint_check.sh<span class="w"> </span>--all<span class="w">    </span><span class="c1"># 包含测试文件</span>
 </code></pre></div>
 
-<h3 id="_8">编码规范速查</h3>
+<h3 id="编码规范速查">编码规范速查
 <table>
 <thead>
 <tr>
@@ -561,8 +561,8 @@ bash<span class="w"> </span>scripts/lint_check.sh<span class="w"> </span>--all<s
 </tbody>
 </table>
 <hr />
-<h2 id="_9">代码走读</h2>
-<h3 id="lint_checksh">lint_check.sh 核心</h3>
+<h2 id="代码走读">代码走读
+<h3 id="lint_checksh-核心">lint_check.sh 核心
 <div class="codehilite"><pre><span></span><code><span class="c1"># 只检查 scratchv/ 目录</span>
 ruff<span class="w"> </span>check<span class="w"> </span>scratchv/
 mypy<span class="w"> </span>scratchv/<span class="w"> </span>--ignore-missing-imports<span class="w"> </span>--follow-imports<span class="o">=</span>silent
@@ -572,7 +572,7 @@ black<span class="w"> </span>scratchv/<span class="w"> </span>tests/
 isort<span class="w"> </span>scratchv/<span class="w"> </span>tests/
 </code></pre></div>
 
-<h3 id="ci">CI 集成</h3>
+<h3 id="CI-集成">CI 集成
 <div class="codehilite"><pre><span></span><code><span class="c1"># .github/workflows/ci.yml</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Lint</span>
 <span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
@@ -582,15 +582,15 @@ isort<span class="w"> </span>scratchv/<span class="w"> </span>tests/
 </code></pre></div>
 
 <hr />
-<h2 id="_10">动手练习</h2>
-<h3 id="1-pre-commit">练习 1: 安装 pre-commit</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-安装-pre-commit">练习 1: 安装 pre-commit
 <p>在本地项目安装 <code>pre-commit install</code>，提交一个代码改动，观察自动检查过程。</p>
-<h3 id="2-lint">练习 2: 修复 lint 问题</h3>
+<h3 id="练习-2-修复-lint-问题">练习 2: 修复 lint 问题
 <p>运行 <code>ruff check .</code>，挑一个 warning 手动修复。</p>
-<h3 id="3">练习 3: 添加类型提示</h3>
+<h3 id="练习-3-添加类型提示">练习 3: 添加类型提示
 <p>找一个没写类型提示的公开函数，添加正确的 type hints，运行 <code>mypy</code> 确认通过。</p>
 <hr />
-<h2 id="_11">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -618,7 +618,7 @@ isort<span class="w"> </span>scratchv/<span class="w"> </span>tests/
 </tbody>
 </table>
 <hr />
-<h2 id="_12">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="https://black.readthedocs.io/" target="_blank" rel="noopener">Black 文档</a> | <a href="https://docs.astral.sh/ruff/" target="_blank" rel="noopener">Ruff 文档</a></li>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/CODING_STANDARDS.md">CODING_STANDARDS</a> — 完整编码规范</li>

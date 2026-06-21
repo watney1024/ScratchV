@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-01-dsl-ifelse-while">Topic 01 — DSL 前端增强器（if/else + while）</h1>
+      <h1>Topic 01 — DSL 前端增强器（if/else + while）</h1>
 <blockquote>
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/frontend/dsl_extended.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>DSL 前端增强器（<code>dsl_extended.py</code>）在基础 DSL 解析器之上扩展了<strong>控制流</strong>能力——新增 <code>if/else</code> 条件分支和 <code>while</code> 循环。它用<strong>递归下降</strong>方式解析新语法，生成带有标签和条件跳转的 IR。</p>
 <p>基础 DSL 只能写线性计算的"计算器"：</p>
 <div class="codehilite"><pre><span></span><code>a = const(3)
@@ -461,12 +461,12 @@ return c
 </code></pre></div>
 
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <p>真实世界的程序都有分支和循环。没有 <code>if/else</code>，你只能写死计算路径；没有 <code>while</code>，你只能写固定次数的 <code>for</code>。</p>
 <p>这个模块让 ScratchV 从"表达式计算器"升级为"图灵完备的编译器"——可以表达任意算法。</p>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="1">1. 语法设计</h3>
+<h2 id="核心概念">核心概念
+<h3 id="语法设计">1. 语法设计
 <div class="codehilite"><pre><span></span><code>if_stmt   → &#39;if&#39; &#39;(&#39; cond &#39;)&#39; &#39;:&#39; block (&#39;else&#39; &#39;:&#39; block)? &#39;endif&#39;
 while_stmt → &#39;while&#39; &#39;(&#39; cond &#39;)&#39; &#39;:&#39; block &#39;endwhile&#39;
 cond      → operand (&#39;==&#39; | &#39;!=&#39; | &#39;&lt;&#39; | &#39;&gt;&#39; | &#39;&lt;=&#39; | &#39;&gt;=&#39;) operand
@@ -481,7 +481,7 @@ block     → (statement)+
         <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span> <span class="o">=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>   <span class="c1"># 右操作数</span>
 </code></pre></div>
 
-<h3 id="2-ir">2. IR 生成模式</h3>
+<h3 id="IR-生成模式">2. IR 生成模式
 <p><strong>if/else</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="nl">entry:</span>
 <span class="w">    </span><span class="nf">cmp</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">cmp</span><span class="p">(</span><span class="no">a</span><span class="p">,</span><span class="w"> </span><span class="no">b</span><span class="p">)</span><span class="w">           </span><span class="c1"># 比较</span>
@@ -509,7 +509,7 @@ block     → (statement)+
 <span class="w">    </span><span class="nf">ret</span><span class="w"> </span><span class="no">acc</span>
 </code></pre></div>
 
-<h3 id="3">3. 嵌套处理</h3>
+<h3 id="嵌套处理">3. 嵌套处理
 <p><code>if</code> 和 <code>while</code> 可以任意嵌套。用全局计数器确保标签唯一：</p>
 <div class="codehilite"><pre><span></span><code><span class="bp">self</span><span class="o">.</span><span class="n">_label_counter</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -519,8 +519,8 @@ block     → (statement)+
 </code></pre></div>
 
 <hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1-if-dsl">Step 1: 写一个带 if 的 DSL 程序</h3>
+<h2 id="一步步">一步步
+<h3 id="Step-1-写一个带-if-的-DSL-程序">Step 1: 写一个带 if 的 DSL 程序
 <div class="codehilite"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/branch.dsl<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
 <span class="s">a = const(3)</span>
 <span class="s">b = const(5)</span>
@@ -533,7 +533,7 @@ block     → (statement)+
 <span class="s">EOF</span>
 </code></pre></div>
 
-<h3 id="step-2-ir">Step 2: 编译并查看 IR</h3>
+<h3 id="Step-2-编译并查看-IR">Step 2: 编译并查看 IR
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_extended</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtendedDSLParser</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">ExtendedDSLParser</span><span class="p">()</span>
@@ -543,7 +543,7 @@ block     → (statement)+
 <span class="nb">print</span><span class="p">(</span><span class="n">IRPrinter</span><span class="p">()</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">program</span><span class="p">))</span>
 </code></pre></div>
 
-<h3 id="step-3-while">Step 3: 写一个 while 循环</h3>
+<h3 id="Step-3-写一个-while-循环">Step 3: 写一个 while 循环
 <div class="codehilite"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/sum.dsl<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
 <span class="s">i = const(0)</span>
 <span class="s">acc = const(0)</span>
@@ -557,8 +557,8 @@ block     → (statement)+
 
 <p>编译并检查 IR 输出，确认循环结构正确。</p>
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="parse_if">核心：<code>parse_if()</code> 方法</h3>
+<h2 id="代码走读">代码走读
+<h3 id="核心codeparse_ifcode-方法">核心：<code>parse_if()</code> 方法
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_if</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_consume</span><span class="p">(</span><span class="s2">&quot;if&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_consume</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
@@ -596,7 +596,7 @@ block     → (statement)+
     <span class="bp">self</span><span class="o">.</span><span class="n">_consume</span><span class="p">(</span><span class="s2">&quot;endif&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="while-ir">while 循环的 IR 生成</h3>
+<h3 id="while-循环的-IR-生成">while 循环的 IR 生成
 <p>关键区别：while 的条件在循环体<strong>之前</strong>检查，循环体末尾跳回条件检查（不是跳回循环体开头）。</p>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_while</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">label_hdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_label</span><span class="p">(</span><span class="s2">&quot;while_hdr&quot;</span><span class="p">)</span>
@@ -617,15 +617,15 @@ block     → (statement)+
 </code></pre></div>
 
 <hr />
-<h2 id="_6">动手练习</h2>
-<h3 id="1-ifwhile">练习 1: 写一个嵌套 if/while 程序</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-写一个嵌套-ifwhile-程序">练习 1: 写一个嵌套 if/while 程序
 <p>写一个 DSL 程序：如果 <code>a &gt; 0</code>，用 while 计算 <code>a</code> 的累加；否则直接返回 0。</p>
-<h3 id="2-tinyfive">练习 2: 用 TinyFive 验证</h3>
+<h3 id="练习-2-用-TinyFive-验证">练习 2: 用 TinyFive 验证
 <p>把你写的 DSL 程序编译成 RISC-V 汇编，用 TinyFive 仿真执行，验证结果是否正确。</p>
-<h3 id="3-for">练习 3: 添加 <code>for</code> 循环语法糖</h3>
+<h3 id="练习-3-添加-codeforcode-循环语法糖">练习 3: 添加 <code>for</code> 循环语法糖
 <p>在 <code>ExtendedDSLParser</code> 中添加 <code>for i = start to end:</code> 语法，自动展开为 while 循环的 IR。</p>
 <hr />
-<h2 id="_7">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -653,7 +653,7 @@ block     → (statement)+
 </tbody>
 </table>
 <hr />
-<h2 id="_8">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li>龙书第 4 章：Syntax Analysis（递归下降解析原理）</li>
 <li>DSL 语法参考：<a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/developer_guide.md">ScratchV DSL 文档</a></li>

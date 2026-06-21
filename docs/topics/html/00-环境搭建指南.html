@@ -437,14 +437,14 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="00">00 — 环境搭建指南</h1>
+      <h1>00 — 环境搭建指南</h1>
 <blockquote>
-<p><strong>目标</strong>: 从零开始，在你的电脑上把 ScratchV 编译器跑起来。<br />
-<strong>预计时间</strong>: 15-30 分钟<br />
+<p><strong>目标</strong>: 从零开始，在你的电脑上把 ScratchV 编译器跑起来。
+<strong>预计时间</strong>: 15-30 分钟
 <strong>前置要求</strong>: 会用终端（命令行），电脑能上网</p>
 </blockquote>
 <hr />
-<h2 id="_1">目录</h2>
+<h2 id="目录">目录
 <ol>
 <li><a href="#1-你需要什么">你需要什么</a></li>
 <li><a href="#2-克隆代码">克隆代码</a></li>
@@ -456,7 +456,7 @@ body {
 <li><a href="#8-检查清单">检查清单</a></li>
 </ol>
 <hr />
-<h2 id="1">1. 你需要什么</h2>
+<h2 id="你需要什么">1. 你需要什么
 <table>
 <thead>
 <tr>
@@ -483,7 +483,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="_2">如果你还没有安装</h3>
+<h3 id="如果你还没有安装">如果你还没有安装
 <p><strong>Ubuntu / Debian / WSL</strong>:</p>
 <div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>git
@@ -494,14 +494,14 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 brew<span class="w"> </span>install<span class="w"> </span>python@3.12<span class="w"> </span>git
 </code></pre></div>
 
-<p><strong>Windows</strong>:<br />
-- 推荐安装 <a href="https://learn.microsoft.com/zh-cn/windows/wsl/install" target="_blank" rel="noopener">WSL2</a>（Windows Subsystem for Linux），然后在 WSL 里按 Ubuntu 的方式操作<br />
+<p><strong>Windows</strong>:
+- 推荐安装 <a href="https://learn.microsoft.com/zh-cn/windows/wsl/install" target="_blank" rel="noopener">WSL2</a>（Windows Subsystem for Linux），然后在 WSL 里按 Ubuntu 的方式操作
 - 或者从 <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a> 下载 Python 安装包</p>
 <blockquote>
 <p>💡 <strong>为什么推荐 WSL？</strong> ScratchV 的 RISC-V 仿真工具（TinyFive、Spike）主要在 Linux 上测试过。WSL 让你在 Windows 上拥有一个完整的 Linux 环境，体验最好。</p>
 </blockquote>
 <hr />
-<h2 id="2">2. 克隆代码</h2>
+<h2 id="克隆代码">2. 克隆代码
 <p>打开终端，进入你放项目的目录：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 进入你喜欢的目录（比如 ~/workspace）</span>
 <span class="nb">cd</span><span class="w"> </span>~/workspace<span class="w">   </span><span class="c1"># 如果没有这个目录，先 mkdir ~/workspace</span>
@@ -519,12 +519,12 @@ remote: Counting objects: 100% (1234/1234), done.
 </code></pre></div>
 
 <blockquote>
-<p>💡 <strong>网络慢怎么办？</strong> 如果 GitHub 访问慢，可以在项目目录下配置代理：<br />
+<p>💡 <strong>网络慢怎么办？</strong> 如果 GitHub 访问慢，可以在项目目录下配置代理：
 <code>bash
 git config http.proxy http://127.0.0.1:7890   # 替换为你的代理地址</code></p>
 </blockquote>
 <hr />
-<h2 id="3">3. 创建虚拟环境</h2>
+<h2 id="创建虚拟环境">3. 创建虚拟环境
 <p>虚拟环境让你的 ScratchV 依赖和系统 Python 隔离开，避免版本冲突。</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 在 ScratchV 目录下创建虚拟环境</span>
 python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
@@ -543,7 +543,7 @@ venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class
 <p>💡 <strong>怎么退出虚拟环境？</strong> 输入 <code>deactivate</code> 即可。</p>
 </blockquote>
 <hr />
-<h2 id="4-scratchv">4. 安装 ScratchV</h2>
+<h2 id="安装-ScratchV">4. 安装 ScratchV
 <div class="codehilite"><pre><span></span><code><span class="c1"># 确保在 ScratchV 目录下，且虚拟环境已激活</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
@@ -557,7 +557,7 @@ Successfully installed scratchv-0.3.0
 
 <p><code>-e</code> 参数是 "editable" 模式，意味着你修改源码后不需要重新安装，直接生效。</p>
 <hr />
-<h2 id="5">5. 验证安装</h2>
+<h2 id="验证安装">5. 验证安装
 <p>运行测试，确认一切正常：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 快速测试（约 1-2 分钟）</span>
 make<span class="w"> </span><span class="nb">test</span>
@@ -571,7 +571,7 @@ tests/test_ir_builder.py::test_build_add PASSED
 </code></pre></div>
 
 <p>如果测试全部通过（绿色 <code>PASSED</code>），恭喜！环境搭建完成 🎉</p>
-<h3 id="onnx">快速试跑：编译一个 ONNX 模型</h3>
+<h3 id="快速试跑编译一个-ONNX-模型">快速试跑：编译一个 ONNX 模型
 <div class="codehilite"><pre><span></span><code><span class="c1"># 编译 CNN 模型，生成 RISC-V 机器码</span>
 python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>/tmp/cnn_test.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
@@ -588,7 +588,7 @@ Done.
 </code></pre></div>
 
 <hr />
-<h2 id="6">6. 安装可选依赖</h2>
+<h2 id="安装可选依赖">6. 安装可选依赖
 <p>ScratchV 的核心编译器<strong>零外部依赖</strong>（只用 Python 标准库）。以下依赖是可选的，按需安装：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 基础安装（核心编译器，零外部依赖）</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
@@ -634,27 +634,27 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </tbody>
 </table>
 <hr />
-<h2 id="7">7. 平台特定说明</h2>
-<h3 id="ubuntu-2204-2404">Ubuntu 22.04 / 24.04</h3>
+<h2 id="平台特定说明">7. 平台特定说明
+<h3 id="Ubuntu-2204-2404">Ubuntu 22.04 / 24.04
 <div class="codehilite"><pre><span></span><code><span class="c1"># 确保系统包齐全</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>update
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git<span class="w"> </span>build-essential
 </code></pre></div>
 
-<h3 id="macos-apple-silicon-intel">macOS (Apple Silicon / Intel)</h3>
+<h3 id="macOS-Apple-Silicon-Intel">macOS (Apple Silicon / Intel)
 <div class="codehilite"><pre><span></span><code><span class="c1"># Xcode Command Line Tools（提供 git、make 等）</span>
 xcode-select<span class="w"> </span>--install
 
 <span class="c1"># 后续步骤同上</span>
 </code></pre></div>
 
-<h3 id="wsl2-windows">WSL2 (Windows)</h3>
+<h3 id="WSL2-Windows">WSL2 (Windows)
 <div class="codehilite"><pre><span></span><code><span class="c1"># WSL 里的 Ubuntu 和原生 Ubuntu 几乎一样</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>update
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git<span class="w"> </span>build-essential
 </code></pre></div>
 
-<h3 id="pip">国内用户加速 pip</h3>
+<h3 id="国内用户加速-pip">国内用户加速 pip
 <div class="codehilite"><pre><span></span><code><span class="c1"># 临时使用清华镜像</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-i<span class="w"> </span>https://pypi.tuna.tsinghua.edu.cn/simple
 
@@ -663,7 +663,7 @@ pip<span class="w"> </span>config<span class="w"> </span><span class="nb">set</s
 </code></pre></div>
 
 <hr />
-<h2 id="8">8. 检查清单</h2>
+<h2 id="检查清单">8. 检查清单
 <p>完成以下所有项，你的环境就准备好了：</p>
 <ul>
 <li>[ ] Python 版本 ≥ 3.8（<code>python3 --version</code> 确认）</li>
@@ -674,7 +674,7 @@ pip<span class="w"> </span>config<span class="w"> </span><span class="nb">set</s
 <li>[ ] 能成功编译 CNN 模型（<code>make bench-cnn</code>）</li>
 </ul>
 <hr />
-<h2 id="_3">遇到问题？</h2>
+<h2 id="遇到问题">遇到问题？
 <p>跳到 <a href="04-故障排除-FAQ.html">04-故障排除FAQ</a> 查找常见问题的解决方案。</p>
 <p>如果还是解决不了，欢迎到 <a href="https://github.com/kinsomwang/ScratchV/issues" target="_blank" rel="noopener">GitHub Issues</a> 提问。</p>
 <hr />

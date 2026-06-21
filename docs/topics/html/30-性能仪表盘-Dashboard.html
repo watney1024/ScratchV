@@ -437,12 +437,12 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-30-ci-dashboard">Topic 30 — CI 基准编排 + Dashboard</h1>
+      <h1>Topic 30 — CI 基准编排 + Dashboard</h1>
 <blockquote>
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/ci/ci_benchmark.py</code>, <code>scratchv/ci/dashboard.py</code></p>
 </blockquote>
 <hr />
-<h2 id="_1">是什么？</h2>
+<h2 id="是什么">是什么？
 <p>CI 基准系统自动运行 ScratchV vs LLVM 的性能对比，生成<strong>纯静态 HTML 仪表盘</strong>，展示：</p>
 <ul>
 <li><strong>静态指令数对比</strong>：按算子和指令类别拆分</li>
@@ -462,15 +462,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="_2">为什么？</h2>
+<h2 id="为什么">为什么？
 <ul>
 <li><strong>持续监控</strong>：每次 push 自动运行，防止性能衰退</li>
 <li><strong>决策依据</strong>：优化是否有效？数据说话</li>
 <li><strong>可视化</strong>：好看的图表比一页数字更有说服力</li>
 </ul>
 <hr />
-<h2 id="_3">核心概念</h2>
-<h3 id="_4">两层粒度</h3>
+<h2 id="核心概念">核心概念
+<h3 id="两层粒度">两层粒度
 <table>
 <thead>
 <tr>
@@ -492,7 +492,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="badge">Badge 评分</h3>
+<h3 id="Badge-评分">Badge 评分
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_badge</span><span class="p">(</span><span class="n">ratio</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">:</span>   <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;badge g&quot;&gt;&#39;</span>  <span class="c1"># 绿色：接近 LLVM</span>
     <span class="k">elif</span> <span class="n">ratio</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>   <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;badge y&quot;&gt;&#39;</span>  <span class="c1"># 黄色：有差距</span>
@@ -500,7 +500,7 @@ body {
 </code></pre></div>
 
 <p>ScratchV/LLVM 比值越低越好（目标是 ≤1.0，即超越 LLVM）。</p>
-<h3 id="_5">数据流</h3>
+<h3 id="数据流">数据流
 <div class="codehilite"><pre><span></span><code>llvm_cache_compare.py → llvm_vs_scratchv.json
 tinyfive_compare.py   → tinyfive_compare.json
                               │
@@ -513,26 +513,26 @@ tinyfive_compare.py   → tinyfive_compare.json
 </code></pre></div>
 
 <hr />
-<h2 id="_6">一步步</h2>
-<h3 id="_7">一键运行</h3>
+<h2 id="一步步">一步步
+<h3 id="一键运行">一键运行
 <div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench-ci
 </code></pre></div>
 
-<h3 id="dashboard">单独生成 Dashboard</h3>
+<h3 id="单独生成-Dashboard">单独生成 Dashboard
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--run<span class="w"> </span>-o<span class="w"> </span>benchmark_reports/dashboard.html
 </code></pre></div>
 
-<h3 id="_8">生成趋势历史</h3>
+<h3 id="生成趋势历史">生成趋势历史
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scratchv/ci/history_page.py<span class="w"> </span>-o<span class="w"> </span>benchmark_reports/history.html
 </code></pre></div>
 
-<h3 id="_9">查看</h3>
+<h3 id="查看">查看
 <div class="codehilite"><pre><span></span><code>firefox<span class="w"> </span>benchmark_reports/dashboard.html
 </code></pre></div>
 
 <hr />
-<h2 id="_10">代码走读</h2>
-<h3 id="ci_benchmarkpy">ci_benchmark.py 编排</h3>
+<h2 id="代码走读">代码走读
+<h3 id="ci_benchmarkpy-编排">ci_benchmark.py 编排
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_ci</span><span class="p">():</span>
     <span class="c1"># 1. LLVM 对比</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
@@ -553,7 +553,7 @@ tinyfive_compare.py   → tinyfive_compare.json
     <span class="p">])</span>
 </code></pre></div>
 
-<h3 id="dashboardpy">dashboard.py 数据收集</h3>
+<h3 id="dashboardpy-数据收集">dashboard.py 数据收集
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">_run</span><span class="p">(</span><span class="s2">&quot;scratchv/standalone/llvm_cache_compare.py&quot;</span><span class="p">,</span>
                 <span class="p">[</span><span class="s2">&quot;--json-output&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/_llvm_bench.json&quot;</span><span class="p">])</span>
@@ -564,18 +564,18 @@ tinyfive_compare.py   → tinyfive_compare.json
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">×&quot;</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="mi">10</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">×&quot;</span>
 </code></pre></div>
 
-<h3 id="html">HTML 生成（纯静态）</h3>
+<h3 id="HTML-生成纯静态">HTML 生成（纯静态）
 <p>Dashboard 输出的是<strong>纯静态 HTML</strong>——零外部依赖，CSS 内嵌，直接用浏览器打开即可。无需 Web 服务器，可托管到 GitHub Pages。</p>
 <hr />
-<h2 id="_11">动手练习</h2>
-<h3 id="1-dashboard">练习 1: 生成自己的 Dashboard</h3>
+<h2 id="动手练习">动手练习
+<h3 id="练习-1-生成自己的-Dashboard">练习 1: 生成自己的 Dashboard
 <p>运行 <code>make bench-ci</code>，打开 <code>dashboard.html</code>，找出 ScratchV 和 LLVM 差距最大的算子和指令类别。</p>
-<h3 id="2">练习 2: 添加新指标</h3>
+<h3 id="练习-2-添加新指标">练习 2: 添加新指标
 <p>在 <code>dashboard.py</code> 中添加一个新指标列（比如"每 MAC 指令数"），重新生成 dashboard。</p>
-<h3 id="3">练习 3: 自定义样式</h3>
+<h3 id="练习-3-自定义样式">练习 3: 自定义样式
 <p>修改 <code>dashboard.py</code> 中的 <code>CSS</code> 变量，改变 dashboard 的颜色主题。</p>
 <hr />
-<h2 id="_12">常见坑</h2>
+<h2 id="常见坑">常见坑
 <table>
 <thead>
 <tr>
@@ -599,7 +599,7 @@ tinyfive_compare.py   → tinyfive_compare.json
 </tbody>
 </table>
 <hr />
-<h2 id="_13">进阶阅读</h2>
+<h2 id="进阶阅读">进阶阅读
 <ul>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读 Dashboard 中的数据</li>
 <li>GitHub Actions 文档：<a href="https://docs.github.com/en/actions/writing-workflows" target="_blank" rel="noopener">Workflow syntax</a></li>
