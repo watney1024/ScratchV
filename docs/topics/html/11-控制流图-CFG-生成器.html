@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/analysis/cfg_builder.py</code> | <strong>行数</strong>: ~400+</p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>控制流图（Control Flow Graph, CFG）生成器把一段<strong>线性排列</strong>的 IR 指令，转成一张<strong>有向图</strong>——每个节点是一个"基本块"（一段连续执行的指令），每条边是一次跳转。</p>
 <div class="codehilite"><pre><span></span><code>原始<span class="w"> </span><span class="nv">IR</span>（线性）<span class="w">                    </span>控制流图（图结构）
 <span class="w">  </span><span class="nv">entry</span>:<span class="w">                               </span>┌───────┐
@@ -462,7 +462,7 @@ body {
 
 <p>CFG 是编译器分析和优化的<strong>基础设施</strong>——几乎所有"跨基本块"的优化（循环检测、死代码消除、寄存器分配）都依赖它。</p>
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>没有 CFG 时，你只能看到指令的先后顺序；有了 CFG，你能看到：</p>
 <ol>
 <li><strong>程序结构</strong>：哪些是分支，哪些是循环，一目了然</li>
@@ -471,8 +471,8 @@ body {
 <li><strong>可视化</strong>：导出为 Graphviz DOT 格式，生成图片</li>
 </ol>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="基本块Basic-Block">1. 基本块（Basic Block）
+<h2>核心概念
+<h3 id="1-基本块basic-block">1. 基本块（Basic Block）
 <p>一个基本块是一段<strong>只能从第一条进入、从最后一条退出</strong>的指令序列。块内没有分支，没有跳转目标。</p>
 <div class="codehilite"><pre><span></span><code><span class="gh">#</span> 这是一个基本块
 t0 = add a, b
@@ -483,7 +483,7 @@ t2 = sub t1, d
 br t2 &gt; 0 → .L_true, .L_false
 </code></pre></div>
 
-<h3 id="边类型EdgeType">2. 边类型（EdgeType）
+<h3 id="2-边类型edgetype">2. 边类型（EdgeType）
 <table>
 <thead>
 <tr>
@@ -515,14 +515,14 @@ br t2 &gt; 0 → .L_true, .L_false
 </tr>
 </tbody>
 </table>
-<h3 id="控制流分析三件套">3. 控制流分析三件套
+<h3 id="3-控制流分析三件套">3. 控制流分析三件套
 <p>CFG Builder 不仅能构建图，还提供：
 - <strong>不可达代码消除</strong>：从入口 DFS，删除走不到的块
 - <strong>支配树</strong>：块 A 支配块 B = 从入口到 B 的每条路径都经过 A
 - <strong>自然循环检测</strong>：通过回边（目标支配源的边）识别循环</p>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-构建-CFG">Step 1: 构建 CFG
+<h2>一步步
+<h3>Step 1: 构建 CFG
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.analysis.cfg_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CFGBuilder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">DSLParser</span>
 
@@ -535,7 +535,7 @@ br t2 &gt; 0 → .L_true, .L_false
 <span class="n">cfg</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div>
 
-<h3 id="Step-2-可视化">Step 2: 可视化
+<h3>Step 2: 可视化
 <div class="codehilite"><pre><span></span><code><span class="c1"># 导出为 Graphviz DOT 格式</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
 
@@ -546,20 +546,20 @@ br t2 &gt; 0 → .L_true, .L_false
 <span class="c1"># $ dot -Tpng cfg.dot -o cfg.png</span>
 </code></pre></div>
 
-<h3 id="Step-3-消除不可达代码">Step 3: 消除不可达代码
+<h3>Step 3: 消除不可达代码
 <div class="codehilite"><pre><span></span><code><span class="n">removed</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">eliminate_unreachable</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">removed</span><span class="si">}</span><span class="s2"> unreachable blocks&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-4-检测循环">Step 4: 检测循环
+<h3>Step 4: 检测循环
 <div class="codehilite"><pre><span></span><code><span class="n">loops</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">detect_loops</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loops</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loop: header=</span><span class="si">{</span><span class="n">loop</span><span class="o">.</span><span class="n">header</span><span class="si">}</span><span class="s2">, blocks=</span><span class="si">{</span><span class="n">loop</span><span class="o">.</span><span class="n">blocks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="CFG-数据结构">CFG 数据结构
+<h2>代码走读
+<h3>CFG 数据结构
 <div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CFGNode</span><span class="p">:</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>               <span class="c1"># 块名（标签）</span>
@@ -576,7 +576,7 @@ br t2 &gt; 0 → .L_true, .L_false
     <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span>              <span class="c1"># 入口块名</span>
 </code></pre></div>
 
-<h3 id="构建算法">构建算法
+<h3>构建算法
 <div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">扫描所有</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">指令</span><span class="err">，</span><span class="n">识别</span><span class="s">&quot;块边界&quot;</span>
 <span class="w">   </span><span class="n">块边界</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">标签</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="w"> </span><span class="n">或</span><span class="w"> </span><span class="n">分支</span><span class="o">/</span><span class="n">跳转之后的下一条</span>
 <span class="mf">2.</span><span class="w"> </span><span class="n">将指令分配到各个基本块</span>
@@ -588,15 +588,15 @@ br t2 &gt; 0 → .L_true, .L_false
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-手动画一个-CFG">练习 1: 手动画一个 CFG
+<h2>动手练习
+<h3>练习 1: 手动画一个 CFG
 <p>写一个包含 if/else 的 DSL 程序，先用解析器生成 IR，再画出手工推导的 CFG，最后和 <code>cfg.to_dot()</code> 的输出对比。</p>
-<h3 id="练习-2-可视化-CFG">练习 2: 可视化 CFG
+<h3>练习 2: 可视化 CFG
 <p>用 Graphviz 把 CFG 渲染成图片：<code>dot -Tpng cfg.dot -o cfg.png</code></p>
-<h3 id="练习-3-检测不可达代码">练习 3: 检测不可达代码
+<h3>练习 3: 检测不可达代码
 <p>写一个包含 <code>return</code> 后还有代码的 DSL 程序，看 CFG Builder 能否检测到不可达块。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -624,7 +624,7 @@ br t2 &gt; 0 → .L_true, .L_false
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 8.4 节：Basic Blocks and Flow Graphs</li>
 <li>龙书第 9.6 节：Loop Detection and Natural Loops</li>

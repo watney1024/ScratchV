@@ -442,11 +442,11 @@ body {
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/backend/asm_peephole.py</code> | <strong>行数</strong>: ~587</p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>窥孔优化器（Peephole Optimizer）在<strong>汇编层面</strong>做"局部小手术"——用一个滑动窗口扫描汇编代码，匹配到某些低效指令组合后，替换为更高效的等价指令（或直接删除）。</p>
 <p>名字由来：就像通过门上的"窥孔"看东西，每次只看很小的范围（2-3 条指令）。</p>
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>编译器的代码生成通常是机械化的"模板翻译"，会产生一些显然低效的指令组合。例如：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 代码生成器可能产生：</span>
 <span class="nf">li</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="w">          </span><span class="c1"># a0 = 5</span>
@@ -458,8 +458,8 @@ body {
 
 <p>这类优化在汇编层面做最合适——因为所有指令都已经"展开"了，模式匹配最直接。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="优化规则PeepholeRule">1. 优化规则（PeepholeRule）
+<h2>核心概念
+<h3 id="1-优化规则peepholerule">1. 优化规则（PeepholeRule）
 <p>每条规则有三要素：</p>
 <div class="codehilite"><pre><span></span><code><span class="n">PeepholeRule</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;addi+addi fusion&quot;</span><span class="p">,</span>           <span class="c1"># 规则名称</span>
@@ -469,7 +469,7 @@ body {
 <span class="p">)</span>
 </code></pre></div>
 
-<h3 id="5-条默认规则">2. 5 条默认规则
+<h3 id="2-5-条默认规则">2. 5 条默认规则
 <table>
 <thead>
 <tr>
@@ -512,7 +512,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="固定点迭代">3. 固定点迭代
+<h3 id="3-固定点迭代">3. 固定点迭代
 <p>优化器会反复扫描直到<strong>没有新变化</strong>（fixed point）：</p>
 <div class="codehilite"><pre><span></span><code>原始汇编 → 扫描 → 匹配 → 替换 → 新汇编
                                     ↓
@@ -523,8 +523,8 @@ body {
 
 <p>最多迭代 50 轮（防止无限循环）。</p>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-基本使用">Step 1: 基本使用
+<h2>一步步
+<h3>Step 1: 基本使用
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.asm_peephole</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsmPeepholeOptimizer</span>
 
 <span class="n">asm_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -543,7 +543,7 @@ body {
 <span class="nb">print</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">report</span><span class="p">())</span>
 </code></pre></div>
 
-<h3 id="Step-2-从命令行使用">Step 2: 从命令行使用
+<h3>Step 2: 从命令行使用
 <div class="codehilite"><pre><span></span><code><span class="c1"># 优化汇编文件</span>
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_peephole<span class="w"> </span>output.s<span class="w"> </span>-o<span class="w"> </span>optimized.s<span class="w"> </span>--report
 
@@ -551,7 +551,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_pee
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_peephole<span class="w"> </span>--list-rules
 </code></pre></div>
 
-<h3 id="Step-3-自定义规则">Step 3: 自定义规则
+<h3>Step 3: 自定义规则
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.asm_peephole</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeepholeRule</span><span class="p">,</span> <span class="n">AsmPeepholeOptimizer</span>
 
 <span class="c1"># 自定义规则：连续的 nop 删除</span>
@@ -568,8 +568,8 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_pee
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="核心循环">核心循环
+<h2>代码走读
+<h3>核心循环
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asm_text</span><span class="p">):</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">_parse_asm</span><span class="p">(</span><span class="n">asm_text</span><span class="p">)</span>  <span class="c1"># 解析为 AsmLine 列表</span>
     <span class="n">total_changes</span> <span class="o">=</span> <span class="mi">0</span>
@@ -604,7 +604,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_pee
     <span class="k">return</span> <span class="n">_lines_to_asm</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span> <span class="n">total_changes</span>
 </code></pre></div>
 
-<h3 id="模式匹配">模式匹配
+<h3>模式匹配
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_match_rule</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
     <span class="n">bindings</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pat_op</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">window</span><span class="p">)):</span>
@@ -620,17 +620,17 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_pee
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-观察优化效果">练习 1: 观察优化效果
+<h2>动手练习
+<h3>练习 1: 观察优化效果
 <p>写一段包含冗余指令的汇编（比如 <code>li + addi</code>），用窥孔优化器处理，对比前后的变化。</p>
-<h3 id="练习-2-添加新规则">练习 2: 添加新规则
+<h3>练习 2: 添加新规则
 <p>设计一条新规则。比如：
 - 连续的 <code>mv a, b; mv b, c</code> → <code>mv a, c</code>
 - <code>addi x, x, 0</code> → 删除（加 0 无意义）</p>
-<h3 id="练习-3-分析-CNN-模型的优化机会">练习 3: 分析 CNN 模型的优化机会
+<h3>练习 3: 分析 CNN 模型的优化机会
 <p>对 CNN 模型生成的汇编运行窥孔优化器，看有多少指令被优化掉了。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -658,7 +658,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_pee
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书（Compilers: Principles, Techniques, and Tools）第 8.5 节：Peephole Optimization</li>
 <li>LLVM 的窥孔优化：<a href="https://llvm.org/docs/CodeGenerator.html#peephole-optimizations" target="_blank" rel="noopener">TableGen Peephole Patterns</a></li>

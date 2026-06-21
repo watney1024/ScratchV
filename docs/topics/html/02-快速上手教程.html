@@ -443,7 +443,7 @@ body {
 <strong>前置要求</strong>: 环境已搭建（<a href="00-环境搭建指南.html">00-环境搭建指南</a>）</p>
 </blockquote>
 <hr />
-<h2 id="目录">目录
+<h2>目录
 <ol>
 <li><a href="#1-hello-world-你的第一个-dsl-程序">Hello World: 你的第一个 DSL 程序</a></li>
 <li><a href="#2-理解编译产物">理解编译产物</a></li>
@@ -454,9 +454,9 @@ body {
 <li><a href="#7-下一步学什么">下一步学什么</a></li>
 </ol>
 <hr />
-<h2 id="Hello-World-你的第一个-DSL-程序">1. Hello World: 你的第一个 DSL 程序
+<h2 id="1-hello-world-你的第一个-dsl-程序">1. Hello World: 你的第一个 DSL 程序
 <p>ScratchV 有自己的迷你编程语言（DSL），用来描述张量计算。我们先写一个最简单的：</p>
-<h3 id="1-创建-DSL-文件">1.1 创建 DSL 文件
+<h3>1.1 创建 DSL 文件
 <div class="codehilite"><pre><span></span><code><span class="c1"># 在项目根目录下</span>
 mkdir<span class="w"> </span>-p<span class="w"> </span>my_examples
 cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
@@ -468,7 +468,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 <span class="s">EOF</span>
 </code></pre></div>
 
-<h3 id="2-编译为-IR中间表示">1.2 编译为 IR（中间表示）
+<h3>1.2 编译为 IR（中间表示）
 <p>DSL 程序第一步是翻译成 ScratchV 的中间表示（IR）：</p>
 <div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
 <span class="s2">from scratchv.frontend.dsl_parser import DSLParser</span>
@@ -487,7 +487,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 </code></pre></div>
 
 <p>这就是 <strong>三地址码 IR</strong>。每一行是一个操作，最多三个参与者（两个输入，一个输出）。</p>
-<h3 id="3-编译为-RISC-V-汇编">1.3 编译为 RISC-V 汇编
+<h3>1.3 编译为 RISC-V 汇编
 <div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
 <span class="s2">from scratchv.frontend.dsl_parser import DSLParser</span>
 <span class="s2">from scratchv.backend.instruction_select import InstructionSelector</span>
@@ -524,8 +524,8 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 <p>💡 这就是你写的 <code>c = add(a, b)</code> 变出来的 RISC-V 汇编。<code>li</code> = 加载常数，<code>add</code> = 加法，<code>mv</code> = 移动数据，<code>ret</code> = 返回结果。</p>
 </blockquote>
 <hr />
-<h2 id="理解编译产物">2. 理解编译产物
-<h3 id="1-指令长什么样">2.1 指令长什么样？
+<h2 id="2-理解编译产物">2. 理解编译产物
+<h3>2.1 指令长什么样？
 <p>RISC-V 汇编的格式是：<code>操作码 目标寄存器, 源寄存器1, 源寄存器2</code></p>
 <div class="codehilite"><pre><span></span><code><span class="nf">add</span><span class="w"> </span><span class="no">a2</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span><span class="w">    </span><span class="err">←</span><span class="w">  </span><span class="no">a2</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="no">a1</span>
 <span class="nf">mul</span><span class="w"> </span><span class="no">a3</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span><span class="w">    </span><span class="err">←</span><span class="w">  </span><span class="no">a3</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="p">*</span><span class="w"> </span><span class="no">a1</span>
@@ -534,7 +534,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 </code></pre></div>
 
 <p>寄存器名字 <code>a0-a7</code> 是函数参数/返回值，<code>t0-t6</code> 是临时变量，<code>s0-s11</code> 是保留变量。</p>
-<h3 id="2-编译流程全景">2.2 编译流程全景
+<h3>2.2 编译流程全景
 <div class="codehilite"><pre><span></span><code><span class="n">my_examples</span><span class="o">/</span><span class="n">hello</span><span class="p">.</span><span class="n">dsl</span><span class="w">     </span><span class="err">←</span><span class="w"> </span><span class="n">你写的</span><span class="w"> </span><span class="n">DSL</span><span class="w"> </span><span class="n">代码</span>
 <span class="w">        </span><span class="err">│</span>
 <span class="w">   </span><span class="n">DSLParser</span><span class="w">               </span><span class="err">←</span><span class="w"> </span><span class="n">解析成</span><span class="w"> </span><span class="n">AST</span>
@@ -557,9 +557,9 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 </code></pre></div>
 
 <hr />
-<h2 id="编译-CNN-模型">3. 编译 CNN 模型
+<h2 id="3-编译-cnn-模型">3. 编译 CNN 模型
 <p>ScratchV 最核心的功能是把 ONNX 格式的 CNN 模型编译成 RISC-V 机器码。</p>
-<h3 id="1-一条命令编译">3.1 一条命令编译
+<h3>3.1 一条命令编译
 <div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench-cnn
 </code></pre></div>
 
@@ -568,7 +568,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 <span class="w">    </span>-o<span class="w"> </span>/tmp/cnn_riscv.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
 </code></pre></div>
 
-<h3 id="2-参数说明">3.2 参数说明
+<h3>3.2 参数说明
 <table>
 <thead>
 <tr>
@@ -599,7 +599,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 </tr>
 </tbody>
 </table>
-<h3 id="3-查看输出">3.3 查看输出
+<h3>3.3 查看输出
 <div class="codehilite"><pre><span></span><code><span class="c1"># 查看汇编输出（如果加了 --asm）</span>
 head<span class="w"> </span>-100<span class="w"> </span>output.s
 
@@ -622,7 +622,7 @@ cat<span class="w"> </span>benchmark_reports/cnn_riscv_report.md
 <p>💡 <strong>静态指令</strong> = 编译器生成了多少行指令（不管循环执行多少次）。<strong>动态指令</strong> = CPU 实际执行了多少条（循环里的指令每次迭代都算），这个数才是真正影响运行速度的。</p>
 </blockquote>
 <hr />
-<h2 id="用-LLVM-路径编译">4. 用 LLVM 路径编译
+<h2 id="4-用-llvm-路径编译">4. 用 LLVM 路径编译
 <p>ScratchV 还有一条 LLVM 路径，生成 LLVM IR 而不是直接生成 RISC-V 机器码。</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 生成 LLVM IR（需要先 pip install llvmlite）</span>
 python3<span class="w"> </span>scratchv/standalone/onnx_to_llvm_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
@@ -650,7 +650,7 @@ python3<span class="w"> </span>scratchv/standalone/onnx_to_llvm_standalone.py<sp
 
 <p>你会注意到：<strong>LLVM 用 <code>fmul</code> (浮点乘) 一条指令搞定了 ScratchV 的 <code>mul + srai</code> 两条</strong>。</p>
 <hr />
-<h2 id="运行基准测试">5. 运行基准测试
+<h2 id="5-运行基准测试">5. 运行基准测试
 <div class="codehilite"><pre><span></span><code><span class="c1"># 基础功能测试</span>
 make<span class="w"> </span><span class="nb">test</span>
 
@@ -689,7 +689,7 @@ make<span class="w"> </span>bench-ci
 </tbody>
 </table>
 <hr />
-<h2 id="查看性能仪表盘">6. 查看性能仪表盘
+<h2 id="6-查看性能仪表盘">6. 查看性能仪表盘
 <div class="codehilite"><pre><span></span><code><span class="c1"># 生成仪表盘</span>
 make<span class="w"> </span>bench-dashboard
 
@@ -706,7 +706,7 @@ google-chrome<span class="w"> </span>benchmark_reports/dashboard.html
 - <strong>缓存命中率</strong>：D-Cache 和综合评分
 - <strong>趋势图</strong>（history.html）：历次提交的性能变化曲线</p>
 <hr />
-<h2 id="下一步学什么">7. 下一步学什么
+<h2 id="7-下一步学什么">7. 下一步学什么
 <p>根据你的兴趣选择：</p>
 <table>
 <thead>

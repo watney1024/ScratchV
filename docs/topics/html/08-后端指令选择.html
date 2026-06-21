@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/backend/instruction_select.py</code>, <code>scratchv/backend/inst_select_ext.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>指令选择器（Instruction Selector）是后端的第一个阶段，负责将<strong>平台无关的 IR 指令</strong>翻译为<strong>RISC-V 特定的机器指令</strong>。</p>
 <div class="codehilite"><pre><span></span><code><span class="n">IR</span><span class="w"> </span><span class="s">Program</span><span class="w"> </span><span class="s">(平台无关)</span><span class="w">           </span><span class="s">MachineInstr[]</span><span class="w"> </span><span class="s">(RISC-V</span><span class="w"> </span><span class="s">特定)</span>
 <span class="w">  </span><span class="c">%3 = add %1, %2        →      ADD v3, v1, v2</span>
@@ -452,7 +452,7 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>IR 里的操作码是<strong>抽象的</strong>——<code>CONV</code>、<code>RELU</code>、<code>GEMM</code> 这些不是 RISC-V 的机器指令。指令选择器要决定：</p>
 <ol>
 <li><strong>哪些 IR 指令能直接映射到 RISC-V 指令</strong>（如 <code>ADD</code> → <code>add</code>）</li>
@@ -460,8 +460,8 @@ body {
 <li><strong>哪些 IR 指令需要展开为循环</strong>（如 <code>CONV</code> → 6 层嵌套循环的 load/mul/srai/add/store）</li>
 </ol>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="映射策略">1. 映射策略
+<h2>核心概念
+<h3 id="1-映射策略">1. 映射策略
 <table>
 <thead>
 <tr>
@@ -493,7 +493,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="指令映射表关键条目">2. 指令映射表（关键条目）
+<h3 id="2-指令映射表关键条目">2. 指令映射表（关键条目）
 <table>
 <thead>
 <tr>
@@ -560,7 +560,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="管线位置">3. 管线位置
+<h3 id="3-管线位置">3. 管线位置
 <div class="codehilite"><pre><span></span><code><span class="n">IR</span><span class="w"> </span><span class="n">Program</span>
 <span class="w">    </span><span class="err">↓</span>
 <span class="o">[</span><span class="n">InstructionSelector</span><span class="o">]</span><span class="w">      </span><span class="err">←</span><span class="w"> </span><span class="n">你现在在这里</span>
@@ -571,8 +571,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-使用指令选择器">Step 1: 使用指令选择器
+<h2>一步步
+<h3>Step 1: 使用指令选择器
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.instruction_select</span><span class="w"> </span><span class="kn">import</span> <span class="n">InstructionSelector</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">DSLParser</span>
 
@@ -589,7 +589,7 @@ body {
     <span class="nb">print</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-2-测试单个-IR-指令的翻译">Step 2: 测试单个 IR 指令的翻译
+<h3>Step 2: 测试单个 IR 指令的翻译
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.ir.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Instruction</span><span class="p">,</span> <span class="n">OpCode</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="n">DataType</span>
 
 <span class="c1"># 创建一个 IR ADD 指令</span>
@@ -609,8 +609,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="核心分发逻辑">核心分发逻辑
+<h2>代码走读
+<h3>核心分发逻辑
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">InstructionSelector</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">:</span> <span class="n">Program</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineInstr</span><span class="p">]:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
@@ -635,7 +635,7 @@ body {
         <span class="k">return</span> <span class="n">handler</span><span class="p">(</span><span class="n">instr</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="RELU-降级">RELU 降级
+<h3>RELU 降级
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_select_relu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instr</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;RELU(x) = max(x, 0)&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span>
@@ -648,7 +648,7 @@ body {
     <span class="p">]</span>
 </code></pre></div>
 
-<h3 id="BR_IF-展开">BR_IF 展开
+<h3>BR_IF 展开
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_select_br_if</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instr</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;br_if cond, true_label, false_label&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span>
@@ -658,15 +658,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-添加一个新的指令映射">练习 1: 添加一个新的指令映射
+<h2>动手练习
+<h3>练习 1: 添加一个新的指令映射
 <p>假设你给 IR 添加了一个 <code>NEG</code>（取反）操作码。在 <code>instruction_select.py</code> 中实现 <code>_select_neg</code>，把它映射为 <code>sub rd, x0, rs</code>（0 - x = -x）。</p>
-<h3 id="练习-2-追踪一个算子的完整翻译">练习 2: 追踪一个算子的完整翻译
+<h3>练习 2: 追踪一个算子的完整翻译
 <p>写一个 DSL 程序包含 <code>relu(add(a, b))</code>，追踪从 DSL → IR → MachineInstr 的完整翻译过程。</p>
-<h3 id="练习-3-对比-ScratchV-和-LLVM-的指令选择">练习 3: 对比 ScratchV 和 LLVM 的指令选择
+<h3>练习 3: 对比 ScratchV 和 LLVM 的指令选择
 <p>对同一个 IR Program，分别用 <code>InstructionSelector</code>（RISC-V 路径）和 <code>LLVMCodeGen</code>（LLVM 路径）生成代码，对比输出。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -694,7 +694,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 8 章：Code Generation — 指令选择、树覆盖、Maximal Munch</li>
 <li>RISC-V 指令集手册：<a href="https://github.com/riscv/riscv-isa-manual/releases" target="_blank" rel="noopener">Volume 1: Unprivileged ISA</a></li>

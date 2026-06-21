@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/analysis/ir_verifier.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>IR 验证器检查 ScratchV IR Program 是否符合<strong>正确性规则</strong>。它应该在每次优化 pass 前后运行——确保优化没有破坏 IR。</p>
 <p>验证 7 条规则：
 1. <strong>def-before-use</strong>: 所有操作数必须在使用前定义
@@ -453,15 +453,15 @@ body {
 6. <strong>ssa-validity</strong>: 每个变量只赋值一次
 7. <strong>entry-existence</strong>: 函数必须有至少一个基本块</p>
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>优化 pass 是 IR→IR 的变换，很容易引入错误：
 - 死代码消除可能误删还在使用的变量
 - 常量折叠可能改变类型
 - 循环不变量外提可能破坏 SSA</p>
 <p>验证器是<strong>安全网</strong>——在 IR 进入后端（产生不可逆的机器码）之前，拦截所有结构性问题。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="错误级别">错误级别
+<h2>核心概念
+<h3>错误级别
 <table>
 <thead>
 <tr>
@@ -480,7 +480,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="VerificationError-结构">VerificationError 结构
+<h3>VerificationError 结构
 <div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">VerificationError</span><span class="p">:</span>
     <span class="n">level</span><span class="p">:</span> <span class="n">ErrorLevel</span>           <span class="c1"># ERROR 或 WARNING</span>
@@ -493,8 +493,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="一步步">一步步
-<h3 id="在编译管线中使用">在编译管线中使用
+<h2>一步步
+<h3>在编译管线中使用
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.analysis.ir_verifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRVerifier</span>
 
 <span class="c1"># 优化前验证</span>
@@ -509,7 +509,7 @@ body {
 <span class="k">assert</span> <span class="ow">not</span> <span class="n">post_errors</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Optimization broke IR: </span><span class="si">{</span><span class="n">post_errors</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div>
 
-<h3 id="快速验证">快速验证
+<h3>快速验证
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.analysis.ir_verifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">verify_ir</span>
 
 <span class="n">passed</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">verify_ir</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
@@ -519,8 +519,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="def-before-use-检查">def-before-use 检查
+<h2>代码走读
+<h3>def-before-use 检查
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_check_def_before_use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
     <span class="n">defined</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># 已定义的变量</span>
     <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
@@ -536,7 +536,7 @@ body {
                 <span class="n">defined</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">instr</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="SSA-检查">SSA 检查
+<h3>SSA 检查
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_check_ssa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
     <span class="n">assigned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
@@ -549,18 +549,18 @@ body {
                 <span class="n">assigned</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">instr</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="block-termination-检查">block-termination 检查
+<h3>block-termination 检查
 <p>每个基本块的<strong>最后一条指令</strong>必须是终结指令（RETURN, BR, BR_IF 之一），否则控制流会"掉进"下一个块——虽然是合法的，但通常是 bug。</p>
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-故意破坏-IR">练习 1: 故意破坏 IR
+<h2>动手练习
+<h3>练习 1: 故意破坏 IR
 <p>手动构造一个有 <code>def-before-use</code> 错误的 IR，用验证器检测。</p>
-<h3 id="练习-2-写一个优化-pass-并验证">练习 2: 写一个优化 pass 并验证
+<h3>练习 2: 写一个优化 pass 并验证
 <p>写一个简单的常量折叠 pass，在优化前后各调用一次验证器。</p>
-<h3 id="练习-3-添加新规则">练习 3: 添加新规则
+<h3>练习 3: 添加新规则
 <p>添加一条验证规则：检查所有 CONV 指令的 <code>kernel_shape</code> 属性是否存在且合法。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -584,7 +584,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 8.5 节：Peephole Optimization（优化正确性验证）</li>
 <li>LLVM Verifier: <code>llvm::verifyFunction()</code> — 业界参考实现</li>

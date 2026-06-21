@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/backend/asm_beautifier.py</code> | <strong>行数</strong>: ~535</p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>汇编美化器（<code>asm_beautifier.py</code>）把机器生成的"裸"RISC-V 汇编代码变成<strong>人类友好</strong>的格式。它做三件事：</p>
 <ol>
 <li><strong>列对齐</strong>：标签、操作码、操作数分别对齐到固定宽度列</li>
@@ -468,22 +468,22 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>初学 RISC-V 汇编时，你经常需要对照手册才能看懂 <code>addi sp, sp, -32</code> 在干什么。美化器把每条指令翻译成<strong>人类可读的公式</strong>，大大降低阅读门槛。</p>
 <p>对编译器开发者来说，美化后的汇编更容易：
 - <strong>人工检查</strong>代码生成是否正确
 - <strong>对比优化前后</strong>的汇编差异
 - <strong>教学演示</strong>时让学生一眼看懂</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="汇编行的结构">1. 汇编行的结构
+<h2>核心概念
+<h3 id="1-汇编行的结构">1. 汇编行的结构
 <p>一条 RISC-V 汇编行可以拆成 4 个部分：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">[label:]  [opcode]  [operands]  [# comment]</span>
 <span class="w">  </span><span class="na">标签      操作码     操作数        注释</span>
 </code></pre></div>
 
 <p>例如：<code>main:  add  a0, a1, a2  # a0 = a1 + a2</code></p>
-<h3 id="语义注释模板">2. 语义注释模板
+<h3 id="2-语义注释模板">2. 语义注释模板
 <p>美化器内置了 80+ 条 RISC-V 指令的"翻译模板"。例如：</p>
 <table>
 <thead>
@@ -526,13 +526,13 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="函数段检测">3. 函数/段检测
+<h3 id="3-函数/段检测">3. 函数/段检测
 <p>美化器自动识别：
 - <strong>段切换</strong>：<code>.text</code> → 代码段，<code>.data</code> → 数据段，<code>.bss</code> → 未初始化数据段
 - <strong>函数入口</strong>：不以 <code>.</code>、<code>L</code>、<code>loop</code> 开头的标签视为函数</p>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-使用美化器">Step 1: 使用美化器
+<h2>一步步
+<h3>Step 1: 使用美化器
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.asm_beautifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">beautify_asm</span>
 
 <span class="n">raw_asm</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -547,7 +547,7 @@ body {
 <span class="nb">print</span><span class="p">(</span><span class="n">pretty</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-2-从命令行使用">Step 2: 从命令行使用
+<h3>Step 2: 从命令行使用
 <div class="codehilite"><pre><span></span><code><span class="c1"># 美化汇编文件并输出到终端</span>
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_beautifier<span class="w"> </span>output.s
 
@@ -561,7 +561,7 @@ python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_bea
 python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.asm_beautifier<span class="w"> </span>output.s<span class="w"> </span>--no-comments
 </code></pre></div>
 
-<h3 id="Step-3-编译-CNN-模型并美化汇编">Step 3: 编译 CNN 模型并美化汇编
+<h3>Step 3: 编译 CNN 模型并美化汇编
 <div class="codehilite"><pre><span></span><code><span class="c1"># 先生成汇编</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>/tmp/cnn.bin<span class="w"> </span>--asm<span class="w"> </span>/tmp/cnn_raw.s
@@ -574,8 +574,8 @@ head<span class="w"> </span>-50<span class="w"> </span>/tmp/cnn_pretty.s
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="核心函数codebeautify_asmcode">核心函数：<code>beautify_asm()</code>
+<h2>代码走读
+<h3>核心函数：<code>beautify_asm()</code>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">beautify_asm</span><span class="p">(</span><span class="n">asm_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">align</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">add_comments</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="c1"># 1. 按行解析 → 每行拆成 {label, opcode, operands, comment}</span>
@@ -595,7 +595,7 @@ head<span class="w"> </span>-50<span class="w"> </span>/tmp/cnn_pretty.s
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_lines</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="注释生成逻辑code_gen_commentcode">注释生成逻辑：<code>_gen_comment()</code>
+<h3>注释生成逻辑：<code>_gen_comment()</code>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_gen_comment</span><span class="p">(</span><span class="n">opcode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operands</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">template</span> <span class="o">=</span> <span class="n">_INST_COMMENTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opcode</span><span class="p">)</span>  <span class="c1"># 查模板表</span>
     <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -604,14 +604,14 @@ head<span class="w"> </span>-50<span class="w"> </span>/tmp/cnn_pretty.s
     <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rd</span><span class="o">=</span><span class="n">operands</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rs1</span><span class="o">=</span><span class="n">operands</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="关键细节">关键细节
+<h3>关键细节
 <ul>
 <li><strong>内存操作数处理</strong>：<code>lw a0, 16(sp)</code> 需要把 <code>16</code> 提取为 <code>imm</code>，<code>sp</code> 提取为 <code>rs1</code></li>
 <li><strong>分支跳转指令</strong>：目标标签通常是最后一个操作数（不是第一个）</li>
 </ul>
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-美化一段手写汇编">练习 1: 美化一段手写汇编
+<h2>动手练习
+<h3>练习 1: 美化一段手写汇编
 <p>创建 <code>test.s</code>：</p>
 <div class="codehilite"><pre><span></span><code><span class="na">.text</span>
 <span class="nl">main:</span>
@@ -625,12 +625,12 @@ head<span class="w"> </span>-50<span class="w"> </span>/tmp/cnn_pretty.s
 </code></pre></div>
 
 <p>然后运行美化器观察效果。</p>
-<h3 id="练习-2-添加新的指令模板">练习 2: 添加新的指令模板
+<h3>练习 2: 添加新的指令模板
 <p>在 <code>_INST_COMMENTS</code> 字典中添加一条新指令的注释模板。比如添加 <code>max</code>（ScratchV 伪指令）的模板。</p>
-<h3 id="练习-3-对比美化前后的可读性">练习 3: 对比美化前后的可读性
+<h3>练习 3: 对比美化前后的可读性
 <p>用 <code>make bench-cnn</code> 生成汇编，分别看美化前后的效果。哪种更容易理解？</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -658,7 +658,7 @@ head<span class="w"> </span>-50<span class="w"> </span>/tmp/cnn_pretty.s
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>RISC-V 汇编语法参考：<a href="https://github.com/riscv-non-isa/riscv-asm-manual" target="_blank" rel="noopener">RISC-V Assembly Programmer's Manual</a></li>
 <li>ABI 寄存器命名约定：<a href="https://github.com/riscv-non-isa/riscv-elf-psabi-doc" target="_blank" rel="noopener">RISC-V ELF psABI</a></li>

@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/standalone/spike_sim.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>Spike 仿真器集成将 ScratchV 编译出的 RV32IM flat binary 包装为最小 ELF32 格式，交给 <strong>Spike</strong>（RISC-V 官方黄金参考仿真器）执行，收集精确的动态指令数、I$/D$ 缓存命中率和指令热点。</p>
 <div class="codehilite"><pre><span></span><code>output.bin (flat binary)
     │
@@ -460,12 +460,12 @@ spike-log-parser  ← 解析提交指令日志
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>ScratchV 内置的估算器（<code>--estimate</code>）是<strong>分析估算</strong>——用 <code>CONV_INSNS_PER_MAC=12</code> 乘以 MAC 数，速度快但不精确。TinyFive 仿真器是<strong>逐条仿真</strong>但很慢（~1 KIPS）。</p>
 <p>Spike 是<strong>工业级 RISC-V 黄金参考模型</strong>——结果权威、速度快 100-500 倍、自带 cache 模拟和指令日志。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="ELF32-包装">ELF32 包装
+<h2>核心概念
+<h3>ELF32 包装
 <p>ScratchV 输出是 flat binary（position-independent，无 header）。Spike 需要 ELF 格式。<code>spike_sim.py</code> 手工构造最小 ELF32：</p>
 <div class="codehilite"><pre><span></span><code><span class="n">ELF_BASE</span> <span class="o">=</span> <span class="mh">0x80000000</span>       <span class="c1"># RISC-V DRAM 基地址</span>
 <span class="n">STACK_TOP</span> <span class="o">=</span> <span class="mh">0x85000000</span>      <span class="c1"># 栈顶（80MB）</span>
@@ -474,14 +474,14 @@ spike-log-parser  ← 解析提交指令日志
 </code></pre></div>
 
 <p>构造过程：手工编码 5 条启动指令（LUI + JAL）→ 拼接 ScratchV 代码 → 写 ELF header。</p>
-<h3 id="Spike-Cache-配置">Spike Cache 配置
+<h3>Spike Cache 配置
 <div class="codehilite"><pre><span></span><code><span class="c1"># I-cache: 64 组, 2 路, 32B/块</span>
 <span class="c1"># D-cache: 128 组, 4 路, 32B/块</span>
 --ic<span class="w"> </span><span class="m">64</span>:2:32<span class="w"> </span>--dc<span class="w"> </span><span class="m">128</span>:4:32
 </code></pre></div>
 
 <p>与 <code>cache_model.py</code> 使用相同的参数，确保结果可比。</p>
-<h3 id="收集的指标">收集的指标
+<h3>收集的指标
 <table>
 <thead>
 <tr>
@@ -524,7 +524,7 @@ spike-log-parser  ← 解析提交指令日志
 </tbody>
 </table>
 <hr />
-<h2 id="一步步">一步步
+<h2>一步步
 <div class="codehilite"><pre><span></span><code><span class="c1"># 1. 编译 ScratchV binary</span>
 python<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>output.bin<span class="w"> </span>--asm<span class="w"> </span>output.s
@@ -537,8 +537,8 @@ python<span class="w"> </span>scratchv/standalone/spike_sim.py<span class="w"> <
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="最小-ELF32-构造">最小 ELF32 构造
+<h2>代码走读
+<h3>最小 ELF32 构造
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_minimal_elf32</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;手工构造包含启动代码 + ScratchV 代码的最小 ELF32&quot;&quot;&quot;</span>
     <span class="c1"># 启动代码（5 条指令）:</span>
@@ -555,7 +555,7 @@ python<span class="w"> </span>scratchv/standalone/spike_sim.py<span class="w"> <
     <span class="k">return</span> <span class="n">build_elf</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="n">ELF_BASE</span><span class="p">,</span> <span class="n">load_addr</span><span class="o">=</span><span class="n">ELF_BASE</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Spike-调用">Spike 调用
+<h3>Spike 调用
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_spike</span><span class="p">(</span><span class="n">elf_path</span><span class="p">,</span> <span class="n">max_instr</span><span class="p">,</span> <span class="n">ic_config</span><span class="p">,</span> <span class="n">dc_config</span><span class="p">):</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">SPIKE</span><span class="p">,</span>
@@ -571,15 +571,15 @@ python<span class="w"> </span>scratchv/standalone/spike_sim.py<span class="w"> <
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-对比-Spike-vs-估算">练习 1: 对比 Spike vs 估算
+<h2>动手练习
+<h3>练习 1: 对比 Spike vs 估算
 <p>对同一个 CNN 模型，分别用 <code>--estimate</code>（分析估算）和 Spike 仿真（真实执行）统计动态指令数，对比差异。</p>
-<h3 id="练习-2-调整-cache-参数">练习 2: 调整 cache 参数
+<h3>练习 2: 调整 cache 参数
 <p>把 D-cache 从 <code>128:4:32</code> 改为 <code>256:8:64</code>，重新仿真，观察命中率变化。</p>
-<h3 id="练习-3-分析-PC-热点">练习 3: 分析 PC 热点
+<h3>练习 3: 分析 PC 热点
 <p>从 Spike 的指令 trace 中提取 PC 热点，确认 &gt;99% 执行时间确实在 Conv2D 最内层循环。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -607,7 +607,7 @@ python<span class="w"> </span>scratchv/standalone/spike_sim.py<span class="w"> <
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li><a href="https://github.com/riscv-software-src/riscv-isa-sim" target="_blank" rel="noopener">Spike RISC-V ISA Simulator</a></li>
 <li>ELF 格式规范: <code>man 5 elf</code></li>

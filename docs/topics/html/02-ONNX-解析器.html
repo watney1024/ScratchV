@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/frontend/onnx_parser.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>ONNX 解析器将 <code>.onnx</code> 模型文件（protobuf 二进制格式）解析为 ScratchV 的内部 IR。支持 15 种 ONNX 算子：Conv、Gemm、MatMul、MaxPool、ReLU、Sigmoid、Softmax 等。</p>
 <div class="codehilite"><pre><span></span><code><span class="o">.</span><span class="n">onnx</span><span class="w"> </span><span class="err">文件</span><span class="w"> </span><span class="p">(</span><span class="n">protobuf</span><span class="w"> </span><span class="err">二进制</span><span class="p">)</span>
 <span class="w">        </span><span class="err">│</span>
@@ -453,15 +453,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <ul>
 <li>ONNX 是 AI 模型的标准交换格式，PyTorch/TensorFlow/Keras 都能导出</li>
 <li>解析器的存在让 ScratchV 能<strong>编译真实的训练好的模型</strong>，而不只是手写 DSL 程序</li>
 <li>两条路径共享解析逻辑：库路径（用 <code>onnx</code> 包）和 Standalone 路径（手工 protobuf 解析）</li>
 </ul>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="ONNX-模型结构">1. ONNX 模型结构
+<h2>核心概念
+<h3 id="1-onnx-模型结构">1. ONNX 模型结构
 <div class="codehilite"><pre><span></span><code><span class="nx">ModelProto</span>
 <span class="w">  </span><span class="err">└──</span><span class="w"> </span><span class="nx">GraphProto</span>
 <span class="w">        </span><span class="err">├──</span><span class="w"> </span><span class="nx">input</span><span class="p">[]</span><span class="w">      </span><span class="err">←</span><span class="w"> </span><span class="nx">模型输入</span><span class="err">（</span><span class="nx">名称</span><span class="err">、</span><span class="nx">形状</span><span class="err">、</span><span class="nx">类型</span><span class="err">）</span>
@@ -474,7 +474,7 @@ body {
 <span class="w">              </span><span class="err">└──</span><span class="w"> </span><span class="nx">attribute</span><span class="p">[]</span><span class="w">  </span><span class="err">←</span><span class="w"> </span><span class="nx">属性</span><span class="p">:</span><span class="w"> </span><span class="nx">kernel_shape</span><span class="p">,</span><span class="w"> </span><span class="nx">strides</span><span class="p">,</span><span class="w"> </span><span class="nx">pads</span>
 </code></pre></div>
 
-<h3 id="15-种已支持的-ONNX-算子">2. 15 种已支持的 ONNX 算子
+<h3 id="2-15-种已支持的-onnx-算子">2. 15 种已支持的 ONNX 算子
 <table>
 <thead>
 <tr>
@@ -535,7 +535,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="两条路径对比">3. 两条路径对比
+<h3 id="3-两条路径对比">3. 两条路径对比
 <table>
 <thead>
 <tr>
@@ -568,8 +568,8 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-加载并查看-ONNX-模型">Step 1: 加载并查看 ONNX 模型
+<h2>一步步
+<h3>Step 1: 加载并查看 ONNX 模型
 <div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">onnx</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;models/graph/cnn.onnx&quot;</span><span class="p">)</span>
@@ -579,7 +579,7 @@ body {
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nodes: </span><span class="si">{</span><span class="p">[(</span><span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-2-用-ScratchV-解析器解析">Step 2: 用 ScratchV 解析器解析
+<h3>Step 2: 用 ScratchV 解析器解析
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.onnx_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ONNXParser</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">ONNXParser</span><span class="p">()</span>
@@ -591,7 +591,7 @@ body {
           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">instructions</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">func</span><span class="o">.</span><span class="n">basic_blocks</span><span class="p">)</span><span class="si">}</span><span class="s2"> instrs&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-3-查看解析出的权重">Step 3: 查看解析出的权重
+<h3>Step 3: 查看解析出的权重
 <div class="codehilite"><pre><span></span><code><span class="c1"># 在 standalone 路径中使用 ONNXModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.standalone.onnx_to_riscv_standalone</span><span class="w"> </span><span class="kn">import</span> <span class="n">ONNXModel</span>
 
@@ -602,8 +602,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="ONNXParser-核心流程">ONNXParser 核心流程
+<h2>代码走读
+<h3>ONNXParser 核心流程
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ONNXParser</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Program</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
@@ -631,7 +631,7 @@ body {
         <span class="k">return</span> <span class="n">program</span>
 </code></pre></div>
 
-<h3 id="算子处理示例Conv">算子处理示例：Conv
+<h3>算子处理示例：Conv
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_handle_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Conv 节点 → CONV IR 指令&quot;&quot;&quot;</span>
     <span class="c1"># 提取属性</span>
@@ -657,7 +657,7 @@ body {
     <span class="k">return</span> <span class="p">[</span><span class="n">instr</span><span class="p">]</span>
 </code></pre></div>
 
-<h3 id="关键细节属性提取">关键细节：属性提取
+<h3>关键细节：属性提取
 <p>ONNX 的属性有类型——可能是 <code>int</code>、<code>ints</code>（整数列表）、<code>float</code> 等：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_get_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">attribute</span><span class="p">:</span>
@@ -672,15 +672,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-添加新算子的支持">练习 1: 添加新算子的支持
+<h2>动手练习
+<h3>练习 1: 添加新算子的支持
 <p>在 <code>onnx_parser.py</code> 中添加 <code>Tanh</code> 算子的处理。ONNX 定义 <code>Tanh</code> 输入一个 tensor，输出一个 tensor（逐元素 tanh）。</p>
-<h3 id="练习-2-可视化-ONNX-模型图">练习 2: 可视化 ONNX 模型图
+<h3>练习 2: 可视化 ONNX 模型图
 <p>用 <a href="https://netron.app" target="_blank" rel="noopener">Netron</a> 打开 <code>models/graph/cnn.onnx</code>，对照解析器的输出，理解模型的拓扑结构。</p>
-<h3 id="练习-3-对比解析前后的权重">练习 3: 对比解析前后的权重
+<h3>练习 3: 对比解析前后的权重
 <p>用 <code>onnxruntime</code> 直接推理模型，和 ScratchV 编译后的结果对比，验证解析的正确性。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -708,7 +708,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li><a href="https://github.com/onnx/onnx/blob/main/docs/Operators.md" target="_blank" rel="noopener">ONNX 算子规范</a> — 所有标准算子的定义</li>
 <li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — Standalone 路径的 ONNXModel 手工 protobuf 解析原理</li>

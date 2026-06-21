@@ -442,14 +442,14 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/backend/const_merge.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>常量加载合并（<code>const_merge.py</code>）在汇编层面优化 RISC-V 加载 32 位常量的指令序列。RISC-V 要加载一个 32 位常数需要两条指令（<code>lui</code> + <code>addi</code>），这个优化器做了两件事：</p>
 <ol>
 <li><strong>lui+addi 合并</strong>：把相邻的 <code>lui rd, hi</code> + <code>addi rd, rd, lo</code> 合并为一条 <code>li rd, full_value</code></li>
 <li><strong>冗余 lui 消除</strong>：删除连续两次加载相同高位立即数的 <code>lui</code></li>
 </ol>
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>RISC-V 指令都是 32 位定长，无法在一条指令里编码 32 位立即数。所以加载常数需要：</p>
 <div class="codehilite"><pre><span></span><code><span class="nf">lui</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x12345</span><span class="w">     </span><span class="c1"># t0 = 0x12345 &lt;&lt; 12 = 0x12345000</span>
 <span class="nf">addi</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0x678</span><span class="w">  </span><span class="c1"># t0 = t0 + 0x678 = 0x12345678</span>
@@ -457,13 +457,13 @@ body {
 
 <p>编译器简单翻译时可能产生不必要的冗余。这个优化器在汇编生成后做"post-pass"清理。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="RISC-V-32-位常数加载">RISC-V 32 位常数加载
+<h2>核心概念
+<h3>RISC-V 32 位常数加载
 <div class="codehilite"><pre><span></span><code>最终值 = (imm_hi &lt;&lt; 12) + sign_extend_12(imm_lo)
 </code></pre></div>
 
 <p>关键细节：<code>addi</code> 的 12 位立即数会被<strong>符号扩展</strong>。<code>0x800</code> → <code>-2048</code>（不是 <code>+2048</code>）。</p>
-<h3 id="两遍优化">两遍优化
+<h3>两遍优化
 <p><strong>Pass 1: lui+addi 合并</strong></p>
 <div class="codehilite"><pre><span></span><code>lui t0, 0x12345     →    li t0, 0x12345678
 addi t0, t0, 0x678
@@ -477,8 +477,8 @@ lui t0, 0x12345          lui t0, 0x12345（第一次已加载）
 </code></pre></div>
 
 <hr />
-<h2 id="一步步">一步步
-<h3 id="使用">使用
+<h2>一步步
+<h3>使用
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.const_merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_constants</span>
 
 <span class="n">asm</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -493,13 +493,13 @@ lui t0, 0x12345          lui t0, 0x12345（第一次已加载）
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Changes: </span><span class="si">{</span><span class="n">changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="命令行">命令行
+<h3>命令行
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>scratchv.backend.const_merge<span class="w"> </span>input.s<span class="w"> </span>-o<span class="w"> </span>output.s<span class="w"> </span>-v
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="合并逻辑">合并逻辑
+<h2>代码走读
+<h3>合并逻辑
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_merge_lui_addi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;找到相邻的 lui+addi 对并合并&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
@@ -515,7 +515,7 @@ lui t0, 0x12345          lui t0, 0x12345（第一次已加载）
                     <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># 标记删除</span>
 </code></pre></div>
 
-<h3 id="符号扩展处理">符号扩展处理
+<h3>符号扩展处理
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_sign_extend_12</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imm</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">imm</span> <span class="o">&amp;</span> <span class="mh">0x800</span><span class="p">:</span>   <span class="c1"># 第11位是1 → 负数</span>
         <span class="k">return</span> <span class="n">imm</span> <span class="o">-</span> <span class="mh">0x1000</span>
@@ -523,15 +523,15 @@ lui t0, 0x12345          lui t0, 0x12345（第一次已加载）
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-观察合并效果">练习 1: 观察合并效果
+<h2>动手练习
+<h3>练习 1: 观察合并效果
 <p>编译 CNN 模型，对输出汇编运行 <code>const_merge</code>，统计合并了多少对 lui+addi。</p>
-<h3 id="练习-2-手动计算">练习 2: 手动计算
+<h3>练习 2: 手动计算
 <p>手工计算 <code>lui t0, 0x12345</code> + <code>addi t0, t0, 0x800</code> 的最终值（注意符号扩展）。</p>
-<h3 id="练习-3-扩展优化">练习 3: 扩展优化
+<h3>练习 3: 扩展优化
 <p>添加对 <code>li</code> 后紧跟 <code>addi</code> 的合并（<code>li x, N; addi x, x, M</code> → <code>li x, N+M</code>）。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -555,7 +555,7 @@ lui t0, 0x12345          lui t0, 0x12345（第一次已加载）
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>RISC-V 指令集手册：第 2.4 节（Immediate Encoding）</li>
 <li>相关 topic: <a href="13-窥孔优化器.html">Topic 13 — 窥孔优化器</a> | <a href="12-指令计数统计器.html">Topic 12 — 指令计数统计器</a></li>

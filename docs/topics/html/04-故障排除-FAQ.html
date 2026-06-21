@@ -443,7 +443,7 @@ body {
 <strong>使用方式</strong>: Ctrl+F 搜索你的报错关键词。</p>
 </blockquote>
 <hr />
-<h2 id="目录">目录
+<h2>目录
 <ol>
 <li><a href="#1-环境问题">环境问题</a></li>
 <li><a href="#2-编译问题">编译问题</a></li>
@@ -453,8 +453,8 @@ body {
 <li><a href="#6-性能问题">性能问题</a></li>
 </ol>
 <hr />
-<h2 id="环境问题">1. 环境问题
-<h3 id="Q-codepip-install--e-code-报-codeerror-externally-managed-environmentcode">Q: <code>pip install -e .</code> 报 <code>error: externally-managed-environment</code>
+<h2 id="1-环境问题">1. 环境问题
+<h3>Q: <code>pip install -e .</code> 报 <code>error: externally-managed-environment</code>
 <p><strong>原因</strong>: 系统的 Python 不允许直接 pip install（常见于 Ubuntu 24.04+、macOS Homebrew）。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 方案 A: 创建虚拟环境（推荐）</span>
@@ -467,7 +467,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <hr />
-<h3 id="Q-codepython3-command-not-foundcode">Q: <code>python3: command not found</code>
+<h3>Q: <code>python3: command not found</code>
 <p><strong>原因</strong>: 你的系统上 Python 命令可能是 <code>python</code> 而不是 <code>python3</code>。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 先看看你有哪些 Python</span>
@@ -481,7 +481,7 @@ brew<span class="w"> </span>install<span class="w"> </span>python@3.12<span clas
 </code></pre></div>
 
 <hr />
-<h3 id="Q-codeModuleNotFoundError-No-module-named-scratchvcode">Q: <code>ModuleNotFoundError: No module named 'scratchv'</code>
+<h3>Q: <code>ModuleNotFoundError: No module named 'scratchv'</code>
 <p><strong>原因</strong>: 没有安装 ScratchV 包，或虚拟环境没激活。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 确认虚拟环境已激活（提示符有 (venv)）</span>
@@ -492,7 +492,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 
 <hr />
-<h3 id="Q-codepip-install-tinyfivecode-失败">Q: <code>pip install tinyfive</code> 失败
+<h3>Q: <code>pip install tinyfive</code> 失败
 <p><strong>原因</strong>: <code>tinyfive</code> 可能需要编译 RISC-V 仿真器的依赖。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 先安装编译工具</span>
@@ -505,7 +505,7 @@ pip<span class="w"> </span>install<span class="w"> </span>tinyfive
 
 <p>如果还是失败，TinyFive 是可选的——核心编译器不需要它。</p>
 <hr />
-<h3 id="Q-国内-codepip-installcode-太慢">Q: 国内 <code>pip install</code> 太慢
+<h3>Q: 国内 <code>pip install</code> 太慢
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 使用清华镜像</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-i<span class="w"> </span>https://pypi.tuna.tsinghua.edu.cn/simple
@@ -515,8 +515,8 @@ pip<span class="w"> </span>config<span class="w"> </span><span class="nb">set</s
 </code></pre></div>
 
 <hr />
-<h2 id="编译问题">2. 编译问题
-<h3 id="Q-codeFileNotFoundError-modelsgraphcnnonnxcode">Q: <code>FileNotFoundError: models/graph/cnn.onnx</code>
+<h2 id="2-编译问题">2. 编译问题
+<h3>Q: <code>FileNotFoundError: models/graph/cnn.onnx</code>
 <p><strong>原因</strong>: 模型文件不存在。可能需要先下载或生成。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 确认文件是否存在</span>
@@ -527,7 +527,7 @@ ls<span class="w"> </span>-la<span class="w"> </span>models/graph/cnn.onnx
 </code></pre></div>
 
 <hr />
-<h3 id="Q-编译-CNN-模型时-codeMemoryErrorcode-或-OOM">Q: 编译 CNN 模型时 <code>MemoryError</code> 或 OOM
+<h3>Q: 编译 CNN 模型时 <code>MemoryError</code> 或 OOM
 <p><strong>原因</strong>: 某些仿真模式（如 ProfiledMachine）会加载整个 binary 到内存并逐条仿真，可能消耗大量内存。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 只用估算模式（不仿真，内存小）</span>
@@ -538,14 +538,14 @@ python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<s
 </code></pre></div>
 
 <hr />
-<h3 id="Q-生成的-RISC-V-代码跑不起来">Q: 生成的 RISC-V 代码跑不起来
+<h3>Q: 生成的 RISC-V 代码跑不起来
 <p><strong>检查清单</strong>:
 1. 确认目标架构是 RV32IM（32 位整数）还是 RV64FD（64 位浮点）
 2. 如果是 ScratchV 原生路径，确认 Q16.16 乘法后是否做了 <code>srai 16</code> 截断
 3. 确认地址空间分配不重叠（MemoryPlan 是否正确）
 4. 尝试用 <code>--asm output.s</code> 输出汇编，人工检查</p>
 <hr />
-<h3 id="Q-code--comparecode-报-codellvmlite-not-foundcode">Q: <code>--compare</code> 报 <code>llvmlite not found</code>
+<h3>Q: <code>--compare</code> 报 <code>llvmlite not found</code>
 <p><strong>原因</strong>: LLVM 对比功能需要 <code>llvmlite</code> 包。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>llvmlite
@@ -553,8 +553,8 @@ python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<s
 
 <p>如果 <code>llvmlite</code> 安装失败（尤其是在非 x86 架构上），可以跳过对比功能，只用 ScratchV 原生路径。</p>
 <hr />
-<h2 id="测试问题">3. 测试问题
-<h3 id="Q-codemake-testcode-失败">Q: <code>make test</code> 失败
+<h2 id="3-测试问题">3. 测试问题
+<h3>Q: <code>make test</code> 失败
 <p><strong>第一步</strong>: 看具体哪个测试失败了：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 运行测试并看详细信息</span>
 python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v<span class="w"> </span>--tb<span class="o">=</span>long
@@ -593,7 +593,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> 
 </tbody>
 </table>
 <hr />
-<h3 id="Q-某个特定测试一直过不了">Q: 某个特定测试一直过不了
+<h3>Q: 某个特定测试一直过不了
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 单独跑这个测试，看详细信息</span>
 python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_specific.py::test_name<span class="w"> </span>-v<span class="w"> </span>--tb<span class="o">=</span>long
@@ -604,7 +604,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> 
 
 <p><code>-s</code> 参数让 print 输出显示在终端（默认被 pytest 捕获）。</p>
 <hr />
-<h3 id="Q-codemake-benchcode-失败">Q: <code>make bench</code> 失败
+<h3>Q: <code>make bench</code> 失败
 <p><strong>原因</strong>: benchmark 通常依赖更多文件（模型、测试数据）。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 确认模型文件存在</span>
@@ -615,8 +615,8 @@ make<span class="w"> </span>split-models
 </code></pre></div>
 
 <hr />
-<h2 id="CI-问题">4. CI 问题
-<h3 id="Q-GitHub-Actions-CI-失败">Q: GitHub Actions CI 失败
+<h2 id="4-ci-问题">4. CI 问题
+<h3>Q: GitHub Actions CI 失败
 <p><strong>第一步</strong>: 看 CI 日志，找到第一个报错。</p>
 <p><strong>常见 CI 问题</strong>:</p>
 <table>
@@ -651,14 +651,14 @@ make<span class="w"> </span>split-models
 </tbody>
 </table>
 <hr />
-<h3 id="Q-本地测试通过但-CI-不通过">Q: 本地测试通过但 CI 不通过
+<h3>Q: 本地测试通过但 CI 不通过
 <p><strong>常见原因</strong>:
 - <strong>Python 版本不同</strong>: CI 固定用 Python 3.12，检查你本地版本：<code>python3 --version</code>
 - <strong>依赖版本不同</strong>: CI 可能装了不同版本的 onnx/numpy
 - <strong>文件路径</strong>: CI 的工作目录可能和本地不同</p>
 <p><strong>解决</strong>: 尽量用 <code>make bench-ci</code> 模拟 CI 的完整流程。</p>
 <hr />
-<h3 id="Q-codemake-bench-cicode-生成的-dashboard-不显示数据">Q: <code>make bench-ci</code> 生成的 dashboard 不显示数据
+<h3>Q: <code>make bench-ci</code> 生成的 dashboard 不显示数据
 <p><strong>原因</strong>: JSON 数据文件可能为空或格式不对。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 检查 JSON 输出</span>
@@ -675,8 +675,8 @@ python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;
 </code></pre></div>
 
 <hr />
-<h2 id="Git-问题">5. Git 问题
-<h3 id="Q-codegit-pushcode-报-codePermission-deniedcode">Q: <code>git push</code> 报 <code>Permission denied</code>
+<h2 id="5-git-问题">5. Git 问题
+<h3>Q: <code>git push</code> 报 <code>Permission denied</code>
 <p><strong>原因</strong>: SSH key 没配置，或没权限推送到仓库。</p>
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 检查 remote URL</span>
@@ -688,7 +688,7 @@ ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com
 </code></pre></div>
 
 <hr />
-<h3 id="Q-合并冲突-merge-conflict">Q: 合并冲突 (merge conflict)
+<h3>Q: 合并冲突 (merge conflict)
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 看哪些文件冲突</span>
 git<span class="w"> </span>status
@@ -700,7 +700,7 @@ git<span class="w"> </span>commit
 </code></pre></div>
 
 <hr />
-<h3 id="Q-codegit-clonecode-太慢或超时">Q: <code>git clone</code> 太慢或超时
+<h3>Q: <code>git clone</code> 太慢或超时
 <p><strong>解决</strong>:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 配置代理</span>
 git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>http.proxy<span class="w"> </span>http://127.0.0.1:7890
@@ -711,8 +711,8 @@ git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="w"> 
 </code></pre></div>
 
 <hr />
-<h2 id="性能问题">6. 性能问题
-<h3 id="Q-为什么-ScratchV-编译的代码比-LLVM-慢">Q: 为什么 ScratchV 编译的代码比 LLVM 慢？
+<h2 id="6-性能问题">6. 性能问题
+<h3>Q: 为什么 ScratchV 编译的代码比 LLVM 慢？
 <p>这是预期的。核心原因：</p>
 <ol>
 <li><strong>Q16.16 定点</strong> vs <strong>float32</strong>: 每个乘加需要 ~12 条整数指令 vs LLVM 的 ~2 条浮点指令</li>
@@ -721,7 +721,7 @@ git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="w"> 
 </ol>
 <p>详情见 <a href="03-指标解读指南.html">03-指标解读指南</a> 第 5 节。</p>
 <hr />
-<h3 id="Q-编译太慢怎么办">Q: 编译太慢怎么办？
+<h3>Q: 编译太慢怎么办？
 <p>ScratchV 的编译速度通常不是瓶颈（CNN 模型几秒就能编译完）。如果觉得慢：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 不用仿真，只用估算</span>
 --estimate<span class="w">    </span><span class="c1"># 快，瞬间完成</span>
@@ -730,14 +730,14 @@ git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="w"> 
 </code></pre></div>
 
 <hr />
-<h3 id="Q-我的优化没看到效果">Q: 我的优化没看到效果
+<h3>Q: 我的优化没看到效果
 <p><strong>检查清单</strong>:
 1. 优化的是内层循环吗？（外层循环里的改动能被内层频率放大）
 2. 跑 benchmark 确认了吗？不要凭感觉
 3. 静态指令数减少了吗？（如果静态指令减少但动态指令没减少，说明优化在错误的地方）
 4. 有没有引入新的开销？（比如少了一条 <code>add</code> 但多了三条 <code>lw</code>）</p>
 <hr />
-<h2 id="还没解决">还没解决？
+<h2>还没解决？
 <ol>
 <li>搜索 <a href="https://github.com/kinsomwang/ScratchV/issues" target="_blank" rel="noopener">GitHub Issues</a> — 看有没有人遇到过同样的问题</li>
 <li>如果没找到，创建新的 Issue，附上：</li>

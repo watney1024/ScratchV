@@ -444,7 +444,7 @@ body {
 <strong>前置要求</strong>: 会写一点点代码（任何语言都行）</p>
 </blockquote>
 <hr />
-<h2 id="目录">目录
+<h2>目录
 <ol>
 <li><a href="#1-编译器是翻译官">编译器是翻译官</a></li>
 <li><a href="#2-翻译的四道工序">翻译的四道工序</a></li>
@@ -455,7 +455,7 @@ body {
 <li><a href="#7-关键概念速查">关键概念速查</a></li>
 </ol>
 <hr />
-<h2 id="编译器是翻译官">1. 编译器是翻译官
+<h2 id="1-编译器是翻译官">1. 编译器是翻译官
 <p>想象你去联合国，一个中国代表在台上用中文演讲，台下坐着说英文、法文、阿拉伯文的听众。这时候需要<strong>翻译官</strong>——把中文转换成听众能懂的语言。</p>
 <p><strong>编译器就是程序的"翻译官"</strong>。</p>
 <p>你写的是 Python 代码（人能读懂的"高级语言"），CPU 只认识 0 和 1 组成的机器指令（"低级语言"）。编译器的工作就是：</p>
@@ -472,7 +472,7 @@ CPU 能懂的 0/1 指令
 
 <p><strong>ScratchV 翻译的是 AI 模型</strong>——把 ONNX 格式的神经网络模型文件，翻译成 RISC-V 芯片能执行的机器码。</p>
 <hr />
-<h2 id="翻译的四道工序">2. 翻译的四道工序
+<h2 id="2-翻译的四道工序">2. 翻译的四道工序
 <p>真正的翻译官不是一句话直接翻出来，而是分步骤的。编译器也一样，通常分四道工序：</p>
 <div class="codehilite"><pre><span></span><code>源程序（ONNX 模型 / DSL 代码）
         │
@@ -504,14 +504,14 @@ CPU 能懂的 0/1 指令
     CPU 可执行的 0/1 文件
 </code></pre></div>
 
-<h3 id="为什么要有中间表示IR">为什么要有"中间表示"（IR）？
+<h3>为什么要有"中间表示"（IR）？
 <p>想象翻译官把中文演讲稿先转成一堆<strong>简笔画/符号</strong>（不关心具体用哪种语言），然后再从这些符号出发翻成英文。</p>
 <p>这个"简笔画/符号"就是 <strong>IR (Intermediate Representation，中间表示)</strong>。</p>
 <p>有了 IR 的好处：
 - 中文 → 英文 和 中文 → 法文 可以<strong>共享同一套"简笔画"</strong>（ScratchV 的 IR 同时支持生成 RISC-V 和 LLVM IR）
 - 在做具体翻译之前，可以先把"简笔画"里的废话去掉（这就是<strong>优化</strong>）</p>
 <hr />
-<h2 id="乐高积木程序的零件">3. 乐高积木：程序的零件
+<h2 id="3-乐高积木程序的零件">3. 乐高积木：程序的零件
 <p>另一个理解编译器的方式：<strong>像拼乐高</strong>。</p>
 <table>
 <thead>
@@ -545,7 +545,7 @@ CPU 能懂的 0/1 指令
 </table>
 <p>编译器就是这样：<strong>把一份"设计图纸"（程序），拆成"标准零件"（IR），再拼成"实物"（机器码）</strong>。</p>
 <hr />
-<h2 id="办公桌数据的流转">4. 办公桌：数据的流转
+<h2 id="4-办公桌数据的流转">4. 办公桌：数据的流转
 <p>还有一个比喻：</p>
 <p>CPU 就像一个<strong>忙碌的办公桌</strong>，上面有：
 - <strong>寄存器</strong>：手边的小便签，能立刻拿到（32 个，每个 32 位），速度最快
@@ -554,7 +554,7 @@ CPU 能懂的 0/1 指令
 <p>编译器的工作之一是<strong>安排好数据放在哪</strong>——尽量把常用的放便签/文件架，少去文件柜拿。</p>
 <p>这就是为什么会有"寄存器分配"、"缓存优化"这些话题——本质上是帮 CPU 的办公桌整理得更高效。</p>
 <hr />
-<h2 id="ScratchV-在翻译什么">5. ScratchV 在翻译什么
+<h2 id="5-scratchv-在翻译什么">5. ScratchV 在翻译什么
 <p>ScratchV 做的事很具体：</p>
 <div class="codehilite"><pre><span></span><code>.<span class="k">ai</span> <span class="s">模型文件</span> <span class="s">(ONNX)</span>
    包含: Conv2D, MaxPool, Gemm, ReLU, Sigmoid...
@@ -569,7 +569,7 @@ CPU 能懂的 0/1 指令
 
 <p>具体来说，ScratchV 把你训练好的 CNN 模型（能识别图片的那种），翻译成一段一段的 RISC-V CPU 指令，让 CPU 能逐步执行<strong>卷积</strong>、<strong>池化</strong>、<strong>矩阵乘法</strong>等计算。</p>
 <hr />
-<h2 id="为什么选-RISC-V">6. 为什么选 RISC-V？
+<h2 id="6-为什么选-risc-v">6. 为什么选 RISC-V？
 <table>
 <thead>
 <tr>
@@ -598,7 +598,7 @@ CPU 能懂的 0/1 指令
 </table>
 <p>对 ScratchV 来说，RISC-V 的简洁意味着：<strong>我们真的可以"从零手写"一个编译器，把每个指令都搞懂</strong>。</p>
 <hr />
-<h2 id="关键概念速查">7. 关键概念速查
+<h2 id="7-关键概念速查">7. 关键概念速查
 <p>在阅读后续文档时，你会遇到这些词。这里先列出来，随时回来查：</p>
 <table>
 <thead>
@@ -662,7 +662,7 @@ CPU 能懂的 0/1 指令
 </tbody>
 </table>
 <hr />
-<h2 id="接下来">接下来
+<h2>接下来
 <ul>
 <li>想动手实践？→ <a href="02-快速上手教程.html">02-快速上手教程</a></li>
 <li>想深入理解指标？→ <a href="03-指标解读指南.html">03-指标解读指南</a></li>

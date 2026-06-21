@@ -791,19 +791,26 @@ def md_to_html(md_text: str) -> str:
     # Post-process: add target="_blank" to external links
     html = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', html)
 
-    # Post-process: add id attributes to headings that lack them
-    # Generate URL-safe slugs from heading text for deep-linking
+    # Post-process: add stable heading ids matching the hand-written TOC format
+    # TOC links look like: [1. 你需要什么](#1-你需要什么)
+    # So we generate:     <h2 id="1-你需要什么">1. 你需要什么</h2>
     def _add_heading_id(m: re.Match) -> str:
         tag = m.group(1)
         text = m.group(2)
-        # Generate slug: keep Chinese chars URL-encoded, ASCII as-is
-        slug = text.strip()
-        # Remove numbering prefix like "1. " or "2. "
-        slug = re.sub(r'^\d+\.\s*', '', slug)
-        # Replace spaces with hyphens, remove most punctuation
-        slug = re.sub(r'[^\w一-鿿\s-]', '', slug)
-        slug = re.sub(r'\s+', '-', slug)
-        return f'<{tag} id="{slug}">{text}'
+        stripped = text.strip()
+        # Check if heading has a numeric prefix like "2. "
+        num_match = re.match(r'^(\d+)\.\s+(.+)', stripped)
+        if num_match:
+            num = num_match.group(1)
+            title_part = num_match.group(2)
+            # Slug: keep Chinese chars, ASCII, hyphens; lowercase English; remove punctuation
+            slug = re.sub(r'[（）()""《》：【】、。，？！\':：]', '', title_part)
+            slug = re.sub(r'\s+', '-', slug.strip())
+            slug = slug.lower()  # case-insensitive matching with TOC links
+            return f'<{tag} id="{num}-{slug}">{text}'
+        else:
+            # No number — use position counter
+            return f'<{tag}>{text}'
 
     html = re.sub(r'<(h[234])>(.*?)</\1>', _add_heading_id, html)
 

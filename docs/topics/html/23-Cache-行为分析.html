@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/standalone/cache_model.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>Cache 模型（<code>cache_model.py</code>）模拟 <strong>L1 指令缓存（I$）和数据缓存（D$）</strong> 的行为。它是 RV32IM 仿真器的"附件"——每条访存指令都经过 cache 模型，统计命中/缺失次数。</p>
 <div class="codehilite"><pre><span></span><code><span class="n">CPU</span><span class="w"> </span><span class="err">执行指令</span>
 <span class="w">    </span><span class="err">↓</span><span class="w"> </span><span class="err">每次</span><span class="w"> </span><span class="n">fetch</span><span class="w">         </span><span class="err">↓</span><span class="w"> </span><span class="err">每次</span><span class="w"> </span><span class="nb">load</span><span class="o">/</span><span class="n">store</span>
@@ -455,14 +455,14 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>只统计动态指令数不够——两条指令序列可能指令数相同但 cache 行为截然不同。Cache 模型让你看到：
 - 内存访问模式是否友好（空间局部性、时间局部性）
 - ScratchV 和 LLVM 的缓存效率差距
 - 为什么相同指令数下某个版本更快</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="组相联-Cache-参数">组相联 Cache 参数
+<h2>核心概念
+<h3>组相联 Cache 参数
 <table>
 <thead>
 <tr>
@@ -499,14 +499,14 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="地址分解32-位">地址分解（32 位）
+<h3>地址分解（32 位）
 <div class="codehilite"><pre><span></span><code>|     tag (剩余位)    | index (log2 sets) | offset (log2 block_size) |
 |     20 位 (I$)      |      6 位 (64)    |        5 位 (32B)       |
 </code></pre></div>
 
-<h3 id="LRU-替换策略">LRU 替换策略
+<h3>LRU 替换策略
 <p>每组有 <code>ways</code> 个位置。当所有位置都满了又有新数据要进来时，淘汰<strong>最久没被访问</strong>的那个（Least Recently Used）。</p>
-<h3 id="Miss-分类">Miss 分类
+<h3>Miss 分类
 <table>
 <thead>
 <tr>
@@ -529,8 +529,8 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="使用">使用
+<h2>一步步
+<h3>使用
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.standalone.cache_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">CacheSim</span>
 
 <span class="c1"># 创建 I-cache 和 D-cache</span>
@@ -554,7 +554,7 @@ body {
 D$: hits=2860000000, misses=748000000, hit_rate=79.27%
 </code></pre></div>
 
-<h3 id="指标速查">指标速查
+<h3>指标速查
 <div class="codehilite"><pre><span></span><code><span class="n">stats</span> <span class="o">=</span> <span class="n">dcache</span><span class="o">.</span><span class="n">stats</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hit rate: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">hit_rate</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Miss rate: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">miss_rate</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -564,8 +564,8 @@ D$: hits=2860000000, misses=748000000, hit_rate=79.27%
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="CacheLine-结构">CacheLine 结构
+<h2>代码走读
+<h3>CacheLine 结构
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CacheLine</span><span class="p">:</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;lru&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -574,7 +574,7 @@ D$: hits=2860000000, misses=748000000, hit_rate=79.27%
         <span class="bp">self</span><span class="o">.</span><span class="n">lru</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>        <span class="c1"># 最后访问时间戳</span>
 </code></pre></div>
 
-<h3 id="access-核心逻辑">access 核心逻辑
+<h3>access 核心逻辑
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">is_read</span><span class="p">):</span>
     <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_bits</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">tag</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset_bits</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_bits</span><span class="p">)</span>
@@ -603,15 +603,15 @@ D$: hits=2860000000, misses=748000000, hit_rate=79.27%
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-分析-CNN-模型的-cache-行为">练习 1: 分析 CNN 模型的 cache 行为
+<h2>动手练习
+<h3>练习 1: 分析 CNN 模型的 cache 行为
 <p>运行 <code>llvm_cache_compare.py</code>，查看 ScratchV 和 LLVM 的 I$/D$ 命中率差异。</p>
-<h3 id="练习-2-调整-cache-参数">练习 2: 调整 cache 参数
+<h3>练习 2: 调整 cache 参数
 <p>把 D$ 的 ways 从 4 改为 8，重新运行对比。命中率提升多少？</p>
-<h3 id="练习-3-实现-FIFO-替换策略">练习 3: 实现 FIFO 替换策略
+<h3>练习 3: 实现 FIFO 替换策略
 <p>在 CacheSim 中添加 FIFO（先进先出）替换策略，和 LRU 对比命中率差异。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -635,7 +635,7 @@ D$: hits=2860000000, misses=748000000, hit_rate=79.27%
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>Hennessy &amp; Patterson: Computer Architecture, 附录 B（Cache 原理）</li>
 <li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读 Cache 指标</li>

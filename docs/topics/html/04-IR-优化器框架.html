@@ -442,14 +442,14 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/optimizer/</code> (5 passes)</p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>IR 优化器框架包含 5 个 IR 层面的优化 pass，它们共享相同接口：输入 <code>Program</code>，原地修改，返回变更计数。</p>
 <div class="codehilite"><pre><span></span><code><span class="n">优化前</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="o">[</span><span class="n">ConstantFolder</span><span class="o">]</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="o">[</span><span class="n">DeadCodeEliminator</span><span class="o">]</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="o">[</span><span class="n">IRPeephole</span><span class="o">]</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="o">[</span><span class="n">MulAddFusion</span><span class="o">]</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="o">[</span><span class="n">LICM</span><span class="o">]</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">优化后</span><span class="w"> </span><span class="n">IR</span>
 <span class="w">             </span><span class="n">常量折叠</span><span class="w">            </span><span class="n">死代码消除</span><span class="w">             </span><span class="n">窥孔优化</span><span class="w">        </span><span class="n">乘加融合</span><span class="w">         </span><span class="n">循环不变量外提</span>
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>代码生成器（指令选择）是<strong>机械翻译</strong>——它不管你给它什么 IR，都会忠实地翻译。优化器的作用是在翻译之前<strong>先把 IR 变简洁</strong>。</p>
 <p>例如生成器可能产生：</p>
 <div class="codehilite"><pre><span></span><code><span class="o">%</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="mi">2</span>
@@ -461,9 +461,9 @@ body {
 
 <p>如果不做优化，后端会为这些冗余指令生成真实的机器码。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="五个优化-Pass">五个优化 Pass
-<h4 id="ConstantFolder常量折叠">1. ConstantFolder（常量折叠）
+<h2>核心概念
+<h3>五个优化 Pass
+<h4 id="1-constantfolder常量折叠">1. ConstantFolder（常量折叠）
 <p>编译时计算常量表达式：</p>
 <div class="codehilite"><pre><span></span><code><span class="o">%</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="mf">2.0</span><span class="w">         </span><span class="err">→</span><span class="w">     </span><span class="o">%</span><span class="mi">3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="mf">6.0</span>
 <span class="o">%</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="mf">3.0</span>
@@ -485,7 +485,7 @@ body {
         <span class="k">return</span> <span class="n">Instruction</span><span class="p">(</span><span class="n">LOAD_CONST</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">instr</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
 </code></pre></div>
 
-<h4 id="DeadCodeEliminator死代码消除">2. DeadCodeEliminator（死代码消除）
+<h4 id="2-deadcodeeliminator死代码消除">2. DeadCodeEliminator（死代码消除）
 <p>删除结果不被任何人使用的指令：</p>
 <div class="codehilite"><pre><span></span><code><span class="c">%1 = add %a, %b    →    (删除，因为 %1 未被使用)</span>
 <span class="c">%2 = mul %c, %d</span>
@@ -497,7 +497,7 @@ body {
 <li>保留有副作用的指令（STORE, RETURN, BR, BR_IF, FOR, ENDFOR）</li>
 <li>迭代执行直到不动点</li>
 </ul>
-<h4 id="IRPeepholeOptimizerIR-窥孔">3. IRPeepholeOptimizer（IR 窥孔）
+<h4 id="3-irpeepholeoptimizerir-窥孔">3. IRPeepholeOptimizer（IR 窥孔）
 <p>局部模式替换：</p>
 <table>
 <thead>
@@ -530,14 +530,14 @@ body {
 </tr>
 </tbody>
 </table>
-<h4 id="MulAddFusion乘加融合">4. MulAddFusion（乘加融合）
+<h4 id="4-muladdfusion乘加融合">4. MulAddFusion（乘加融合）
 <p>标记 <code>mul→add</code> 模式，为后端 FMA（Fused Multiply-Add）提供提示：</p>
 <div class="codehilite"><pre><span></span><code><span class="c">%1 = mul %a, %b           →    %2 = add %1, %c  ; fused_mul_add=True</span>
 <span class="c">%2 = add %1, %c</span>
 </code></pre></div>
 
 <p>如果目标 ISA 支持 <code>fmadd</code>，后端可以发射单条指令。</p>
-<h4 id="LICM循环不变量外提">5. LICM（循环不变量外提）
+<h4 id="5-licm循环不变量外提">5. LICM（循环不变量外提）
 <p>将循环内不依赖循环变量的计算移到循环前：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="o">:</span><span class="w">        </span><span class="nf">%pi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="mf">3.14</span>
 <span class="w">    </span><span class="nf">%pi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="mf">3.14</span><span class="w">  </span><span class="err">→</span><span class="w">   </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="o">:</span>
@@ -546,8 +546,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-运行单个优化-pass">Step 1: 运行单个优化 pass
+<h2>一步步
+<h3>Step 1: 运行单个优化 pass
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.optimizer.constant_folding</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantFolder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">DSLParser</span>
 
@@ -565,7 +565,7 @@ body {
 <span class="c1"># 打印 IR</span>
 </code></pre></div>
 
-<h3 id="Step-2-链式运行多个-pass">Step 2: 链式运行多个 pass
+<h3>Step 2: 链式运行多个 pass
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.optimizer.constant_folding</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantFolder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.optimizer.dead_code</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeadCodeEliminator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.optimizer.licm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LICM</span>
@@ -577,7 +577,7 @@ body {
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total optimizations: </span><span class="si">{</span><span class="n">total_changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="Step-3-使用-PassManager">Step 3: 使用 PassManager
+<h3>Step 3: 使用 PassManager
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.compiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">PassManager</span>
 
 <span class="n">pm</span> <span class="o">=</span> <span class="n">PassManager</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>  <span class="c1"># none | basic | all</span>
@@ -585,8 +585,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="优化-Pass-的统一接口">优化 Pass 的统一接口
+<h2>代码走读
+<h3>优化 Pass 的统一接口
 <p>所有 pass 实现相同签名：</p>
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OptimizationPass</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">:</span> <span class="n">Program</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -594,7 +594,7 @@ body {
         <span class="o">...</span>
 </code></pre></div>
 
-<h3 id="死代码消除的回溯标记">死代码消除的回溯标记
+<h3>死代码消除的回溯标记
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DeadCodeEliminator</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">):</span>
         <span class="n">used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -614,7 +614,7 @@ body {
             <span class="bp">self</span><span class="o">.</span><span class="n">_mark_used</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">defining_instruction</span><span class="p">,</span> <span class="n">used</span><span class="p">)</span>  <span class="c1"># 递归</span>
 </code></pre></div>
 
-<h3 id="LICM-的循环不变量检测">LICM 的循环不变量检测
+<h3>LICM 的循环不变量检测
 <p>一条指令是"循环不变量"当且仅当：
 1. 它的所有操作数都不依赖于循环变量
 2. 或者操作数是来自循环外的常量</p>
@@ -630,15 +630,15 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-写一个能被优化的-IR">练习 1: 写一个能被优化的 IR
+<h2>动手练习
+<h3>练习 1: 写一个能被优化的 IR
 <p>手写一个包含 <code>(2+3)*4</code> 常量表达式和死代码的 IR，运行优化器，观察哪些指令被消除了。</p>
-<h3 id="练习-2-添加新的窥孔规则">练习 2: 添加新的窥孔规则
+<h3>练习 2: 添加新的窥孔规则
 <p>在 <code>IRPeepholeOptimizer</code> 中添加规则：<code>sub rd, rs, 0</code> → <code>mv rd, rs</code>。</p>
-<h3 id="练习-3-测量优化效果">练习 3: 测量优化效果
+<h3>练习 3: 测量优化效果
 <p>对一个 DSL 程序分别以 <code>"none"</code> 和 <code>"all"</code> 级别编译，用指令计数器对比指令数变化。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -666,7 +666,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 9 章：Machine-Independent Optimizations</li>
 <li>LLVM Pass 框架：<a href="https://llvm.org/docs/WritingAnLLVMPass.html" target="_blank" rel="noopener">Writing an LLVM Pass</a></li>

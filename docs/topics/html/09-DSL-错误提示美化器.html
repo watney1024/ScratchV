@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/frontend/dsl_errors.py</code> | <strong>行数</strong>: ~445</p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>DSL 错误提示美化器（<code>dsl_errors.py</code>）让 ScratchV 的 DSL 解析器在遇到语法错误时，产生 <strong>gcc/clang 风格</strong> 的错误信息——准确指出哪个文件的第几行第几列出错，高亮问题 token，并给出修复建议。</p>
 <p>效果对比：</p>
 <div class="codehilite"><pre><span></span><code>#<span class="w"> </span>普通报错（看不清）
@@ -456,7 +456,7 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>写代码时，编译器报错的质量直接影响开发效率。好的错误信息告诉你三件事：</p>
 <ol>
 <li><strong>在哪出错</strong>（文件名:行号:列号）</li>
@@ -465,8 +465,8 @@ body {
 </ol>
 <p>gcc 和 clang 的错误格式已成为业界标准。这个模块让 ScratchV 的 DSL 错误信息也达到这个水准。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="DSLSyntaxError">1. DSLSyntaxError
+<h2>核心概念
+<h3 id="1-dslsyntaxerror">1. DSLSyntaxError
 <p>一个增强的异常类，携带精确的位置信息：</p>
 <div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DSLSyntaxError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -479,7 +479,7 @@ body {
     <span class="n">error_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 错误码</span>
 </code></pre></div>
 
-<h3 id="ErrorCollector">2. ErrorCollector
+<h3 id="2-errorcollector">2. ErrorCollector
 <p>收集多个错误后统一输出（不会遇到第一个错就停）：</p>
 <div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;test.dsl&quot;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
@@ -491,7 +491,7 @@ body {
 </code></pre></div>
 
 <p>默认最多收集 20 个错误，超过后会提示 "further errors suppressed"。</p>
-<h3 id="拼写建议数据库">3. 拼写建议数据库
+<h3 id="3-拼写建议数据库">3. 拼写建议数据库
 <p>内置了常见拼写错误的修复建议：</p>
 <table>
 <thead>
@@ -520,8 +520,8 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-创建和格式化一个错误">Step 1: 创建和格式化一个错误
+<h2>一步步
+<h3>Step 1: 创建和格式化一个错误
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_error</span><span class="p">,</span> <span class="n">format_error</span>
 
 <span class="n">err</span> <span class="o">=</span> <span class="n">make_error</span><span class="p">(</span>
@@ -543,7 +543,7 @@ body {
 <span class="nv">note</span>:<span class="w"> </span><span class="nv">did</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="s1">&#39;return&#39;</span>?
 </code></pre></div>
 
-<h3 id="Step-2-使用-ErrorCollector-收集多个错误">Step 2: 使用 ErrorCollector 收集多个错误
+<h3>Step 2: 使用 ErrorCollector 收集多个错误
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCollector</span>
 
 <span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;my_program.dsl&quot;</span><span class="p">,</span> <span class="n">max_errors</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -560,7 +560,7 @@ body {
 <span class="nb">print</span><span class="p">(</span><span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">())</span>
 </code></pre></div>
 
-<h3 id="Step-3-在解析器中使用">Step 3: 在解析器中使用
+<h3>Step 3: 在解析器中使用
 <div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">ast</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_code</span><span class="p">)</span>
@@ -573,8 +573,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="format_error-函数">format_error 函数
+<h2>代码走读
+<h3>format_error 函数
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># 1. 位置信息: filename:line:col: error: message</span>
@@ -600,8 +600,8 @@ body {
 
 <p><strong>关键细节</strong>：<code>_estimate_token_length</code> 从出错列位置向后扫描连续字母/数字，确定 <code>~</code> 波浪线的长度。</p>
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-故意写错-DSL-代码">练习 1: 故意写错 DSL 代码
+<h2>动手练习
+<h3>练习 1: 故意写错 DSL 代码
 <p>创建 <code>bad.dsl</code>：</p>
 <div class="codehilite"><pre><span></span><code>a = const(3)
 b = const(5)
@@ -610,12 +610,12 @@ d = retrun(c)     # 故意把 return 写成 retrun
 </code></pre></div>
 
 <p>用 DSL 解析器解析它，观察错误提示。</p>
-<h3 id="练习-2-添加新的拼写建议">练习 2: 添加新的拼写建议
+<h3>练习 2: 添加新的拼写建议
 <p>在 <code>_SUGGESTIONS</code> 字典中添加你的常见拼写错误和对应的修复建议。</p>
-<h3 id="练习-3-实现多错误收集">练习 3: 实现多错误收集
+<h3>练习 3: 实现多错误收集
 <p>写一个 DSL 文件包含 3 个语法错误，用 ErrorCollector 一次性收集并输出。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -643,7 +643,7 @@ d = retrun(c)     # 故意把 return 写成 retrun
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>GCC 错误格式规范：<a href="https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html" target="_blank" rel="noopener">GCC Diagnostic Message Formatting</a></li>
 <li>Rust 编译器的错误信息设计：<a href="https://doc.rust-lang.org/error-index.html" target="_blank" rel="noopener">Rust Compiler Error Index</a>（行业最佳实践）</li>

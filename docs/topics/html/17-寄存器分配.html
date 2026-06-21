@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/backend/regalloc_linear.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>寄存器分配器把指令中使用的<strong>无限多虚拟寄存器</strong>（vreg）映射到<strong>有限多的物理寄存器</strong>（a0-a7, t0-t6, s0-s11）。当物理寄存器不够用时，自动插入"溢出代码"——把暂时不用的值存到栈上，需要时再加载回来。</p>
 <div class="codehilite"><pre><span></span><code>指令选择输出: ADD v3, v1, v2     ← 虚拟寄存器 (有无穷多个)
         ↓
@@ -452,12 +452,12 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>CPU 只有有限的寄存器（RISC-V 32 位有 32 个，排除 x0/sp/gp/tp/ra 剩下 25 个可分配）。编译器的代码生成阶段为了方便，假设有无穷多个虚拟寄存器。寄存器分配器负责把"无穷"映射到"有限"。</p>
 <p>类比：你有一个 25 格的文件架，但可能有 100 份文件需要处理。你需要不断把不用的文件放回文件柜（溢出到栈），把要用的文件拿出来（从栈加载）。</p>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="活跃区间Live-Interval">1. 活跃区间（Live Interval）
+<h2>核心概念
+<h3 id="1-活跃区间live-interval">1. 活跃区间（Live Interval）
 <p>每个虚拟寄存器有一个"从出生到死亡"的区间：</p>
 <div class="codehilite"><pre><span></span><code>v1:  [0 ───────── 5]     ← 在指令0被定义，在指令5最后使用
 v2:     [1 ─── 3]         ← 在指令1被定义，在指令3最后使用
@@ -465,7 +465,7 @@ v3:         [2 ────── 6]
 </code></pre></div>
 
 <p>两个区间<strong>重叠</strong> = 两个变量<strong>同时活跃</strong> = 它们不能共享同一个物理寄存器。</p>
-<h3 id="线性扫描算法">2. 线性扫描算法
+<h3 id="2-线性扫描算法">2. 线性扫描算法
 <div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">计算所有变量的活跃区间</span><span class="err">（</span><span class="n">按开始位置排序</span><span class="err">）</span>
 <span class="mf">2.</span><span class="w"> </span><span class="n">维护一个</span><span class="w"> </span><span class="s">&quot;active&quot;</span><span class="w"> </span><span class="n">列表</span><span class="err">（</span><span class="n">当前活跃的区间</span><span class="err">，</span><span class="n">按结束位置排序</span><span class="err">）</span>
 <span class="mf">3.</span><span class="w"> </span><span class="n">逐个处理区间</span><span class="p">:</span>
@@ -475,10 +475,10 @@ v3:         [2 ────── 6]
 <span class="mf">4.</span><span class="w"> </span><span class="n">为被溢出的变量插入</span><span class="w"> </span><span class="n">spill</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="p">(</span><span class="n">sw</span><span class="o">/</span><span class="n">lw</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="溢出策略Spill">3. 溢出策略（Spill）
+<h3 id="3-溢出策略spill">3. 溢出策略（Spill）
 <p>当寄存器满了，必须选择<strong>一个</strong>变量"溢出"到栈上。选择策略是：<strong>溢出活跃区间结束最晚的那个</strong>。</p>
 <p>为什么？因为溢出一个"快要用完"的变量（结束早）可能刚溢出又要加载回来，而溢出"还要用很久"的变量更划算——一次溢出，省出寄存器供多个变量使用。</p>
-<h3 id="RISC-V-可分配寄存器">4. RISC-V 可分配寄存器
+<h3 id="4-risc-v-可分配寄存器">4. RISC-V 可分配寄存器
 <table>
 <thead>
 <tr>
@@ -510,8 +510,8 @@ v3:         [2 ────── 6]
 </tbody>
 </table>
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-理解活跃区间">Step 1: 理解活跃区间
+<h2>一步步
+<h3>Step 1: 理解活跃区间
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.backend.regalloc_linear</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearScanAllocator</span><span class="p">,</span> <span class="n">LsInstruction</span>
 
 <span class="c1"># 3 条指令，3 个虚拟寄存器</span>
@@ -537,7 +537,7 @@ v4: [1, 3) uses={2}      ← 从指令1到指令2活跃
 v6: [2, 3) uses={}       ← 只有定义，没有使用？
 </code></pre></div>
 
-<h3 id="Step-2-执行寄存器分配">Step 2: 执行寄存器分配
+<h3>Step 2: 执行寄存器分配
 <div class="codehilite"><pre><span></span><code><span class="n">mapping</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">intervals</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">vreg</span><span class="p">,</span> <span class="n">preg</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vreg</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">preg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -546,14 +546,14 @@ v6: [2, 3) uses={}       ← 只有定义，没有使用？
 <span class="nb">print</span><span class="p">(</span><span class="n">allocator</span><span class="o">.</span><span class="n">report</span><span class="p">())</span>
 </code></pre></div>
 
-<h3 id="Step-3-生成分配后的汇编">Step 3: 生成分配后的汇编
+<h3>Step 3: 生成分配后的汇编
 <div class="codehilite"><pre><span></span><code><span class="n">code</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">.</span><span class="n">get_allocated_code</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="Live-Interval-计算">Live Interval 计算
+<h2>代码走读
+<h3>Live Interval 计算
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_live_intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
     <span class="n">intervals</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">instr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
@@ -569,7 +569,7 @@ v6: [2, 3) uses={}       ← 只有定义，没有使用？
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">intervals</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">iv</span><span class="p">:</span> <span class="n">iv</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="核心分配循环">核心分配循环
+<h3>核心分配循环
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals</span><span class="p">):</span>
     <span class="n">active</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># (end_pos, preg, interval)</span>
     <span class="n">free_regs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phys_regs</span><span class="p">)</span>
@@ -595,7 +595,7 @@ v6: [2, 3) uses={}       ← 只有定义，没有使用？
     <span class="k">return</span> <span class="n">mapping</span>
 </code></pre></div>
 
-<h3 id="Spill-Code-生成">Spill Code 生成
+<h3>Spill Code 生成
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_gen_spill_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vreg</span><span class="p">,</span> <span class="n">preg</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;为溢出的虚拟寄存器插入 sw/lw&quot;&quot;&quot;</span>
     <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alloc_stack_slot</span><span class="p">(</span><span class="n">vreg</span><span class="p">)</span>
@@ -604,15 +604,15 @@ v6: [2, 3) uses={}       ← 只有定义，没有使用？
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-手算活跃区间">练习 1: 手算活跃区间
+<h2>动手练习
+<h3>练习 1: 手算活跃区间
 <p>写 5 条指令（3 个虚拟寄存器），手工画出每个寄存器的活跃区间，然后用代码验证。</p>
-<h3 id="练习-2-观察溢出">练习 2: 观察溢出
+<h3>练习 2: 观察溢出
 <p>用 30 个虚拟寄存器但只有 5 个物理寄存器，运行 allocator，观察哪些寄存器被溢出、溢出了几次。</p>
-<h3 id="练习-3-改进溢出策略">练习 3: 改进溢出策略
+<h3>练习 3: 改进溢出策略
 <p>尝试修改溢出策略：不是溢出 end 最远的，而是溢出<strong>使用次数最少</strong>的。比较两种策略的总溢出次数。</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -640,7 +640,7 @@ v6: [2, 3) uses={}       ← 只有定义，没有使用？
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 8.8 节：Register Allocation</li>
 <li>Poletto &amp; Sarkar (1999): Linear Scan Register Allocation (ACM TOPLAS)</li>

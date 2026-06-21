@@ -442,7 +442,7 @@ body {
 <p><strong>难度</strong>: 中级 | <strong>源文件</strong>: <code>scratchv/ir/types.py</code>, <code>scratchv/ir/builder.py</code>, <code>scratchv/ir/printer.py</code></p>
 </blockquote>
 <hr />
-<h2 id="是什么">是什么？
+<h2>是什么？
 <p>IR（Intermediate Representation，中间表示）是 ScratchV 编译器的<strong>核心数据结构</strong>。它夹在前端和后端之间，是所有模块沟通的"通用语言"。</p>
 <div class="codehilite"><pre><span></span><code>ONNX/DSL → [前端] → IR → [优化器] → IR&#39; → [后端] → RISC-V/LLVM IR
                       ↑        ↑        ↑
@@ -451,7 +451,7 @@ body {
 
 <p>IR 采用<strong>三地址码</strong>格式：每条指令最多三个操作数（一个输出 + 两个输入），像 <code>%3 = add %1, %2</code>。</p>
 <hr />
-<h2 id="为什么">为什么？
+<h2>为什么？
 <p>为什么编译器需要一个"中间层"而不是直接把 ONNX 翻译成 RISC-V？</p>
 <ol>
 <li><strong>解耦</strong>：前端只需要产出 IR，后端只需要消费 IR。换一个前端（比如支持 PyTorch）不需要改后端</li>
@@ -460,15 +460,15 @@ body {
 <li><strong>可调试</strong>：IR 是人类可读的文本，可以打印出来检查每一步</li>
 </ol>
 <hr />
-<h2 id="核心概念">核心概念
-<h3 id="层次结构">1. 层次结构
+<h2>核心概念
+<h3 id="1-层次结构">1. 层次结构
 <div class="codehilite"><pre><span></span><code>Program                          ← 整个程序（一个 ONNX 模型 = 一个 Program）
   └── Function[]                 ← 函数列表（每个算子对应一个 Function）
         └── BasicBlock[]         ← 基本块列表
               └── Instruction[]  ← 指令列表（三地址码）
 </code></pre></div>
 
-<h3 id="OpCode36-种操作码">2. OpCode（36 种操作码）
+<h3 id="2-opcode36-种操作码">2. OpCode（36 种操作码）
 <table>
 <thead>
 <tr>
@@ -500,7 +500,7 @@ body {
 </tr>
 </tbody>
 </table>
-<h3 id="ValueSSA-值">3. Value（SSA 值）
+<h3 id="3-valuessa-值">3. Value（SSA 值）
 <div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Value</span><span class="p">:</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># SSA 名称: &quot;%1&quot;, &quot;%conv_result&quot;</span>
@@ -510,7 +510,7 @@ body {
     <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span>        <span class="c1"># Tensor 形状: (1, 32, 64, 64)</span>
 </code></pre></div>
 
-<h3 id="SSAStatic-Single-Assignment">4. SSA（Static Single Assignment）
+<h3 id="4-ssastatic-single-assignment">4. SSA（Static Single Assignment）
 <p>每个变量<strong>只被赋值一次</strong>。如果需要修改，创建一个新版本：</p>
 <div class="codehilite"><pre><span></span><code><span class="c">%1 = add a, b       # 正确</span>
 <span class="c">%1 = add %1, c      # 错误！%1 被赋值了两次</span>
@@ -518,8 +518,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="一步步">一步步
-<h3 id="Step-1-手工构建-IR">Step 1: 手工构建 IR
+<h2>一步步
+<h3>Step 1: 手工构建 IR
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.ir.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Program</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">BasicBlock</span><span class="p">,</span> <span class="n">Instruction</span><span class="p">,</span> <span class="n">OpCode</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="n">DataType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.ir.builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRBuilder</span>
 
@@ -541,7 +541,7 @@ body {
 <span class="n">program</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div>
 
-<h3 id="Step-2-打印-IR">Step 2: 打印 IR
+<h3>Step 2: 打印 IR
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.ir.printer</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRPrinter</span>
 
 <span class="n">printer</span> <span class="o">=</span> <span class="n">IRPrinter</span><span class="p">()</span>
@@ -553,7 +553,7 @@ body {
 <span class="w">  </span><span class="nf">%c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="nf">%a</span><span class="p">,</span><span class="w"> </span><span class="nf">%b</span>
 </code></pre></div>
 
-<h3 id="Step-3-在优化-pass-中遍历-IR">Step 3: 在优化 pass 中遍历 IR
+<h3>Step 3: 在优化 pass 中遍历 IR
 <div class="codehilite"><pre><span></span><code><span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">program</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="n">basic_blocks</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">instr</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">instructions</span><span class="p">:</span>
@@ -565,8 +565,8 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="代码走读">代码走读
-<h3 id="IRBuilder-的关键方法">IRBuilder 的关键方法
+<h2>代码走读
+<h3>IRBuilder 的关键方法
 <div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">IRBuilder</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">new_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;创建一个新的 SSA 值&quot;&quot;&quot;</span>
@@ -583,7 +583,7 @@ body {
         <span class="k">return</span> <span class="n">func</span>
 </code></pre></div>
 
-<h3 id="SSA-命名约定">SSA 命名约定
+<h3>SSA 命名约定
 <p>ScratchV 的 IR 使用 <code>%</code> 前缀表示 SSA 变量，类似 LLVM IR：</p>
 <div class="codehilite"><pre><span></span><code><span class="o">%</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="mi">3</span>
 <span class="o">%</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="mi">5</span>
@@ -591,17 +591,17 @@ body {
 </code></pre></div>
 
 <hr />
-<h2 id="动手练习">动手练习
-<h3 id="练习-1-手写-IR">练习 1: 手写 IR
+<h2>动手练习
+<h3>练习 1: 手写 IR
 <p>写一个简单的算术表达式 <code>(3 + 5) * 2</code>，手工构建对应的 IR 指令序列。</p>
-<h3 id="练习-2-阅读-IR-输出">练习 2: 阅读 IR 输出
+<h3>练习 2: 阅读 IR 输出
 <p>用 DSL 写一个小程序，使用解析器生成 IR，打印出来阅读。</p>
-<h3 id="练习-3-添加新的-OpCode">练习 3: 添加新的 OpCode
+<h3>练习 3: 添加新的 OpCode
 <p>在 <code>OpCode</code> 枚举中添加一个新的操作码（比如 <code>SQRT</code>），然后思考：
 - 前端如何生成这个 OpCode？
 - 后端如何把它翻译成 RISC-V 指令？</p>
 <hr />
-<h2 id="常见坑">常见坑
+<h2>常见坑
 <table>
 <thead>
 <tr>
@@ -629,7 +629,7 @@ body {
 </tbody>
 </table>
 <hr />
-<h2 id="进阶阅读">进阶阅读
+<h2>进阶阅读
 <ul>
 <li>龙书第 6 章：Intermediate-Code Generation</li>
 <li>LLVM IR 参考：<a href="https://llvm.org/docs/LangRef.html" target="_blank" rel="noopener">LLVM Language Reference Manual</a>（ScratchV IR 的灵感来源）</li>
