@@ -794,6 +794,7 @@ def md_to_html(md_text: str) -> str:
     html = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', html)
 
     # Fix internal .md links → correct .html using the COURSE mapping
+    # Also clean up the link text (remove .md extension from display text)
     def _replace_md_link(m: re.Match) -> str:
         md_path = m.group(1)
         target = _md_link_to_html(md_path)
@@ -801,6 +802,9 @@ def md_to_html(md_text: str) -> str:
 
     html = re.sub(r'href="([^"]+\.md)"', _replace_md_link, html)
     html = re.sub(r'href="([^"]+\.md#[^"]+)"', lambda m: f'href="{_md_link_to_html(m.group(1))}"', html)
+
+    # Clean up link text: remove trailing .md from display text
+    html = re.sub(r'>([^<]+)\.md</a>', r'>\1</a>', html)
 
     # Fix relative links from topics/ to docs/
     html = html.replace('href="../index.html"', 'href="index.html"')
