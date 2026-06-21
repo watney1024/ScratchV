@@ -86,6 +86,7 @@ jobs:
         run: |
           python3.12 -m pip install --upgrade pip
           python3.12 -m pip install -e ".[all]"
+          python3.12 -m pip install markdown
 
       # ── 3.1 ONNX 模型管线基准测试 ──────────────────────────────────────
       - name: ONNX model pipeline benchmarks
@@ -165,6 +166,14 @@ jobs:
       - name: Copy promotional page into Pages artifact
         if: github.ref == 'refs/heads/main'
         run: cp docs/ScratchV.html benchmark_reports/ScratchV.html
+
+      # ── 文档课程 HTML 站点 ──────────────────────────────────────────────
+      - name: Build docs HTML course site
+        if: github.ref == 'refs/heads/main'
+        run: |
+          python3.12 -m pip install markdown
+          python3.12 scripts/build_docs_html.py --output-dir benchmark_reports/docs
+          echo "Docs site built: benchmark_reports/docs/index.html"
 
       # ── 优化历史页面 ──────────────────────────────────────────────────
       - name: Generate optimization history page
