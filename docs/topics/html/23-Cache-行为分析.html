@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSL 错误提示美化器 — ScratchV 编译器课程 — ScratchV 编译器课程</title>
+<title>Cache 行为分析 — ScratchV 编译器课程 — ScratchV 编译器课程</title>
 <meta name="description" content="ScratchV 零基础编译器课程 — 从 ONNX 到 RISC-V 的全流程实战">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -384,13 +384,13 @@ body {
 <li class="sidenav-section active"><button class="sidenav-section-btn" aria-expanded="true"><span>🔰 入门模块</span><span class="sidenav-count">14</span></button><ul class="sidenav-sub">
 <li><a href="05-汇编代码美化器.html" class="" data-doc="汇编代码美化器"><span class="sidenav-num">05</span><span class="sidenav-doc-title">汇编代码美化器</span><span class="sidenav-check" data-check="汇编代码美化器"></span></a></li>
 <li><a href="07-编译器日志增强器.html" class="" data-doc="编译器日志增强器"><span class="sidenav-num">07</span><span class="sidenav-doc-title">编译器日志增强器</span><span class="sidenav-check" data-check="编译器日志增强器"></span></a></li>
-<li><a href="09-DSL-错误提示美化器.html" class="active" data-doc="DSL 错误提示美化器"><span class="sidenav-num">09</span><span class="sidenav-doc-title">DSL 错误提示美化器</span><span class="sidenav-check" data-check="DSL 错误提示美化器"></span></a></li>
+<li><a href="09-DSL-错误提示美化器.html" class="" data-doc="DSL 错误提示美化器"><span class="sidenav-num">09</span><span class="sidenav-doc-title">DSL 错误提示美化器</span><span class="sidenav-check" data-check="DSL 错误提示美化器"></span></a></li>
 <li><a href="11-控制流图-CFG-生成器.html" class="" data-doc="控制流图 (CFG) 生成器"><span class="sidenav-num">11</span><span class="sidenav-doc-title">控制流图 (CFG) 生成器</span><span class="sidenav-check" data-check="控制流图 (CFG) 生成器"></span></a></li>
 <li><a href="13-窥孔优化器.html" class="" data-doc="窥孔优化器"><span class="sidenav-num">13</span><span class="sidenav-doc-title">窥孔优化器</span><span class="sidenav-check" data-check="窥孔优化器"></span></a></li>
 <li><a href="18-指令调度器.html" class="" data-doc="指令调度器"><span class="sidenav-num">18</span><span class="sidenav-doc-title">指令调度器</span><span class="sidenav-check" data-check="指令调度器"></span></a></li>
 <li><a href="12-指令计数统计器.html" class="" data-doc="指令计数统计器"><span class="sidenav-num">12</span><span class="sidenav-doc-title">指令计数统计器</span><span class="sidenav-check" data-check="指令计数统计器"></span></a></li>
 <li><a href="06-性能基准套件.html" class="" data-doc="性能基准套件"><span class="sidenav-num">06</span><span class="sidenav-doc-title">性能基准套件</span><span class="sidenav-check" data-check="性能基准套件"></span></a></li>
-<li><a href="23-Cache-行为分析.html" class="" data-doc="Cache 行为分析"><span class="sidenav-num">23</span><span class="sidenav-doc-title">Cache 行为分析</span><span class="sidenav-check" data-check="Cache 行为分析"></span></a></li>
+<li><a href="23-Cache-行为分析.html" class="active" data-doc="Cache 行为分析"><span class="sidenav-num">23</span><span class="sidenav-doc-title">Cache 行为分析</span><span class="sidenav-check" data-check="Cache 行为分析"></span></a></li>
 <li><a href="30-性能仪表盘-Dashboard.html" class="" data-doc="性能仪表盘 (Dashboard)"><span class="sidenav-num">30</span><span class="sidenav-doc-title">性能仪表盘 (Dashboard)</span><span class="sidenav-check" data-check="性能仪表盘 (Dashboard)"></span></a></li>
 <li><a href="24-Spike-仿真集成.html" class="" data-doc="Spike 仿真集成"><span class="sidenav-num">24</span><span class="sidenav-doc-title">Spike 仿真集成</span><span class="sidenav-check" data-check="Spike 仿真集成"></span></a></li>
 <li><a href="25-LLVM-vs-ScratchV-对比.html" class="" data-doc="LLVM vs ScratchV 对比"><span class="sidenav-num">25</span><span class="sidenav-doc-title">LLVM vs ScratchV 对比</span><span class="sidenav-check" data-check="LLVM vs ScratchV 对比"></span></a></li>
@@ -426,7 +426,7 @@ body {
 
   <main class="main">
     <div class="topbar">
-      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="beginner.html">入门模块</a> <span class="bc-sep">›</span> <a href="09-DSL-错误提示美化器.html">DSL 错误提示美化器</a></div>
+      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="beginner.html">入门模块</a> <span class="bc-sep">›</span> <a href="23-Cache-行为分析.html">Cache 行为分析</a></div>
       <div class="topbar-actions">
         <button class="btn-progress" id="btnProgress" title="学习进度">📊</button>
       </div>
@@ -437,185 +437,181 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-09-dsl">Topic 09 — DSL 错误提示美化器</h1>
+      <h1 id="topic-23-cache-lru">Topic 23 — Cache 模型（组相联 + LRU）</h1>
 <blockquote>
-<p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/frontend/dsl_errors.py</code> | <strong>行数</strong>: ~445</p>
+<p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/standalone/cache_model.py</code></p>
 </blockquote>
 <hr />
 <h2 id="_1">是什么？</h2>
-<p>DSL 错误提示美化器（<code>dsl_errors.py</code>）让 ScratchV 的 DSL 解析器在遇到语法错误时，产生 <strong>gcc/clang 风格</strong> 的错误信息——准确指出哪个文件的第几行第几列出错，高亮问题 token，并给出修复建议。</p>
-<p>效果对比：</p>
-<div class="codehilite"><pre><span></span><code>#<span class="w"> </span>普通报错（看不清）
-<span class="nv">SyntaxError</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span>
-
-#<span class="w"> </span>美化后的报错（<span class="nv">gcc</span><span class="w"> </span>风格，一目了然）
-<span class="nv">test</span>.<span class="nv">dsl</span>:<span class="mi">5</span>:<span class="mi">12</span>:<span class="w"> </span><span class="nv">error</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span><span class="w"> </span><span class="s1">&#39;retrun&#39;</span>
-<span class="w">  </span><span class="mi">5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nb">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">retrun</span><span class="ss">(</span><span class="nv">x</span><span class="ss">)</span>
-<span class="w">    </span><span class="o">|</span><span class="w">          </span><span class="o">^~~~~~~</span>
-<span class="nv">note</span>:<span class="w"> </span><span class="nv">did</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="s1">&#39;return&#39;</span>?
+<p>Cache 模型（<code>cache_model.py</code>）模拟 <strong>L1 指令缓存（I$）和数据缓存（D$）</strong> 的行为。它是 RV32IM 仿真器的"附件"——每条访存指令都经过 cache 模型，统计命中/缺失次数。</p>
+<div class="codehilite"><pre><span></span><code><span class="n">CPU</span><span class="w"> </span><span class="err">执行指令</span>
+<span class="w">    </span><span class="err">↓</span><span class="w"> </span><span class="err">每次</span><span class="w"> </span><span class="n">fetch</span><span class="w">         </span><span class="err">↓</span><span class="w"> </span><span class="err">每次</span><span class="w"> </span><span class="nb">load</span><span class="o">/</span><span class="n">store</span>
+<span class="err">┌──────────┐</span><span class="w">       </span><span class="err">┌──────────┐</span>
+<span class="err">│</span><span class="w">  </span><span class="n">I</span><span class="o">$</span><span class="w"> </span><span class="n">Cache</span><span class="w"> </span><span class="err">│</span><span class="w">       </span><span class="err">│</span><span class="w">  </span><span class="n">D</span><span class="o">$</span><span class="w"> </span><span class="n">Cache</span><span class="w"> </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="mi">64</span><span class="err">×</span><span class="mi">2</span><span class="err">×</span><span class="mi">32</span><span class="n">B</span><span class="w"> </span><span class="err">│</span><span class="w">       </span><span class="err">│</span><span class="mi">128</span><span class="err">×</span><span class="mi">4</span><span class="err">×</span><span class="mi">32</span><span class="n">B</span><span class="w"> </span><span class="err">│</span>
+<span class="err">└──────────┘</span><span class="w">       </span><span class="err">└──────────┘</span>
+<span class="w">    </span><span class="err">↓</span><span class="w"> </span><span class="n">miss</span><span class="w">             </span><span class="err">↓</span><span class="w"> </span><span class="n">miss</span>
+<span class="w">    </span><span class="err">主内存</span><span class="w"> </span><span class="p">(</span><span class="err">无限容量，固定延迟</span><span class="p">)</span>
 </code></pre></div>
 
 <hr />
 <h2 id="_2">为什么？</h2>
-<p>写代码时，编译器报错的质量直接影响开发效率。好的错误信息告诉你三件事：</p>
-<ol>
-<li><strong>在哪出错</strong>（文件名:行号:列号）</li>
-<li><strong>出了什么错</strong>（一句话说清楚）</li>
-<li><strong>怎么修</strong>（修复建议）</li>
-</ol>
-<p>gcc 和 clang 的错误格式已成为业界标准。这个模块让 ScratchV 的 DSL 错误信息也达到这个水准。</p>
+<p>只统计动态指令数不够——两条指令序列可能指令数相同但 cache 行为截然不同。Cache 模型让你看到：<br />
+- 内存访问模式是否友好（空间局部性、时间局部性）<br />
+- ScratchV 和 LLVM 的缓存效率差距<br />
+- 为什么相同指令数下某个版本更快</p>
 <hr />
 <h2 id="_3">核心概念</h2>
-<h3 id="1-dslsyntaxerror">1. DSLSyntaxError</h3>
-<p>一个增强的异常类，携带精确的位置信息：</p>
-<div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">DSLSyntaxError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">line</span><span class="p">:</span> <span class="nb">int</span>              <span class="c1"># 行号（从 1 开始）</span>
-    <span class="n">col</span><span class="p">:</span> <span class="nb">int</span>               <span class="c1"># 列号（从 1 开始）</span>
-    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 错误描述</span>
-    <span class="n">source_line</span><span class="p">:</span> <span class="nb">str</span>       <span class="c1"># 出错的源代码行</span>
-    <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 文件名</span>
-    <span class="n">fix_hint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 修复建议</span>
-    <span class="n">error_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 错误码</span>
-</code></pre></div>
-
-<h3 id="2-errorcollector">2. ErrorCollector</h3>
-<p>收集多个错误后统一输出（不会遇到第一个错就停）：</p>
-<div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;test.dsl&quot;</span><span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">DSLSyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">collector</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-<span class="c1"># ... 继续解析找更多错 ...</span>
-<span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">()</span>  <span class="c1"># 一次性输出所有错误</span>
-</code></pre></div>
-
-<p>默认最多收集 20 个错误，超过后会提示 "further errors suppressed"。</p>
-<h3 id="3">3. 拼写建议数据库</h3>
-<p>内置了常见拼写错误的修复建议：</p>
+<h3 id="cache">组相联 Cache 参数</h3>
 <table>
 <thead>
 <tr>
-<th>写错了</th>
-<th>建议</th>
+<th>参数</th>
+<th>I$</th>
+<th>D$</th>
+<th>含义</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>retrun</code></td>
-<td><code>did you mean 'return'?</code></td>
+<td>sets</td>
+<td>64</td>
+<td>128</td>
+<td>组数</td>
 </tr>
 <tr>
-<td><code>endiff</code></td>
-<td><code>did you mean 'endif'?</code></td>
+<td>ways</td>
+<td>2</td>
+<td>4</td>
+<td>每组的路数（相联度）</td>
 </tr>
 <tr>
-<td><code>sofmax</code></td>
-<td><code>did you mean 'softmax'?</code></td>
+<td>block_size</td>
+<td>32B</td>
+<td>32B</td>
+<td>每块 8 个 32-bit 字</td>
 </tr>
 <tr>
-<td><code>matmal</code></td>
-<td><code>did you mean 'matmul'?</code></td>
+<td><strong>总容量</strong></td>
+<td><strong>4KB</strong></td>
+<td><strong>16KB</strong></td>
+<td>sets × ways × block_size</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32">地址分解（32 位）</h3>
+<div class="codehilite"><pre><span></span><code>|     tag (剩余位)    | index (log2 sets) | offset (log2 block_size) |
+|     20 位 (I$)      |      6 位 (64)    |        5 位 (32B)       |
+</code></pre></div>
+
+<h3 id="lru">LRU 替换策略</h3>
+<p>每组有 <code>ways</code> 个位置。当所有位置都满了又有新数据要进来时，淘汰<strong>最久没被访问</strong>的那个（Least Recently Used）。</p>
+<h3 id="miss">Miss 分类</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+<th>能优化吗？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Compulsory miss</strong></td>
+<td>第一次访问某地址</td>
+<td>❌ 不可避免</td>
+</tr>
+<tr>
+<td><strong>Conflict miss</strong></td>
+<td>不同地址映射到同一组，互相踢出</td>
+<td>✅ 改数据布局</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="_4">一步步</h2>
-<h3 id="step-1">Step 1: 创建和格式化一个错误</h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_error</span><span class="p">,</span> <span class="n">format_error</span>
+<h3 id="_5">使用</h3>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.standalone.cache_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">CacheSim</span>
 
-<span class="n">err</span> <span class="o">=</span> <span class="n">make_error</span><span class="p">(</span>
-    <span class="n">line</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">col</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;unexpected token &#39;retrun&#39;&quot;</span><span class="p">,</span>
-    <span class="n">source_line</span><span class="o">=</span><span class="s2">&quot;result = retrun(x)&quot;</span><span class="p">,</span>
-    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;test.dsl&quot;</span><span class="p">,</span>
-    <span class="n">fix_hint</span><span class="o">=</span><span class="s2">&quot;did you mean &#39;return&#39;?&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="c1"># 创建 I-cache 和 D-cache</span>
+<span class="n">icache</span> <span class="o">=</span> <span class="n">CacheSim</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;I$&quot;</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">ways</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">dcache</span> <span class="o">=</span> <span class="n">CacheSim</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;D$&quot;</span><span class="p">,</span> <span class="n">sets</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ways</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">format_error</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+<span class="c1"># 每次取指</span>
+<span class="n">icache</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">addr</span><span class="o">=</span><span class="n">pc</span><span class="p">,</span> <span class="n">is_read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 每次数据访问</span>
+<span class="n">dcache</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">addr</span><span class="o">=</span><span class="n">mem_addr</span><span class="p">,</span> <span class="n">is_read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    <span class="c1"># load</span>
+<span class="n">dcache</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">addr</span><span class="o">=</span><span class="n">mem_addr</span><span class="p">,</span> <span class="n">is_read</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># store</span>
+
+<span class="c1"># 查看统计</span>
+<span class="n">icache</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+<span class="n">dcache</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
 </code></pre></div>
 
 <p>输出：</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">test</span>.<span class="nv">dsl</span>:<span class="mi">5</span>:<span class="mi">12</span>:<span class="w"> </span><span class="nv">error</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span><span class="w"> </span><span class="s1">&#39;retrun&#39;</span>
-<span class="w">  </span><span class="mi">5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nb">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">retrun</span><span class="ss">(</span><span class="nv">x</span><span class="ss">)</span>
-<span class="w">    </span><span class="o">|</span><span class="w">          </span><span class="o">^~~~~~~</span>
-<span class="nv">note</span>:<span class="w"> </span><span class="nv">did</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="s1">&#39;return&#39;</span>?
+<div class="codehilite"><pre><span></span><code>I$: hits=3220000000, misses=16000000, hit_rate=99.50%
+D$: hits=2860000000, misses=748000000, hit_rate=79.27%
 </code></pre></div>
 
-<h3 id="step-2-errorcollector">Step 2: 使用 ErrorCollector 收集多个错误</h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCollector</span>
-
-<span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;my_program.dsl&quot;</span><span class="p">,</span> <span class="n">max_errors</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># 发现错误时</span>
-<span class="n">collector</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span>
-    <span class="n">line</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;undefined variable &#39;x&#39;&quot;</span><span class="p">,</span>
-    <span class="n">source_line</span><span class="o">=</span><span class="s2">&quot;y = add(x, 1)&quot;</span><span class="p">,</span>
-    <span class="n">fix_hint</span><span class="o">=</span><span class="s2">&quot;variable &#39;x&#39; used before assignment&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># 最后统一输出</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">())</span>
-</code></pre></div>
-
-<h3 id="step-3">Step 3: 在解析器中使用</h3>
-<div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">ast</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_code</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">DSLSyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">collector</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="n">collector</span><span class="o">.</span><span class="n">has_errors</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<h3 id="_6">指标速查</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">stats</span> <span class="o">=</span> <span class="n">dcache</span><span class="o">.</span><span class="n">stats</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hit rate: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">hit_rate</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Miss rate: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">miss_rate</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MPKI: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">mpki</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>     <span class="c1"># Misses Per 1000 accesses</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compulsory: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">compulsory_misses</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conflict: </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">conflict_misses</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="format_error">format_error 函数</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># 1. 位置信息: filename:line:col: error: message</span>
-    <span class="n">location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">line</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">col</span><span class="si">}</span><span class="s2">: &quot;</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">error: </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># 2. 源代码行显示</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">line</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># 3. 列标记 (^~~~)</span>
-    <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">col</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;^&quot;</span>
-    <span class="n">token_len</span> <span class="o">=</span> <span class="n">_estimate_token_length</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">col</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">marker</span> <span class="o">+=</span> <span class="s2">&quot;~&quot;</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">token_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
-
-    <span class="c1"># 4. 修复建议</span>
-    <span class="n">hint</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">fix_hint</span> <span class="ow">or</span> <span class="n">_compute_suggestion</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">hint</span><span class="p">:</span>
-        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;note: </span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+<h2 id="_7">代码走读</h2>
+<h3 id="cacheline">CacheLine 结构</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CacheLine</span><span class="p">:</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;lru&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>        <span class="c1"># 地址高位</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># 有效位（初始无效）</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lru</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>        <span class="c1"># 最后访问时间戳</span>
 </code></pre></div>
 
-<p><strong>关键细节</strong>：<code>_estimate_token_length</code> 从出错列位置向后扫描连续字母/数字，确定 <code>~</code> 波浪线的长度。</p>
-<hr />
-<h2 id="_6">动手练习</h2>
-<h3 id="1-dsl">练习 1: 故意写错 DSL 代码</h3>
-<p>创建 <code>bad.dsl</code>：</p>
-<div class="codehilite"><pre><span></span><code>a = const(3)
-b = const(5)
-c = add(a, b)
-d = retrun(c)     # 故意把 return 写成 retrun
+<h3 id="access">access 核心逻辑</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">is_read</span><span class="p">):</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_bits</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset_bits</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_bits</span><span class="p">)</span>
+
+    <span class="n">set_lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets_lines</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>  <span class="c1"># 该组的所有路</span>
+
+    <span class="c1"># 1. 先检查是否命中</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">set_lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">valid</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">tag</span><span class="p">:</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">lru</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timestamp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hits</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># 2. Miss — 需要替换</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">misses</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># 找空位或淘汰 LRU 最老的</span>
+    <span class="n">victim</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">set_lines</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">lru</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">valid</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">victim</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">compulsory_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">conflict_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">victim</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+    <span class="n">victim</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">victim</span><span class="o">.</span><span class="n">lru</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timestamp</span>
+    <span class="k">return</span> <span class="kc">False</span>
 </code></pre></div>
 
-<p>用 DSL 解析器解析它，观察错误提示。</p>
-<h3 id="2">练习 2: 添加新的拼写建议</h3>
-<p>在 <code>_SUGGESTIONS</code> 字典中添加你的常见拼写错误和对应的修复建议。</p>
-<h3 id="3_1">练习 3: 实现多错误收集</h3>
-<p>写一个 DSL 文件包含 3 个语法错误，用 ErrorCollector 一次性收集并输出。</p>
 <hr />
-<h2 id="_7">常见坑</h2>
+<h2 id="_8">动手练习</h2>
+<h3 id="1-cnn-cache">练习 1: 分析 CNN 模型的 cache 行为</h3>
+<p>运行 <code>llvm_cache_compare.py</code>，查看 ScratchV 和 LLVM 的 I$/D$ 命中率差异。</p>
+<h3 id="2-cache">练习 2: 调整 cache 参数</h3>
+<p>把 D$ 的 ways 从 4 改为 8，重新运行对比。命中率提升多少？</p>
+<h3 id="3-fifo">练习 3: 实现 FIFO 替换策略</h3>
+<p>在 CacheSim 中添加 FIFO（先进先出）替换策略，和 LRU 对比命中率差异。</p>
+<hr />
+<h2 id="_9">常见坑</h2>
 <table>
 <thead>
 <tr>
@@ -625,41 +621,37 @@ d = retrun(c)     # 故意把 return 写成 retrun
 </thead>
 <tbody>
 <tr>
-<td><strong>列号从 1 开始</strong></td>
-<td><code>col</code> 是 1-based（人类习惯），不是 0-based（程序习惯），和 <code>line</code> 一致</td>
+<td><strong>写策略</strong></td>
+<td>当前使用 write-allocate + write-back，store miss 会先加载再写</td>
 </tr>
 <tr>
-<td><strong>错误上限</strong></td>
-<td>ErrorCollector 默认最多 20 个错误，超过后静默丢弃（避免刷屏）</td>
+<td><strong>地址对齐</strong></td>
+<td>Cache 按 block 对齐，32B block 意味着低 5 位地址被忽略</td>
 </tr>
 <tr>
-<td><strong>拼写建议的匹配</strong></td>
-<td><code>_compute_suggestion</code> 会把源代码中的每个词和 <code>_SUGGESTIONS</code> 逐词比对，不是模糊匹配</td>
-</tr>
-<tr>
-<td><strong>ANSI 颜色</strong></td>
-<td>彩色输出在管道到文件时会变成乱码，对有颜色的场景用 <code>use_color=False</code></td>
+<td><strong>LRU 精度</strong></td>
+<td>时间戳实现简单但数字可能溢出（对 32 亿次访问需要 64 位）</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="_8">进阶阅读</h2>
+<h2 id="_10">进阶阅读</h2>
 <ul>
-<li>GCC 错误格式规范：<a href="https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html" target="_blank" rel="noopener">GCC Diagnostic Message Formatting</a></li>
-<li>Rust 编译器的错误信息设计：<a href="https://doc.rust-lang.org/error-index.html" target="_blank" rel="noopener">Rust Compiler Error Index</a>（行业最佳实践）</li>
-<li>相关 topic: <a href="01-DSL前端增强器.html">Topic 01 — DSL 前端增强器</a> | <a href="07-编译器日志增强器.html">Topic 07 — 编译器日志增强器</a></li>
+<li>Hennessy &amp; Patterson: Computer Architecture, 附录 B（Cache 原理）</li>
+<li><a href="../03-指标解读指南.html">03-指标解读指南</a> — 如何解读 Cache 指标</li>
+<li>相关 topic: <a href="19-Standalone-RISC-V编译器.html">Topic 19 — Standalone RISC-V</a> | <a href="25-LLVM对比工具.html">Topic 25 — LLVM vs ScratchV 对比</a></li>
 </ul>
     </article>
 
     <footer class="content-footer">
       <nav class="page-nav-row">
-        <a class="page-nav prev" href="07-编译器日志增强器.html">
+        <a class="page-nav prev" href="06-性能基准套件.html">
             <span class="pn-label">← 上一节</span>
-            <span class="pn-title">编译器日志增强器</span>
+            <span class="pn-title">性能基准套件</span>
         </a>
-        <a class="page-nav next" href="11-控制流图-CFG-生成器.html">
+        <a class="page-nav next" href="30-性能仪表盘-Dashboard.html">
             <span class="pn-label">下一节 →</span>
-            <span class="pn-title">控制流图 (CFG) 生成器</span>
+            <span class="pn-title">性能仪表盘 (Dashboard)</span>
         </a>
       </nav>
       <div class="footer-info">

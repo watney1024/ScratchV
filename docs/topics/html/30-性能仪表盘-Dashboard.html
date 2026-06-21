@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSL 错误提示美化器 — ScratchV 编译器课程 — ScratchV 编译器课程</title>
+<title>性能仪表盘 (Dashboard) — ScratchV 编译器课程 — ScratchV 编译器课程</title>
 <meta name="description" content="ScratchV 零基础编译器课程 — 从 ONNX 到 RISC-V 的全流程实战">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -384,14 +384,14 @@ body {
 <li class="sidenav-section active"><button class="sidenav-section-btn" aria-expanded="true"><span>🔰 入门模块</span><span class="sidenav-count">14</span></button><ul class="sidenav-sub">
 <li><a href="05-汇编代码美化器.html" class="" data-doc="汇编代码美化器"><span class="sidenav-num">05</span><span class="sidenav-doc-title">汇编代码美化器</span><span class="sidenav-check" data-check="汇编代码美化器"></span></a></li>
 <li><a href="07-编译器日志增强器.html" class="" data-doc="编译器日志增强器"><span class="sidenav-num">07</span><span class="sidenav-doc-title">编译器日志增强器</span><span class="sidenav-check" data-check="编译器日志增强器"></span></a></li>
-<li><a href="09-DSL-错误提示美化器.html" class="active" data-doc="DSL 错误提示美化器"><span class="sidenav-num">09</span><span class="sidenav-doc-title">DSL 错误提示美化器</span><span class="sidenav-check" data-check="DSL 错误提示美化器"></span></a></li>
+<li><a href="09-DSL-错误提示美化器.html" class="" data-doc="DSL 错误提示美化器"><span class="sidenav-num">09</span><span class="sidenav-doc-title">DSL 错误提示美化器</span><span class="sidenav-check" data-check="DSL 错误提示美化器"></span></a></li>
 <li><a href="11-控制流图-CFG-生成器.html" class="" data-doc="控制流图 (CFG) 生成器"><span class="sidenav-num">11</span><span class="sidenav-doc-title">控制流图 (CFG) 生成器</span><span class="sidenav-check" data-check="控制流图 (CFG) 生成器"></span></a></li>
 <li><a href="13-窥孔优化器.html" class="" data-doc="窥孔优化器"><span class="sidenav-num">13</span><span class="sidenav-doc-title">窥孔优化器</span><span class="sidenav-check" data-check="窥孔优化器"></span></a></li>
 <li><a href="18-指令调度器.html" class="" data-doc="指令调度器"><span class="sidenav-num">18</span><span class="sidenav-doc-title">指令调度器</span><span class="sidenav-check" data-check="指令调度器"></span></a></li>
 <li><a href="12-指令计数统计器.html" class="" data-doc="指令计数统计器"><span class="sidenav-num">12</span><span class="sidenav-doc-title">指令计数统计器</span><span class="sidenav-check" data-check="指令计数统计器"></span></a></li>
 <li><a href="06-性能基准套件.html" class="" data-doc="性能基准套件"><span class="sidenav-num">06</span><span class="sidenav-doc-title">性能基准套件</span><span class="sidenav-check" data-check="性能基准套件"></span></a></li>
 <li><a href="23-Cache-行为分析.html" class="" data-doc="Cache 行为分析"><span class="sidenav-num">23</span><span class="sidenav-doc-title">Cache 行为分析</span><span class="sidenav-check" data-check="Cache 行为分析"></span></a></li>
-<li><a href="30-性能仪表盘-Dashboard.html" class="" data-doc="性能仪表盘 (Dashboard)"><span class="sidenav-num">30</span><span class="sidenav-doc-title">性能仪表盘 (Dashboard)</span><span class="sidenav-check" data-check="性能仪表盘 (Dashboard)"></span></a></li>
+<li><a href="30-性能仪表盘-Dashboard.html" class="active" data-doc="性能仪表盘 (Dashboard)"><span class="sidenav-num">30</span><span class="sidenav-doc-title">性能仪表盘 (Dashboard)</span><span class="sidenav-check" data-check="性能仪表盘 (Dashboard)"></span></a></li>
 <li><a href="24-Spike-仿真集成.html" class="" data-doc="Spike 仿真集成"><span class="sidenav-num">24</span><span class="sidenav-doc-title">Spike 仿真集成</span><span class="sidenav-check" data-check="Spike 仿真集成"></span></a></li>
 <li><a href="25-LLVM-vs-ScratchV-对比.html" class="" data-doc="LLVM vs ScratchV 对比"><span class="sidenav-num">25</span><span class="sidenav-doc-title">LLVM vs ScratchV 对比</span><span class="sidenav-check" data-check="LLVM vs ScratchV 对比"></span></a></li>
 <li><a href="26-TinyFive-对比工具.html" class="" data-doc="TinyFive 对比工具"><span class="sidenav-num">26</span><span class="sidenav-doc-title">TinyFive 对比工具</span><span class="sidenav-check" data-check="TinyFive 对比工具"></span></a></li>
@@ -426,7 +426,7 @@ body {
 
   <main class="main">
     <div class="topbar">
-      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="beginner.html">入门模块</a> <span class="bc-sep">›</span> <a href="09-DSL-错误提示美化器.html">DSL 错误提示美化器</a></div>
+      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="beginner.html">入门模块</a> <span class="bc-sep">›</span> <a href="30-性能仪表盘-Dashboard.html">性能仪表盘 (Dashboard)</a></div>
       <div class="topbar-actions">
         <button class="btn-progress" id="btnProgress" title="学习进度">📊</button>
       </div>
@@ -437,185 +437,145 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1 id="topic-09-dsl">Topic 09 — DSL 错误提示美化器</h1>
+      <h1 id="topic-30-ci-dashboard">Topic 30 — CI 基准编排 + Dashboard</h1>
 <blockquote>
-<p><strong>难度</strong>: 入门 | <strong>源文件</strong>: <code>scratchv/frontend/dsl_errors.py</code> | <strong>行数</strong>: ~445</p>
+<p><strong>难度</strong>: 高级 | <strong>源文件</strong>: <code>scratchv/ci/ci_benchmark.py</code>, <code>scratchv/ci/dashboard.py</code></p>
 </blockquote>
 <hr />
 <h2 id="_1">是什么？</h2>
-<p>DSL 错误提示美化器（<code>dsl_errors.py</code>）让 ScratchV 的 DSL 解析器在遇到语法错误时，产生 <strong>gcc/clang 风格</strong> 的错误信息——准确指出哪个文件的第几行第几列出错，高亮问题 token，并给出修复建议。</p>
-<p>效果对比：</p>
-<div class="codehilite"><pre><span></span><code>#<span class="w"> </span>普通报错（看不清）
-<span class="nv">SyntaxError</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span>
-
-#<span class="w"> </span>美化后的报错（<span class="nv">gcc</span><span class="w"> </span>风格，一目了然）
-<span class="nv">test</span>.<span class="nv">dsl</span>:<span class="mi">5</span>:<span class="mi">12</span>:<span class="w"> </span><span class="nv">error</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span><span class="w"> </span><span class="s1">&#39;retrun&#39;</span>
-<span class="w">  </span><span class="mi">5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nb">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">retrun</span><span class="ss">(</span><span class="nv">x</span><span class="ss">)</span>
-<span class="w">    </span><span class="o">|</span><span class="w">          </span><span class="o">^~~~~~~</span>
-<span class="nv">note</span>:<span class="w"> </span><span class="nv">did</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="s1">&#39;return&#39;</span>?
+<p>CI 基准系统自动运行 ScratchV vs LLVM 的性能对比，生成<strong>纯静态 HTML 仪表盘</strong>，展示：</p>
+<ul>
+<li><strong>静态指令数对比</strong>：按算子和指令类别拆分</li>
+<li><strong>动态指令数对比</strong>：带百分比差异</li>
+<li><strong>缓存命中率 &amp; 缺失字节</strong></li>
+<li><strong>趋势折线图</strong>（history.html）：历次提交的性能变化</li>
+<li><strong>综合评分</strong>：绿/黄/红 badge 标记差距大小</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>make bench-ci
+    │
+    ├─→ ci_benchmark.py     ← 编排器：运行 LLVM 对比 + TinyFive 对比
+    │       ├─→ llvm_cache_compare.py
+    │       └─→ tinyfive_compare.py
+    │
+    └─→ dashboard.py        ← 可视化：JSON → HTML dashboard
+            └─→ benchmark_reports/dashboard.html (纯静态, 零依赖)
 </code></pre></div>
 
 <hr />
 <h2 id="_2">为什么？</h2>
-<p>写代码时，编译器报错的质量直接影响开发效率。好的错误信息告诉你三件事：</p>
-<ol>
-<li><strong>在哪出错</strong>（文件名:行号:列号）</li>
-<li><strong>出了什么错</strong>（一句话说清楚）</li>
-<li><strong>怎么修</strong>（修复建议）</li>
-</ol>
-<p>gcc 和 clang 的错误格式已成为业界标准。这个模块让 ScratchV 的 DSL 错误信息也达到这个水准。</p>
+<ul>
+<li><strong>持续监控</strong>：每次 push 自动运行，防止性能衰退</li>
+<li><strong>决策依据</strong>：优化是否有效？数据说话</li>
+<li><strong>可视化</strong>：好看的图表比一页数字更有说服力</li>
+</ul>
 <hr />
 <h2 id="_3">核心概念</h2>
-<h3 id="1-dslsyntaxerror">1. DSLSyntaxError</h3>
-<p>一个增强的异常类，携带精确的位置信息：</p>
-<div class="codehilite"><pre><span></span><code><span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">DSLSyntaxError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">line</span><span class="p">:</span> <span class="nb">int</span>              <span class="c1"># 行号（从 1 开始）</span>
-    <span class="n">col</span><span class="p">:</span> <span class="nb">int</span>               <span class="c1"># 列号（从 1 开始）</span>
-    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 错误描述</span>
-    <span class="n">source_line</span><span class="p">:</span> <span class="nb">str</span>       <span class="c1"># 出错的源代码行</span>
-    <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 文件名</span>
-    <span class="n">fix_hint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 修复建议</span>
-    <span class="n">error_code</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="c1"># 错误码</span>
-</code></pre></div>
-
-<h3 id="2-errorcollector">2. ErrorCollector</h3>
-<p>收集多个错误后统一输出（不会遇到第一个错就停）：</p>
-<div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;test.dsl&quot;</span><span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">DSLSyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">collector</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-<span class="c1"># ... 继续解析找更多错 ...</span>
-<span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">()</span>  <span class="c1"># 一次性输出所有错误</span>
-</code></pre></div>
-
-<p>默认最多收集 20 个错误，超过后会提示 "further errors suppressed"。</p>
-<h3 id="3">3. 拼写建议数据库</h3>
-<p>内置了常见拼写错误的修复建议：</p>
+<h3 id="_4">两层粒度</h3>
 <table>
 <thead>
 <tr>
-<th>写错了</th>
-<th>建议</th>
+<th>层级</th>
+<th>维度</th>
+<th>用途</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>retrun</code></td>
-<td><code>did you mean 'return'?</code></td>
+<td><strong>指令级</strong></td>
+<td>按类别：ALU, FP, Load, Store, Branch, Jump</td>
+<td>了解哪类指令是瓶颈</td>
 </tr>
 <tr>
-<td><code>endiff</code></td>
-<td><code>did you mean 'endif'?</code></td>
-</tr>
-<tr>
-<td><code>sofmax</code></td>
-<td><code>did you mean 'softmax'?</code></td>
-</tr>
-<tr>
-<td><code>matmal</code></td>
-<td><code>did you mean 'matmul'?</code></td>
+<td><strong>算子级</strong></td>
+<td>按类型：Conv, Gemm, MaxPool, ReLU, Sigmoid</td>
+<td>了解哪个算子差距最大</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="_4">一步步</h2>
-<h3 id="step-1">Step 1: 创建和格式化一个错误</h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_error</span><span class="p">,</span> <span class="n">format_error</span>
-
-<span class="n">err</span> <span class="o">=</span> <span class="n">make_error</span><span class="p">(</span>
-    <span class="n">line</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">col</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;unexpected token &#39;retrun&#39;&quot;</span><span class="p">,</span>
-    <span class="n">source_line</span><span class="o">=</span><span class="s2">&quot;result = retrun(x)&quot;</span><span class="p">,</span>
-    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;test.dsl&quot;</span><span class="p">,</span>
-    <span class="n">fix_hint</span><span class="o">=</span><span class="s2">&quot;did you mean &#39;return&#39;?&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">format_error</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+<h3 id="badge">Badge 评分</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_badge</span><span class="p">(</span><span class="n">ratio</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">:</span>   <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;badge g&quot;&gt;&#39;</span>  <span class="c1"># 绿色：接近 LLVM</span>
+    <span class="k">elif</span> <span class="n">ratio</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>   <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;badge y&quot;&gt;&#39;</span>  <span class="c1"># 黄色：有差距</span>
+    <span class="k">else</span><span class="p">:</span>              <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;badge r&quot;&gt;&#39;</span>  <span class="c1"># 红色：差距大</span>
 </code></pre></div>
 
-<p>输出：</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">test</span>.<span class="nv">dsl</span>:<span class="mi">5</span>:<span class="mi">12</span>:<span class="w"> </span><span class="nv">error</span>:<span class="w"> </span><span class="nv">unexpected</span><span class="w"> </span><span class="nv">token</span><span class="w"> </span><span class="s1">&#39;retrun&#39;</span>
-<span class="w">  </span><span class="mi">5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nb">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">retrun</span><span class="ss">(</span><span class="nv">x</span><span class="ss">)</span>
-<span class="w">    </span><span class="o">|</span><span class="w">          </span><span class="o">^~~~~~~</span>
-<span class="nv">note</span>:<span class="w"> </span><span class="nv">did</span><span class="w"> </span><span class="nv">you</span><span class="w"> </span><span class="nv">mean</span><span class="w"> </span><span class="s1">&#39;return&#39;</span>?
-</code></pre></div>
-
-<h3 id="step-2-errorcollector">Step 2: 使用 ErrorCollector 收集多个错误</h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">scratchv.frontend.dsl_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorCollector</span>
-
-<span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;my_program.dsl&quot;</span><span class="p">,</span> <span class="n">max_errors</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># 发现错误时</span>
-<span class="n">collector</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span>
-    <span class="n">line</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;undefined variable &#39;x&#39;&quot;</span><span class="p">,</span>
-    <span class="n">source_line</span><span class="o">=</span><span class="s2">&quot;y = add(x, 1)&quot;</span><span class="p">,</span>
-    <span class="n">fix_hint</span><span class="o">=</span><span class="s2">&quot;variable &#39;x&#39; used before assignment&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># 最后统一输出</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">())</span>
-</code></pre></div>
-
-<h3 id="step-3">Step 3: 在解析器中使用</h3>
-<div class="codehilite"><pre><span></span><code><span class="n">collector</span> <span class="o">=</span> <span class="n">ErrorCollector</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">ast</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_code</span><span class="p">)</span>
-<span class="k">except</span> <span class="n">DSLSyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">collector</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="n">collector</span><span class="o">.</span><span class="n">has_errors</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">collector</span><span class="o">.</span><span class="n">report</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<p>ScratchV/LLVM 比值越低越好（目标是 ≤1.0，即超越 LLVM）。</p>
+<h3 id="_5">数据流</h3>
+<div class="codehilite"><pre><span></span><code>llvm_cache_compare.py → llvm_vs_scratchv.json
+tinyfive_compare.py   → tinyfive_compare.json
+                              │
+                     dashboard.py
+                              │
+                ┌─────────────┴─────────────┐
+                ▼                           ▼
+         dashboard.html              history.html
+         (静态指令+Cache)            (趋势折线图)
 </code></pre></div>
 
 <hr />
-<h2 id="_5">代码走读</h2>
-<h3 id="format_error">format_error 函数</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">format_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># 1. 位置信息: filename:line:col: error: message</span>
-    <span class="n">location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">line</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">col</span><span class="si">}</span><span class="s2">: &quot;</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">error: </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># 2. 源代码行显示</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">line</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># 3. 列标记 (^~~~)</span>
-    <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">col</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;^&quot;</span>
-    <span class="n">token_len</span> <span class="o">=</span> <span class="n">_estimate_token_length</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">col</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">marker</span> <span class="o">+=</span> <span class="s2">&quot;~&quot;</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">token_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
-
-    <span class="c1"># 4. 修复建议</span>
-    <span class="n">hint</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">fix_hint</span> <span class="ow">or</span> <span class="n">_compute_suggestion</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">source_line</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">hint</span><span class="p">:</span>
-        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;note: </span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+<h2 id="_6">一步步</h2>
+<h3 id="_7">一键运行</h3>
+<div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench-ci
 </code></pre></div>
 
-<p><strong>关键细节</strong>：<code>_estimate_token_length</code> 从出错列位置向后扫描连续字母/数字，确定 <code>~</code> 波浪线的长度。</p>
-<hr />
-<h2 id="_6">动手练习</h2>
-<h3 id="1-dsl">练习 1: 故意写错 DSL 代码</h3>
-<p>创建 <code>bad.dsl</code>：</p>
-<div class="codehilite"><pre><span></span><code>a = const(3)
-b = const(5)
-c = add(a, b)
-d = retrun(c)     # 故意把 return 写成 retrun
+<h3 id="dashboard">单独生成 Dashboard</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scratchv/ci/dashboard.py<span class="w"> </span>--run<span class="w"> </span>-o<span class="w"> </span>benchmark_reports/dashboard.html
 </code></pre></div>
 
-<p>用 DSL 解析器解析它，观察错误提示。</p>
-<h3 id="2">练习 2: 添加新的拼写建议</h3>
-<p>在 <code>_SUGGESTIONS</code> 字典中添加你的常见拼写错误和对应的修复建议。</p>
-<h3 id="3_1">练习 3: 实现多错误收集</h3>
-<p>写一个 DSL 文件包含 3 个语法错误，用 ErrorCollector 一次性收集并输出。</p>
+<h3 id="_8">生成趋势历史</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scratchv/ci/history_page.py<span class="w"> </span>-o<span class="w"> </span>benchmark_reports/history.html
+</code></pre></div>
+
+<h3 id="_9">查看</h3>
+<div class="codehilite"><pre><span></span><code>firefox<span class="w"> </span>benchmark_reports/dashboard.html
+</code></pre></div>
+
 <hr />
-<h2 id="_7">常见坑</h2>
+<h2 id="_10">代码走读</h2>
+<h3 id="ci_benchmarkpy">ci_benchmark.py 编排</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_ci</span><span class="p">():</span>
+    <span class="c1"># 1. LLVM 对比</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+        <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;scratchv/standalone/llvm_cache_compare.py&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--json-output&quot;</span><span class="p">,</span> <span class="s2">&quot;llvm_vs_scratchv.json&quot;</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="c1"># 2. TinyFive 对比</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+        <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;scratchv/standalone/tinyfive_compare.py&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--json&quot;</span><span class="p">,</span> <span class="s2">&quot;tinyfive_compare.json&quot;</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="c1"># 3. 生成 Dashboard</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span>
+        <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;scratchv/ci/dashboard.py&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--llvm-json&quot;</span><span class="p">,</span> <span class="s2">&quot;llvm_vs_scratchv.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--tinyfive-json&quot;</span><span class="p">,</span> <span class="s2">&quot;tinyfive_compare.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;dashboard.html&quot;</span><span class="p">,</span>
+    <span class="p">])</span>
+</code></pre></div>
+
+<h3 id="dashboardpy">dashboard.py 数据收集</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">_run</span><span class="p">(</span><span class="s2">&quot;scratchv/standalone/llvm_cache_compare.py&quot;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;--json-output&quot;</span><span class="p">,</span> <span class="s2">&quot;/tmp/_llvm_bench.json&quot;</span><span class="p">])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ratio</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="n">ll</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ScratchV / LLVM&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">sv</span> <span class="o">/</span> <span class="n">ll</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">×&quot;</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="mi">10</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">×&quot;</span>
+</code></pre></div>
+
+<h3 id="html">HTML 生成（纯静态）</h3>
+<p>Dashboard 输出的是<strong>纯静态 HTML</strong>——零外部依赖，CSS 内嵌，直接用浏览器打开即可。无需 Web 服务器，可托管到 GitHub Pages。</p>
+<hr />
+<h2 id="_11">动手练习</h2>
+<h3 id="1-dashboard">练习 1: 生成自己的 Dashboard</h3>
+<p>运行 <code>make bench-ci</code>，打开 <code>dashboard.html</code>，找出 ScratchV 和 LLVM 差距最大的算子和指令类别。</p>
+<h3 id="2">练习 2: 添加新指标</h3>
+<p>在 <code>dashboard.py</code> 中添加一个新指标列（比如"每 MAC 指令数"），重新生成 dashboard。</p>
+<h3 id="3">练习 3: 自定义样式</h3>
+<p>修改 <code>dashboard.py</code> 中的 <code>CSS</code> 变量，改变 dashboard 的颜色主题。</p>
+<hr />
+<h2 id="_12">常见坑</h2>
 <table>
 <thead>
 <tr>
@@ -625,41 +585,37 @@ d = retrun(c)     # 故意把 return 写成 retrun
 </thead>
 <tbody>
 <tr>
-<td><strong>列号从 1 开始</strong></td>
-<td><code>col</code> 是 1-based（人类习惯），不是 0-based（程序习惯），和 <code>line</code> 一致</td>
+<td><strong>CI 超时</strong></td>
+<td><code>bench-ci</code> 可能运行较久（TinyFive 仿真慢），CI 要设置足够的 timeout（当前 20min）</td>
 </tr>
 <tr>
-<td><strong>错误上限</strong></td>
-<td>ErrorCollector 默认最多 20 个错误，超过后静默丢弃（避免刷屏）</td>
+<td><strong>JSON 缓存</strong></td>
+<td>如果之前的 JSON 文件存在，dashboard 可能用旧数据。<code>make bench-ci</code> 默认 <code>--skip-cache</code></td>
 </tr>
 <tr>
-<td><strong>拼写建议的匹配</strong></td>
-<td><code>_compute_suggestion</code> 会把源代码中的每个词和 <code>_SUGGESTIONS</code> 逐词比对，不是模糊匹配</td>
-</tr>
-<tr>
-<td><strong>ANSI 颜色</strong></td>
-<td>彩色输出在管道到文件时会变成乱码，对有颜色的场景用 <code>use_color=False</code></td>
+<td><strong>Python 版本</strong></td>
+<td>CI 固定用 Python 3.12，本地开发如果用其他版本可能结果略有差异</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="_8">进阶阅读</h2>
+<h2 id="_13">进阶阅读</h2>
 <ul>
-<li>GCC 错误格式规范：<a href="https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html" target="_blank" rel="noopener">GCC Diagnostic Message Formatting</a></li>
-<li>Rust 编译器的错误信息设计：<a href="https://doc.rust-lang.org/error-index.html" target="_blank" rel="noopener">Rust Compiler Error Index</a>（行业最佳实践）</li>
-<li>相关 topic: <a href="01-DSL前端增强器.html">Topic 01 — DSL 前端增强器</a> | <a href="07-编译器日志增强器.html">Topic 07 — 编译器日志增强器</a></li>
+<li><a href="../03-指标解读指南.html">03-指标解读指南</a> — 如何解读 Dashboard 中的数据</li>
+<li>GitHub Actions 文档：<a href="https://docs.github.com/en/actions/writing-workflows" target="_blank" rel="noopener">Workflow syntax</a></li>
+<li>相关 topic: <a href="06-性能基准套件.html">Topic 06 — 性能基准套件</a> | <a href="19-Standalone-RISC-V编译器.html">Topic 19 — Standalone RISC-V</a></li>
 </ul>
     </article>
 
     <footer class="content-footer">
       <nav class="page-nav-row">
-        <a class="page-nav prev" href="07-编译器日志增强器.html">
+        <a class="page-nav prev" href="23-Cache-行为分析.html">
             <span class="pn-label">← 上一节</span>
-            <span class="pn-title">编译器日志增强器</span>
+            <span class="pn-title">Cache 行为分析</span>
         </a>
-        <a class="page-nav next" href="11-控制流图-CFG-生成器.html">
+        <a class="page-nav next" href="24-Spike-仿真集成.html">
             <span class="pn-label">下一节 →</span>
-            <span class="pn-title">控制流图 (CFG) 生成器</span>
+            <span class="pn-title">Spike 仿真集成</span>
         </a>
       </nav>
       <div class="footer-info">
