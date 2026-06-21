@@ -108,6 +108,14 @@ ONNX 模型 (.onnx)
 
 ---
 
+## 💬 加入社区
+
+**QQ 群：`1106852304`**
+
+有问题？想交流？欢迎加入 ScratchV 编译器学习群，一起讨论、一起成长。
+
+---
+
 ## 🤝 贡献
 
 ScratchV 是零基础友好的教育项目。查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与。

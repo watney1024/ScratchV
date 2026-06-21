@@ -118,7 +118,6 @@ for sec in COURSE["sections"]:
         d["section_id"] = sec["id"]
         ALL_DOCS.append(d)
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # HTML template engine
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -228,6 +227,43 @@ def _prev_next_href(doc: dict) -> str:
     num = doc["num"]
     safe = title.replace(" ", "-").replace("(", "").replace(")", "").replace("/", "-")
     return f"{num}-{safe}.html"
+
+
+# ── Build MD path → HTML filename mapping ──────────────────────────────────
+_MD_TO_HTML: dict[str, str] = {}
+for _d in ALL_DOCS:
+    rel = _d["file"]
+    if rel.startswith("docs/"):
+        rel = rel[5:]
+    html_name = _prev_next_href(_d)
+    _MD_TO_HTML[rel] = html_name
+    _MD_TO_HTML[_d["file"]] = html_name
+
+
+def _md_link_to_html(md_path: str) -> str:
+    """Convert a .md link to the correct .html filename using COURSE mapping."""
+    cleaned = md_path
+    while cleaned.startswith("../"):
+        cleaned = cleaned[3:]
+    cleaned = cleaned.lstrip("./")
+
+    for key, val in _MD_TO_HTML.items():
+        if key.endswith(cleaned) or cleaned.endswith(key) or key == cleaned:
+            return val
+        if Path(key).name == Path(cleaned).name:
+            return val
+
+    if cleaned.endswith(".md"):
+        filename = cleaned.split("/")[-1]
+        if filename in ("ARCHITECTURE.md", "developer_guide.md",
+                        "optimization_guide.md", "verification.md",
+                        "CODING_STANDARDS.md", "CONTRIBUTING.md",
+                        "ScratchV.md", "INDEX.md"):
+            return f"https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/{cleaned}"
+        if "topics/INDEX" in cleaned or cleaned == "INDEX.md":
+            return f"https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/topics/INDEX.md"
+
+    return md_path
 
 
 def _build_sidebar(current_section: str, current_doc: str) -> str:
@@ -757,8 +793,14 @@ def md_to_html(md_text: str) -> str:
     # Post-process: add target="_blank" to external links
     html = re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" target="_blank" rel="noopener"', html)
 
-    # Fix internal .md links → .html
-    html = re.sub(r'href="([^"]+)\.md"', r'href="\1.html"', html)
+    # Fix internal .md links → correct .html using the COURSE mapping
+    def _replace_md_link(m: re.Match) -> str:
+        md_path = m.group(1)
+        target = _md_link_to_html(md_path)
+        return f'href="{target}"'
+
+    html = re.sub(r'href="([^"]+\.md)"', _replace_md_link, html)
+    html = re.sub(r'href="([^"]+\.md#[^"]+)"', lambda m: f'href="{_md_link_to_html(m.group(1))}"', html)
 
     # Fix relative links from topics/ to docs/
     html = html.replace('href="../index.html"', 'href="index.html"')
