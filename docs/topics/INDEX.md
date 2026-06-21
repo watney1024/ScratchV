@@ -59,10 +59,10 @@
 | [21](21-IR验证器.md) | IR 验证器 | 高级 | ✅ |
 | [22](22-Standalone-LLVM编译器.md) | Standalone LLVM 编译器 | 高级 | ✅ |
 | [23](23-Cache模型.md) | Cache 模型（组相联+LRU） | 高级 | ✅ |
-| 24 | Spike 仿真集成 | 高级 | ⬜ |
-| 25 | LLVM vs ScratchV 对比工具 | 高级 | ⬜ |
-| 26 | TinyFive 对比工具 | 高级 | ⬜ |
-| 27 | RV32 全量 Benchmark | — | ⬜ |
+| [24](24-Spike仿真.md) | Spike 仿真集成 | 高级 | ✅ |
+| [25](25-LLVM对比工具.md) | LLVM vs ScratchV 对比工具 | 高级 | ✅ |
+| [26](26-TinyFive对比.md) | TinyFive 对比工具 | 高级 | ✅ |
+| [27](27-RV32全量Benchmark.md) | RV32 全量 Benchmark | 中级 | ✅ |
 | [28](28-扩展指令选择.md) | 完善后端指令选择（扩展） | 高级 | ✅ |
 | 29 | （预留） | — | ⬜ |
 | [30](30-CI-Dashboard.md) | CI 基准编排 + Dashboard | 高级 | ✅ |
