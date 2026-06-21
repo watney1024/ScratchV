@@ -1,7 +1,33 @@
 # ScratchV developer makefile
 .POSIX:
 
-.PHONY: install test bench bench-cnn clean lint
+.PHONY: quick-start install test bench bench-cnn clean lint
+
+# ── Beginner quick-start ─────────────────────────────────────────────────────
+
+quick-start:
+	@echo "╔══════════════════════════════════════════╗"
+	@echo "║   ⚡ ScratchV — 快速上手                 ║"
+	@echo "╠══════════════════════════════════════════╣"
+	@echo "║                                          ║"
+	@echo "║  1. 创建虚拟环境                          ║"
+	@echo "║     python3 -m venv .venv                ║"
+	@echo "║     source .venv/bin/activate            ║"
+	@echo "║                                          ║"
+	@echo "║  2. 安装 ScratchV                        ║"
+	@echo "║     pip install -e .                     ║"
+	@echo "║                                          ║"
+	@echo "║  3. 运行测试 (确认环境正确)                ║"
+	@echo "║     make test                            ║"
+	@echo "║                                          ║"
+	@echo "║  4. 编译你的第一个 AI 模型                 ║"
+	@echo "║     make bench-cnn                       ║"
+	@echo "║                                          ║"
+	@echo "║  5. 打开交互式课程 (浏览器)                ║"
+	@echo "║     xdg-open docs/topics/html/index.html ║"
+	@echo "║                                          ║"
+	@echo "║  📖 详细教程: docs/00-环境搭建指南.md      ║"
+	@echo "╚══════════════════════════════════════════╝"
 
 # ── Installation ──────────────────────────────────────────────────────────
 

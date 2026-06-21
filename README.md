@@ -1,226 +1,113 @@
-# ScratchV
+# ⚡ ScratchV
 
-**From ONNX to RISC-V binary — a minimal AI compiler built from scratch.**
+**从 ONNX 到 RISC-V 机器码 — 一个你完全看得懂的 AI 编译器。**
 
-ScratchV is an educational compiler project that implements a complete
-toolchain: parse ONNX models (or a simple DSL), lower through a custom
-intermediate representation (IR), apply optimizations, and emit RISC-V
-assembly / LLVM IR / binary machine code.
+[![Python](https://img.shields.io/badge/python-3.12+-blue)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![CI](https://github.com/ScratchV-Compiler/ScratchV/actions/workflows/ci.yml/badge.svg)](https://github.com/ScratchV-Compiler/ScratchV/actions)
+[![Docs](https://img.shields.io/badge/docs-课程站点-blue)](https://scratchv-compiler.github.io/ScratchV/docs/)
 
 ---
 
-## Project Structure
+## 🚀 我是新手，从哪开始？
+
+```
+1. 克隆代码     git clone https://github.com/ScratchV-Compiler/ScratchV.git
+2. 安装依赖     cd ScratchV && pip install -e .
+3. 打开课程     xdg-open docs/topics/html/index.html
+```
+
+或者一步步来：
+
+| 步骤 | 看什么 | 时间 |
+|------|--------|------|
+| 🔧 搭环境 | [00-环境搭建指南](docs/00-环境搭建指南.md) | 15 min |
+| 💡 理解概念 | [01-编译器概念入门](docs/01-编译器概念入门.md) | 15 min |
+| 🏃 动手试试 | [02-快速上手教程](docs/02-快速上手教程.md) | 30 min |
+| 📊 看懂数据 | [03-指标解读指南](docs/03-指标解读指南.md) | 15 min |
+| 🐛 遇到问题 | [04-故障排除FAQ](docs/04-故障排除FAQ.md) | 随时查 |
+
+> 🌐 **在线课程**: [在浏览器中学习](https://scratchv-compiler.github.io/ScratchV/docs/) — 带进度追踪、搜索、深色主题的交互式课程
+
+---
+
+## ⚡ 快速命令
+
+```bash
+make quick-start    # 打印新手引导
+make test           # 运行全部测试
+make bench-cnn      # 编译 CNN 模型 + 性能估算
+make bench-ci       # 完整 CI 对比 (ScratchV vs LLVM)
+make bench-reports  # 生成 Dashboard + 优化历史
+```
+
+---
+
+## 📂 项目结构（核心目录）
 
 ```
 ScratchV/
-├── scratchv/                # Main compiler package
-│   ├── ir/                  #   Intermediate representation (three-address code)
-│   │   ├── types.py         #     Value, Instruction, BasicBlock, Function, Program
-│   │   ├── builder.py       #     IR construction helper (chainable API)
-│   │   └── printer.py       #     IR text dump
-│   ├── frontend/            #   Input parsing
-│   │   ├── onnx_parser.py   #     ONNX model → IR (Conv, Gemm, Sigmoid, ...)
-│   │   ├── dsl_parser.py    #     Simple DSL → IR (test without ONNX dep)
-│   │   ├── dsl_extended.py  #     Extended DSL: if/else, while loops
-│   │   └── dsl_errors.py    #     GCC-style error messages with fix suggestions
-│   ├── optimizer/           #   IR → IR optimizations
-│   │   ├── constant_folding.py  #     Compile-time constant evaluation
-│   │   ├── dead_code.py         #     Unused instruction removal
-│   │   ├── peephole.py          #     Redundant pattern elimination
-│   │   ├── muladd_fusion.py     #     Mul+Add instruction combining
-│   │   └── licm.py              #     Loop Invariant Code Motion
-│   ├── analysis/             #   IR analysis & verification
-│   │   ├── cfg_builder.py    #     CFG builder, dominator tree, loop detection
-│   │   └── ir_verifier.py    #     7-rule IR validator (def-use, types, labels...)
-│   ├── backend/             #   Code generation
-│   │   ├── instruction_select.py #  IR → RISC-V pseudo-instructions
-│   │   ├── inst_select_ext.py    #  Extended: sqrt/min/max/abs/float64 support
-│   │   ├── register_alloc.py     #  Register allocation (naive + greedy)
-│   │   ├── regalloc_linear.py    #  Linear-scan register allocator with spill
-│   │   ├── inst_scheduler.py     #  List scheduler with DAG + latency model
-│   │   ├── asm_emit.py           #  RISC-V assembly text emission
-│   │   ├── asm_beautifier.py     #  Assembly beautifier (align + comment)
-│   │   ├── asm_peephole.py       #  Assembly-level peephole optimizer
-│   │   ├── const_merge.py        #  Constant-load merger (lui+addi → li)
-│   │   ├── inst_counter.py       #  Instruction category counter + charts
-│   │   ├── riscv_encoder.py      #  RISC-V RV32IM binary encoder
-│   │   └── llvm_codegen.py       #  LLVM IR text generation
-│   ├── verification/        #   Verification & comparison
-│   │   └── verifier.py      #     ONNX Runtime + numpy reference comparison
-│   ├── simulator/           #   Simulation
-│   │   ├── tinyfive.py      #     TinyFive adapter with instruction counting
-│   │   └── rv32_emulator.py #     RV32IM emulator with NN runtime hooks
-│   ├── utils/               #   Utilities
-│   │   └── logger.py        #     Colored logging with phase timing
-│   └── main.py              #   CLI entry point
-├── scratchv_dag/            # Standalone DAG / memory library
-│   ├── sdnode.py            #   SDNode, MVT, SelectionDAG container
-│   ├── selection_dag.py     #   DAGBuilder, DAGCombiner, DAGScheduler
-│   ├── cache.py             #   4 MB L1 cache simulator (LRU, write-back)
-│   ├── allocator.py         #   Buddy allocator with cache-line alignment
-│   └── README.md            #   Standalone docs
-├── benchmarks/              # Benchmark suite (23 DSL cases + per-topic bench)
-│   ├── bench_runner.py      #   Automated test runner with HTML reports
-│   ├── bench_*.py           #   Per-module performance benchmarks
-│   └── cases/               #   23 DSL test cases (.dsl + .expected + .desc)
-├── tests/                   # 348 unit tests
-├── examples/                # DSL models, ONNX generator, pipeline demos
-├── scripts/                 # Utility scripts (full pipeline, lint check)
-├── docs/
-│   ├── topics/              #   14 topic proposals + 14 implementation guides
-│   ├── CODING_STANDARDS.md  #   Code style guide
-│   ├── verification.md      #   Verification guide
-│   ├── optimization_guide.md #  Optimization passes guide
-│   ├── developer_guide.md   #   Internal architecture & extension guide
-│   └── ScratchV.html        #   Project landing page (zh-CN)
-├── models/                  # Generated / example ONNX models
-├── CHANGELOG.md             # Release history
-├── CONTRIBUTING.md          # Contribution guidelines
-└── Makefile                 # Dev targets (test, clean, lint, …)
+├── scratchv/             ← 编译器源码
+│   ├── frontend/         ← ONNX 解析 / DSL 解析
+│   ├── ir/               ← 中间表示 (三地址码 SSA)
+│   ├── optimizer/        ← 5 个优化 pass
+│   ├── backend/          ← RISC-V 代码生成 / LLVM 后端
+│   ├── standalone/       ← 零依赖独立编译器 + 仿真工具
+│   ├── ci/               ← CI 编排 + 性能仪表盘
+│   └── analysis/         ← CFG 构建 / IR 验证
+├── docs/                 ← 📚 完整文档体系
+│   ├── 00~04-*.md        ← 新手入门 5 篇
+│   ├── topics/           ← 30 个模块详解
+│   └── topics/html/      ← 🌐 交互式课程站点
+├── benchmarks/           ← 23 个 DSL 基准用例
+├── tests/                ← 348 个单元测试
+├── scripts/              ← 工具脚本
+└── models/               ← 测试用 ONNX 模型
 ```
 
-## Quick Start
+---
 
-### Installation
+## 📊 核心数据 (cnn.onnx)
 
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-pip install onnx onnxruntime tinyfive pytest
-```
+| 指标 | LLVM (float32) | ScratchV (Q16.16) | 追赶进度 |
+|------|---------------|-------------------|---------|
+| 静态指令 | 1,102 | 749 | ✅ 0.68× |
+| 动态指令 | 18.5 亿 | 32.2 亿 | 🟡 1.74× |
+| 优化前 | — | 78.0 亿 | 已减 58.7% |
 
-### Compile an ONNX model
+> 📈 实时数据: [性能仪表盘](https://scratchv-compiler.github.io/ScratchV/dashboard.html)
 
-```bash
-# Compile with RISC-V backend (→ RISC-V assembly + binary)
-python3.12 -m scratchv models/graph/cnn.onnx -o cnn.s --dump-ir
+---
 
-# Compile with LLVM backend
-python3.12 -m scratchv models/graph/cnn.onnx --backend llvm -o cnn.ll
-
-# Full CNN pipeline: ONNX → IR → asm → binary → execution → MSE/MAE
-python3.12 scripts/run_full_pipeline.py models/graph/cnn.onnx --dump-asm
-```
-
-### Compile a DSL model
-
-```bash
-# Simple arithmetic
-python3.12 -m scratchv examples/simple_add.dsl -o output.s --dump-ir
-
-# Full optimization pipeline
-python3.12 -m scratchv examples/relu_test.dsl -o relu.s --optimize all --dump-ir
-
-# Extended DSL (if/else, while loops)
-python3.12 -c "
-from scratchv.frontend.dsl_extended import ExtendedDSLParser
-dsl = '''
-  while (i < 10):
-    acc = add(acc, x)
-  endwhile
-  return acc
-'''
-parser = ExtendedDSLParser()
-prog = parser.parse(dsl)
-print(prog.dump())
-"
-```
-
-### Run tests
-
-```bash
-# All 348 tests
-python3.12 -m pytest tests/ -v
-
-# CNN pipeline tests only
-python3.12 -m pytest tests/test_cnn_pipeline.py -v
-
-# Backend topic tests
-python3.12 -m pytest tests/test_asm_beautifier.py tests/test_inst_counter.py tests/test_asm_peephole.py -v
-```
-
-### Run benchmarks
-
-```bash
-# Full benchmark suite
-python3.12 benchmarks/bench_runner.py
-
-# Individual module benchmarks
-python3.12 benchmarks/bench_regalloc_linear.py
-python3.12 benchmarks/bench_inst_scheduler.py
-```
-
-## Command-line options
-
-| Flag | Description |
-| :--- | :--- |
-| `-o FILE` | Output file (default: output.s for riscv, output.ll for llvm) |
-| `--backend {riscv,llvm}` | Target backend (default: riscv) |
-| `--dump-ir` | Print IR before and after optimization |
-| `--optimize {none,basic,all}` | Optimization level (default: none) |
-| `--reg-alloc {naive,greedy}` | Register allocation strategy (default: greedy) |
-| `--verify` | Verify output against ONNX Runtime / numpy reference |
-| `--rtol FLOAT` | Relative tolerance for verification (default: 1e-5) |
-| `--atol FLOAT` | Absolute tolerance for verification (default: 1e-8) |
-
-## Pipeline Overview
+## 🗺️ 编译器管线
 
 ```
-                        ┌──────────────────────────────────────────────┐
-                        │           ScratchV Compiler                  │
-                        │                                              │
-ONNX Model ──▶ ONNX Parser ──▶ IR (3-addr) ──▶ Optimizer ──┐         │
-                        │                              │     │         │
-DSL Source ──▶ DSL Parser ────┘                       │     │         │
-                                                      │     │         │
-                          ┌───────────────────────────┘     │         │
-                          ▼                                 │         │
-               ┌─────────────────┐                          │         │
-               │ Instruction Sel │──▶ Reg Alloc ──▶ Asm Emit│──▶ RISC-V .s
-               └─────────────────┘       │                   │         │
-                          │              ▼                   │         │
-                          │    RISC-V Encoder ──▶ .bin      │         │
-                          ▼                                  │         │
-               ┌─────────────────┐                          │         │
-               │ LLVM Codegen    │──▶ LLVM IR (.ll)         │         │
-               └─────────────────┘                          │         │
-                        │                                    │         │
-                        ▼                                    │         │
-               ┌──────────────────────────┐                  │         │
-               │ Verification Framework   │                  │         │
-               │ • ONNX Runtime reference │                  │         │
-               │ • Numpy reference        │                  │         │
-               │ • IR Trace Executor      │                  │         │
-               │ • RV32 Emulator          │                  │         │
-               │ • MSE / MAE comparison   │                  │         │
-               └──────────────────────────┘                  │         │
-└──────────────────────────────────────────────────────────────┘
+ONNX 模型 (.onnx)
+    │
+    ├─→ ScratchV 原生路径 (Q16.16 定点 → RV32IM 机器码)
+    │   ONNX解析 → MemoryPlan → CNNRISCVGenerator → .bin
+    │
+    └─→ LLVM 路径 (float32 → LLVM IR → RV64FD 汇编)
+        ONNX解析 → LLVMCNNGenerator → .ll → llc → .s
 ```
 
-## Topic Modules (14 课题)
+---
 
-Each topic includes: implementation module + docs/topics/ guide + tests + benchmark.
+## 📚 全部文档
 
-| # | Topic | Module | Difficulty |
-| :--- | :--- | :--- | :--- |
-| 1 | DSL Frontend Enhancer (if/else, while) | `scratchv/frontend/dsl_extended.py` | Medium |
-| 5 | RISC-V Assembly Beautifier | `scratchv/backend/asm_beautifier.py` | Low |
-| 6 | Compiler Benchmark Suite | `benchmarks/bench_runner.py` | Medium |
-| 7 | Compiler Logging System | `scratchv/utils/logger.py` | Low |
-| 9 | DSL Error Beautifier | `scratchv/frontend/dsl_errors.py` | Medium |
-| 11 | CFG Builder + Loop Detection | `scratchv/analysis/cfg_builder.py` | High |
-| 12 | Instruction Counter + Charts | `scratchv/backend/inst_counter.py` | High |
-| 13 | Assembly Peephole Optimizer | `scratchv/backend/asm_peephole.py` | Low |
-| 14 | Constant Load Merge | `scratchv/backend/const_merge.py` | Low |
-| 17 | Linear Scan Register Allocator | `scratchv/backend/regalloc_linear.py` | High |
-| 18 | Instruction Scheduler | `scratchv/backend/inst_scheduler.py` | High |
-| 20 | Code Standards & Formatting | `.pre-commit-config.yaml` | Low |
-| 21 | IR Verifier | `scratchv/analysis/ir_verifier.py` | Medium |
-| 28 | Extended Instruction Selection | `scratchv/backend/inst_select_ext.py` | Medium |
+| 入口 | 说明 |
+|------|------|
+| [📘 课程首页](docs/topics/html/index.html) | 交互式课程（推荐新手） |
+| [📖 文档导航](docs/INDEX.md) | 全部 Markdown 文档索引 |
+| [🏗️ 架构总览](docs/ARCHITECTURE.md) | ONNX→RISC-V 双路径详解 |
+| [📊 性能仪表盘](https://scratchv-compiler.github.io/ScratchV/dashboard.html) | LLVM vs ScratchV 对比 |
 
-See `docs/topics/` for detailed guides and the original topic proposals.
+---
 
-## License
+## 🤝 贡献
 
-MIT
+ScratchV 是零基础友好的教育项目。查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与。
+
+## 📄 许可
+
+MIT License — 详见 [LICENSE](LICENSE)

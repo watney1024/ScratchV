@@ -44,7 +44,7 @@
 | [optimization_guide.md](optimization_guide.md) | 优化指南：从哪里入手、怎么验证 |
 | [verification.md](verification.md) | 验证方法：如何确认编译结果正确 |
 | [CODING_STANDARDS.md](CODING_STANDARDS.md) | 代码风格规范 |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | 贡献指南 |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | 贡献指南 |
 
 ---
 

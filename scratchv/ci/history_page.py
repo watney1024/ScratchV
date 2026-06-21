@@ -378,7 +378,7 @@ def generate(history: dict | None = None) -> str:
         })
 
     h = f"""<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ScratchV | 优化历史</title><style>{CSS}</style></head><body><div class="wrap">
+<title>ScratchV | 优化历史</title><style>{CSS}</style></head><body><div class="wrap"><div class="topnav"><a href="docs/index.html">📘 课程</a> <a href="dashboard.html">📊 Dashboard</a> <a href="tests.html">🧪 测试</a></div>
 <div class="header">
 <h1>ScratchV 编译器优化历史</h1>
 <div class="sub">模型: {history["model"]} &nbsp;|&nbsp; Baseline: {baseline["name"]} ({_f(baseline["dynamic_insns"])} 动态指令) &nbsp;|&nbsp; 更新于 {datetime.now().strftime("%Y-%m-%d")}</div>

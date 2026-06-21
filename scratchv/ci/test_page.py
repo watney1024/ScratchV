@@ -131,7 +131,7 @@ def generate(modules: dict | None = None, junit_path: str = "") -> str:
                          key=lambda x: (-x[1]["failed"], x[0]))
 
     h = f"""<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ScratchV · Unit Tests</title><style>{CSS}</style></head><body><div class="wrap">
+<title>ScratchV · Unit Tests</title><style>{CSS}</style></head><body><div class="wrap"><div class="topnav"><a href="docs/index.html">📘 课程</a> <a href="dashboard.html">📊 Dashboard</a> <a href="history.html">📈 历史</a></div>
 <div class="header">
 <h1>ScratchV 单元测试</h1>
 <div class="sub">{len(modules)} 个模块 · {total_tests} 个测试用例 · 更新于 {datetime.now().strftime("%Y-%m-%d %H:%M")}</div>

@@ -188,6 +188,16 @@ jobs:
             --junit benchmark_reports/test_results.xml \
             -o benchmark_reports/tests.html
 
+      # ── 精简 Pages 产物（移除大型编译产物） ──────────────────────────
+      - name: Clean large binaries before Pages deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          rm -f benchmark_reports/*.bin benchmark_reports/*.elf
+          rm -f benchmark_reports/*.ll
+          rm -f benchmark_reports/cnn.onnx_*
+          rm -f benchmark_reports/_ll_* benchmark_reports/_sv.*
+          echo "Cleaned large binaries from Pages artifact"
+
       # ── 上传 Pages 产物 ──────────────────────────────────────────────
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'

@@ -80,6 +80,9 @@ def _badge(v):
 CSS = """*{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.5}
 .wrap{max-width:960px;margin:0 auto;padding:20px}
+.topnav{text-align:right;margin-bottom:10px;font-size:12px}
+.topnav a{color:#94a3b8;text-decoration:none;margin-left:12px;padding:4px 8px;border:1px solid #334155;border-radius:6px;transition:all .2s}
+.topnav a:hover{color:#e2e8f0;border-color:#64748b}
 .hdr{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:12px;padding:20px 28px;margin-bottom:18px}
 .hdr h1{font-size:1.15rem;color:#f1f5f9}
 .hdr .sub{font-size:.75rem;color:#94a3b8;margin-top:3px}
@@ -816,6 +819,7 @@ def generate(ld=None, single_op_data=None, history_data=None):
     # ── Build HTML ──
     h = f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ScratchV · Dashboard</title><style>{CSS}</style></head><body><div class="wrap">
+<div class="topnav"><a href="docs/index.html">📘 课程</a> <a href="history.html">📈 历史</a> <a href="tests.html">🧪 测试</a> <a href="https://github.com/ScratchV-Compiler/ScratchV">💻 GitHub</a></div>
 <div class="hdr"><h1>ScratchV vs LLVM — 追赶 LLVM 进度</h1>
 <div class="sub"><b>LLVM RV64FD (float32)</b> — baseline (target ≤1.0x) &nbsp;|&nbsp; <b>ScratchV RV32IM (Q16.16)</b> — {R_insn} current</div></div>
 
