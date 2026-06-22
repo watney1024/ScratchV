@@ -1,10 +1,19 @@
-# Topic 24 — Spike 仿真集成
+# 课题24：Spike 仿真集成
 
-> **难度**: 高级 | **源文件**: `scratchv/standalone/spike_sim.py`
+> **难度**：高 | **类型**：参考分析 | **源文件**：`scratchv/standalone/spike_sim.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
+
+Spike 仿真器集成将 ScratchV 编译出的 RV32IM flat binary 包装为最小 ELF32 格式，交给 Spike（RISC-V 官方黄金参考仿真器）执行，收集精确的动态指令数、I$/D$ 缓存命中率和指令热点。Spike 比 TinyFive 快 100-500 倍，是验证 ScratchV 代码正确性和性能的权威工具。
+
+---
+
+## 理解背景
+
+### 是什么？
 
 Spike 仿真器集成将 ScratchV 编译出的 RV32IM flat binary 包装为最小 ELF32 格式，交给 **Spike**（RISC-V 官方黄金参考仿真器）执行，收集精确的动态指令数、I$/D$ 缓存命中率和指令热点。
 
@@ -24,19 +33,15 @@ spike-log-parser  ← 解析提交指令日志
 动态指令数 + I$/D$ stats + PC 热点 + 指令trace
 ```
 
----
-
-## 为什么？
+### 为什么？
 
 ScratchV 内置的估算器（`--estimate`）是**分析估算**——用 `CONV_INSNS_PER_MAC=12` 乘以 MAC 数，速度快但不精确。TinyFive 仿真器是**逐条仿真**但很慢（~1 KIPS）。
 
 Spike 是**工业级 RISC-V 黄金参考模型**——结果权威、速度快 100-500 倍、自带 cache 模拟和指令日志。
 
----
+### 核心概念
 
-## 核心概念
-
-### ELF32 包装
+#### ELF32 包装
 
 ScratchV 输出是 flat binary（position-independent，无 header）。Spike 需要 ELF 格式。`spike_sim.py` 手工构造最小 ELF32：
 
@@ -49,7 +54,7 @@ OUTPUT_BUF = 0x87000000     # a1 = 输出 buffer
 
 构造过程：手工编码 5 条启动指令（LUI + JAL）→ 拼接 ScratchV 代码 → 写 ELF header。
 
-### Spike Cache 配置
+#### Spike Cache 配置
 
 ```bash
 # I-cache: 64 组, 2 路, 32B/块
@@ -59,7 +64,7 @@ OUTPUT_BUF = 0x87000000     # a1 = 输出 buffer
 
 与 `cache_model.py` 使用相同的参数，确保结果可比。
 
-### 收集的指标
+#### 收集的指标
 
 | 指标 | 来源 | 精度 |
 |------|------|------|
@@ -72,19 +77,21 @@ OUTPUT_BUF = 0x87000000     # a1 = 输出 buffer
 
 ---
 
-## 一步步
+## 理解要点
 
-```bash
-# 1. 编译 ScratchV binary
-python scratchv/standalone/onnx_to_riscv_standalone.py models/graph/cnn.onnx \
-    -o output.bin --asm output.s
+1. 理解 ELF32 最小包装的原理：启动代码（5 条指令）、地址空间布局（ELF_BASE, STACK_TOP, INPUT/OUTPUT_BUF）
+2. 掌握 Spike 的 cache 配置参数（--ic, --dc）与 cache_model.py 的对应关系
+3. 能够独立运行 Spike 仿真并解读 commit log 输出
+4. 理解 Spike vs TinyFive vs 分析估算三种方式的精度/速度权衡
+5. 了解 PC 热点分析的基本方法
 
-# 2. 用 Spike 仿真（限制 5000 万指令）
-python scratchv/standalone/spike_sim.py \
-    --binary output.bin --code-size 3140 \
-    --max-instr 50000000 \
-    --ic 64:2:32 --dc 128:4:32
-```
+---
+
+## 交付产物
+
+- Spike 仿真运行日志（包含动态指令数、I$/D$ 命中率）
+- Spike vs 分析估算的对比表（同一模型，两种方式）
+- PC 热点分布图（确认 >99% 执行时间在 Conv2D 内层循环）
 
 ---
 
@@ -148,7 +155,7 @@ def run_spike(elf_path, max_instr, ic_config, dc_config):
 
 | 坑 | 说明 |
 |----|------|
-| **Spike 二进制路径** | 当前硬编码为 `/home/kinsomwang/workspace/coralnpu-spike-rv32/bin/spike`，需要自己编译 Spike RV32 版本 |
+| **Spike 二进制路径** | 需要自己编译 Spike RV32 版本，当前硬编码路径需要确认存在 |
 | **内存限制** | Spike 默认内存模型可能不够大，CNN 模型需要 `-m512`（512MB） |
 | **执行时间** | 全量 CNN（32 亿指令）在 Spike 上可能跑数小时，用 `--max-instr` 限制 |
 | **ELF 兼容性** | 最小 ELF32 只包含必要 header，某些 Spike 版本可能要求更完整的 ELF |
@@ -159,4 +166,13 @@ def run_spike(elf_path, max_instr, ic_config, dc_config):
 
 - [Spike RISC-V ISA Simulator](https://github.com/riscv-software-src/riscv-isa-sim)
 - ELF 格式规范: `man 5 elf`
-- 相关 topic: [Topic 23 — Cache 模型](23-Cache模型.md) | [Topic 19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+- 相关 topic: [课题23 — Cache 模型](23-Cache模型.md) | [课题19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：安装并编译 Spike RV32 版本。阅读 `spike_sim.py` 源码，理解 ELF32 包装流程（启动代码 → 拼接 payload → ELF header）。画出地址空间布局图。
+- **第 2 周**：编译一个简单的 CNN 模型，分别用分析估算和 Spike 仿真统计动态指令数。对比差异并分析原因（估算公式的假设是否准确？）。
+- **第 3 周**：使用 Spike 的 `--log-commits` 和 `--log-cache` 功能，提取指令 trace 和 cache 统计。用 PC 热点分析确认执行时间分布。
+- **第 4 周**：尝试将 Spike 仿真集成到 CI 流程中（替代或补充 TinyFive）。设计 timeout 和 fallback 策略（Spike 可能不可用）。

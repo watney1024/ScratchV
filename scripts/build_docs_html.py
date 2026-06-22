@@ -56,27 +56,34 @@ COURSE = {
             ],
         },
         {
-            "id": "beginner",
-            "title": "入门模块",
+            "id": "beginner-build",
+            "title": "入门模块 — 动手做",
             "icon": "🔰",
-            "desc": "基础实现（美化/日志/CFG/窥孔/调度） + 学会看（Dashboard/Cache/Spike仿真/LLVM对比/TinyFive对比/Benchmark）",
+            "desc": "从零开始实现编译器的基础工具：美化器、日志、CFG、窥孔、调度",
             "docs": [
-                # 基础实现类
                 {"file": "docs/topics/05-汇编代码美化器.md", "num": "05", "title": "汇编代码美化器"},
                 {"file": "docs/topics/07-编译器日志增强器.md", "num": "07", "title": "编译器日志增强器"},
                 {"file": "docs/topics/09-DSL错误提示美化器.md", "num": "09", "title": "DSL 错误提示美化器"},
                 {"file": "docs/topics/11-控制流图生成器.md", "num": "11", "title": "控制流图 (CFG) 生成器"},
                 {"file": "docs/topics/13-窥孔优化器.md", "num": "13", "title": "窥孔优化器"},
                 {"file": "docs/topics/18-指令调度器.md", "num": "18", "title": "指令调度器"},
-                # 学会看 — 可视化 & 性能分析工具
-                {"file": "docs/topics/12-指令计数统计器.md", "num": "12", "title": "指令计数统计器"},
+                {"file": "docs/topics/20-代码规范.md", "num": "20", "title": "代码规范与格式化"},
+            ],
+        },
+        {
+            "id": "beginner-observe",
+            "title": "入门模块 — 学会看",
+            "icon": "📊",
+            "desc": "学习使用性能分析和可视化工具：Benchmark、Cache、Spike、LLVM/TinyFive 对比",
+            "docs": [
                 {"file": "docs/topics/06-性能基准套件.md", "num": "06", "title": "性能基准套件"},
+                {"file": "docs/topics/12-指令计数统计器.md", "num": "12", "title": "指令计数统计器"},
                 {"file": "docs/topics/23-Cache模型.md", "num": "23", "title": "Cache 行为分析"},
-                {"file": "docs/topics/30-CI-Dashboard.md", "num": "30", "title": "性能仪表盘 (Dashboard)"},
                 {"file": "docs/topics/24-Spike仿真.md", "num": "24", "title": "Spike 仿真集成"},
                 {"file": "docs/topics/25-LLVM对比工具.md", "num": "25", "title": "LLVM vs ScratchV 对比"},
                 {"file": "docs/topics/26-TinyFive对比.md", "num": "26", "title": "TinyFive 对比工具"},
                 {"file": "docs/topics/27-RV32全量Benchmark.md", "num": "27", "title": "RV32 全量 Benchmark"},
+                {"file": "docs/topics/30-CI-Dashboard.md", "num": "30", "title": "性能仪表盘 (Dashboard)"},
             ],
         },
         {
@@ -94,7 +101,6 @@ COURSE = {
                 {"file": "docs/topics/16-LLVM代码生成.md", "num": "16", "title": "LLVM 代码生成后端"},
                 {"file": "docs/topics/17-寄存器分配.md", "num": "17", "title": "寄存器分配"},
                 {"file": "docs/topics/19-Standalone-RISC-V编译器.md", "num": "19", "title": "Standalone RISC-V 编译器"},
-                {"file": "docs/topics/20-代码规范.md", "num": "20", "title": "代码规范与格式化"},
             ],
         },
         {
@@ -106,6 +112,17 @@ COURSE = {
                 {"file": "docs/topics/21-IR验证器.md", "num": "21", "title": "IR 验证器"},
                 {"file": "docs/topics/22-Standalone-LLVM编译器.md", "num": "22", "title": "Standalone LLVM 编译器"},
                 {"file": "docs/topics/28-扩展指令选择.md", "num": "28", "title": "扩展指令选择 (F/D/abs/sqrt)"},
+            ],
+        },
+        {
+            "id": "planned",
+            "title": "规划中",
+            "icon": "⬜",
+            "desc": "未来将开发的模块：循环展开、函数内联、SIMD 向量化",
+            "docs": [
+                {"file": "docs/topics/10-循环展开优化.md", "num": "10", "title": "循环展开优化", "planned": True},
+                {"file": "docs/topics/15-函数内联.md", "num": "15", "title": "函数内联", "planned": True},
+                {"file": "docs/topics/29-SIMD向量化.md", "num": "29", "title": "SIMD 向量化", "planned": True},
             ],
         },
     ],
@@ -858,9 +875,9 @@ def build_index():
       <h1>{COURSE['title']}</h1>
       <p>{COURSE['subtitle']}</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-val">{total}</div><div class="hero-stat-label">课程模块</div></div>
-        <div class="hero-stat"><div class="hero-stat-val">4</div><div class="hero-stat-label">难度层级</div></div>
-        <div class="hero-stat"><div class="hero-stat-val">32</div><div class="hero-stat-label">详细文档</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">35</div><div class="hero-stat-label">课程文档</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">5</div><div class="hero-stat-label">难度层级</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">30</div><div class="hero-stat-label">专题模块</div></div>
       </div>
     </div>
     <h2>📚 课程目录</h2>
@@ -883,6 +900,10 @@ def build_section_page(sec: dict):
         badge_class = sec["id"]
         if badge_class == "foundation":
             badge_class = "beginner"
+        elif badge_class in ("beginner-build", "beginner-observe"):
+            badge_class = "beginner"
+        elif badge_class == "planned":
+            badge_class = "intermediate"  # use existing style for planned
         time_str = ""
         if d.get("time"):
             time_str = f'<span style="font-size:11px;color:var(--text-secondary)">⏱ {d["time"]}</span>'

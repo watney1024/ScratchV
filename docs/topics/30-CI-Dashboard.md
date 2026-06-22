@@ -1,10 +1,19 @@
-# Topic 30 — CI 基准编排 + Dashboard
+# 课题30：CI 基准编排 + Dashboard
 
-> **难度**: 高级 | **源文件**: `scratchv/ci/ci_benchmark.py`, `scratchv/ci/dashboard.py`
+> **难度**：高 | **类型**：参考分析 | **源文件**：`scratchv/ci/ci_benchmark.py`, `scratchv/ci/dashboard.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
+
+CI 基准系统自动运行 ScratchV vs LLVM 的性能对比，生成纯静态 HTML 仪表盘。Dashboard 展示静态/动态指令数对比、缓存命中率、趋势折线图，是评估 ScratchV 编译优化进展的核心可视化工具。
+
+---
+
+## 理解背景
+
+### 是什么？
 
 CI 基准系统自动运行 ScratchV vs LLVM 的性能对比，生成**纯静态 HTML 仪表盘**，展示：
 
@@ -25,26 +34,22 @@ make bench-ci
             └─→ benchmark_reports/dashboard.html (纯静态, 零依赖)
 ```
 
----
-
-## 为什么？
+### 为什么？
 
 - **持续监控**：每次 push 自动运行，防止性能衰退
 - **决策依据**：优化是否有效？数据说话
 - **可视化**：好看的图表比一页数字更有说服力
 
----
+### 核心概念
 
-## 核心概念
-
-### 两层粒度
+#### 两层粒度
 
 | 层级 | 维度 | 用途 |
 |------|------|------|
 | **指令级** | 按类别：ALU, FP, Load, Store, Branch, Jump | 了解哪类指令是瓶颈 |
 | **算子级** | 按类型：Conv, Gemm, MaxPool, ReLU, Sigmoid | 了解哪个算子差距最大 |
 
-### Badge 评分
+#### Badge 评分
 
 ```python
 def _badge(ratio):
@@ -55,7 +60,7 @@ def _badge(ratio):
 
 ScratchV/LLVM 比值越低越好（目标是 ≤1.0，即超越 LLVM）。
 
-### 数据流
+#### 数据流
 
 ```
 llvm_cache_compare.py → llvm_vs_scratchv.json
@@ -71,31 +76,21 @@ tinyfive_compare.py   → tinyfive_compare.json
 
 ---
 
-## 一步步
+## 理解要点
 
-### 一键运行
+1. 理解 CI 基准编排的完整流程：llvm_cache_compare → tinyfive_compare → dashboard
+2. 掌握 Dashboard 的两层粒度（指令级 / 算子级）和 Badge 评分标准
+3. 能够独立运行 `make bench-ci` 并解读 dashboard.html 中的各项指标
+4. 理解纯静态 HTML 的生成方式（CSS 内嵌，零外部依赖，可直接托管 GitHub Pages）
+5. 了解 history.html 的趋势追踪机制
 
-```bash
-make bench-ci
-```
+---
 
-### 单独生成 Dashboard
+## 交付产物
 
-```bash
-python scratchv/ci/dashboard.py --run -o benchmark_reports/dashboard.html
-```
-
-### 生成趋势历史
-
-```bash
-python scratchv/ci/history_page.py -o benchmark_reports/history.html
-```
-
-### 查看
-
-```bash
-firefox benchmark_reports/dashboard.html
-```
+- 一次完整的 `make bench-ci` 运行输出（dashboard.html + history.html）
+- Dashboard 指标解读笔记（标注各项指标的含义和当前 ScratchV vs LLVM 差距）
+- 至少一个自定义指标的实验（修改 dashboard.py 添加新列）
 
 ---
 
@@ -173,4 +168,13 @@ Dashboard 输出的是**纯静态 HTML**——零外部依赖，CSS 内嵌，直
 
 - [03-指标解读指南](../03-指标解读指南.md) — 如何解读 Dashboard 中的数据
 - GitHub Actions 文档：[Workflow syntax](https://docs.github.com/en/actions/writing-workflows)
-- 相关 topic: [Topic 06 — 性能基准套件](06-性能基准套件.md) | [Topic 19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+- 相关 topic: [课题6 — 性能基准套件](06-性能基准套件.md) | [课题19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：运行 `make bench-ci`，打开生成的 `dashboard.html` 和 `history.html`。逐项理解每个指标的含义（静态指令、动态指令、I$/D$ 命中率、MPKI）。对照 [03-指标解读指南](../03-指标解读指南.md) 做笔记。
+- **第 2 周**：阅读 `ci_benchmark.py` 和 `dashboard.py` 源码。理解编排逻辑（如何依次运行对比工具）和数据收集→HTML 生成的流程。画出数据流图。
+- **第 3 周**：为 Dashboard 添加一个新指标（如"每个算子的代码体积"或"寄存器溢出次数"）。修改 `dashboard.py` 的数据收集和 HTML 生成逻辑。
+- **第 4 周**：研究 GitHub Actions CI workflow（`.github/workflows/ci.yml`），理解 `bench-ci` 在 CI 中的触发条件和超时配置。尝试在本地模拟 CI 环境运行完整的 bench-ci 流程。

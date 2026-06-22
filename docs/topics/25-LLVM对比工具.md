@@ -1,33 +1,36 @@
-# Topic 25 — LLVM vs ScratchV 缓存对比工具
+# 课题25：LLVM vs ScratchV 缓存对比工具
 
-> **难度**: 高级 | **源文件**: `scratchv/standalone/llvm_cache_compare.py`
+> **难度**：高 | **类型**：参考分析 | **源文件**：`scratchv/standalone/llvm_cache_compare.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
 
-`llvm_cache_compare.py` 是 ScratchV 的**核心对比分析工具**——它对 LLVM 生成的 RV64FD 汇编和 ScratchV 生成的 RV32IM 汇编做**并排分析**，计算两者在动态指令数、缓存行为、访存模式上的差异。
+`llvm_cache_compare.py` 是 ScratchV 的核心对比分析工具——它对 LLVM 生成的 RV64FD 汇编和 ScratchV 生成的 RV32IM 汇编做并排分析，计算两者在动态指令数、缓存行为、访存模式上的差异。这是 ScratchV 最重要的性能分析工具，告诉你"差距到底在哪里"。
 
-因为无法在 Python 内运行完整的 RV64FD 仿真，它使用**分析估算法**：
-1. 从 LLVM 汇编中提取内层循环体的静态指令
+---
+
+## 理解背景
+
+### 是什么？
+
+`llvm_cache_compare.py` 对 LLVM 和 ScratchV 的汇编做**并排分析**。因为无法在 Python 内运行完整的 RV64FD 仿真，它使用**分析估算法**：
+1. 从汇编中提取内层循环体的静态指令
 2. 基于 CNN 层维度计算动态执行次数
 3. 将访存模式输入 cache 模型估算命中率
 4. 生成并排对比表
 
----
-
-## 为什么？
+### 为什么？
 
 这是 ScratchV **最重要的性能分析工具**——它告诉你：
 - ScratchV 和 LLVM 的**差距到底在哪里**（哪个算子？哪类指令？）
 - 每次优化后的**实际效果**（量化对比）
 - Cache 层面的**深层瓶颈**（不仅仅是指令数）
 
----
+### 核心概念
 
-## 核心概念
-
-### 分析流程
+#### 分析流程
 
 ```
 LLVM .s 汇编                    ScratchV .s 汇编
@@ -48,22 +51,7 @@ Cache 模型 (I$/D$)             Cache 模型 (I$/D$)
        并排对比表 + JSON 输出
 ```
 
-### CNN 层维度计算
-
-```python
-def compute_layer_dims():
-    layers = []
-    # Conv1: 3→32, 3×3, stride=1, pad=0
-    macs = 32 * 248 * 248 * 3 * 3 * 3  # ~110M
-    layers.append(LayerDims("Conv1", macs, ...))
-    # Conv2: 32→32, 3×3
-    macs2 = 32 * 122 * 122 * 32 * 3 * 3  # ~74M
-    layers.append(LayerDims("Conv2", macs2, ...))
-    # ... 继续计算所有层 ...
-    return layers
-```
-
-### 对比维度
+#### 对比维度
 
 | 维度 | LLVM (RV64FD) | ScratchV (RV32IM) |
 |------|--------------|-------------------|
@@ -75,50 +63,21 @@ def compute_layer_dims():
 
 ---
 
-## 一步步
+## 理解要点
 
-### 运行对比
+1. 理解分析估算法的原理：内层循环指令 × 循环迭代次数 = 动态指令数
+2. 掌握对比工具的完整分析流程（汇编→提取内层循环→估算动态→Cache 模型→并排对比）
+3. 能够独立运行对比工具并解读 JSON/Markdown 输出
+4. 理解 LLVM vs ScratchV 在各维度的差距根源（ALU 指令数差距最大，D$ 行为接近）
+5. 了解对比工具在 CI Dashboard 中的角色（数据源）
 
-```bash
-# 生成 JSON 对比数据
-python scratchv/standalone/llvm_cache_compare.py \
-    --json-output output/llvm_vs_scratchv.json
+---
 
-# 同时生成 Markdown 报告
-python scratchv/standalone/llvm_cache_compare.py \
-    --json-output output/llvm_vs_scratchv.json \
-    --markdown output/llvm_vs_scratchv.md
-```
+## 交付产物
 
-### 查看结果
-
-```python
-import json
-with open("output/llvm_vs_scratchv.json") as f:
-    data = json.load(f)
-
-for key in data:
-    print(f"{key}: {data[key]}")
-```
-
-典型输出：
-```json
-{
-  "llvm_static_insns": 1102,
-  "scratchv_static_insns": 749,
-  "llvm_dynamic_insns": 1060000000,
-  "scratchv_dynamic_insns": 3220000000,
-  "ratio": 3.04,
-  "llvm_dcache_hit_rate": 88.75,
-  "scratchv_dcache_hit_rate": 88.75
-}
-```
-
-### 在 CI 中使用
-
-```bash
-make bench-ci    # 自动调用 llvm_cache_compare.py → dashboard.py
-```
+- 一次完整的对比运行输出（JSON + Markdown 报告）
+- 差距分析笔记（按算子、按指令类别的差距矩阵）
+- 内层循环指令的逐条对比表（ScratchV vs LLVM）
 
 ---
 
@@ -192,4 +151,13 @@ def estimate_dynamic(inner_loop_insns, layer_dims):
 
 - [03-指标解读指南](../03-指标解读指南.md) — 如何解读对比数据
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — 双路径对比详解
-- 相关 topic: [Topic 23 — Cache 模型](23-Cache模型.md) | [Topic 30 — CI Dashboard](30-CI-Dashboard.md)
+- 相关 topic: [课题23 — Cache 模型](23-Cache模型.md) | [课题30 — CI Dashboard](30-CI-Dashboard.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：运行 `llvm_cache_compare.py`，生成 JSON 和 Markdown 报告。逐项理解每个对比维度（ALU/Load/Store/Branch/I$/D$）的含义和计算方式。
+- **第 2 周**：阅读 `llvm_cache_compare.py` 源码。理解 `extract_inner_loop()` 的标签识别逻辑和 `estimate_dynamic()` 的迭代次数计算。验证估算结果与 TinyFive 实测的偏差。
+- **第 3 周**：深入分析差距最大的维度和算子。是 Conv2D 的 MUL 指令太多？还是地址计算的 ADD 链太长？画出每个算子的指令类别分布饼图。
+- **第 4 周**：为对比工具添加一个新维度（如"每 MAC 的分支指令数"或"寄存器溢出次数估算"）。将新指标集成到 `dashboard.py` 的 HTML 输出中。

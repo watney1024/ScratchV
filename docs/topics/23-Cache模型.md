@@ -1,12 +1,21 @@
-# Topic 23 — Cache 模型（组相联 + LRU）
+# 课题23：Cache 模型（组相联 + LRU）
 
-> **难度**: 高级 | **源文件**: `scratchv/standalone/cache_model.py`
+> **难度**：高 | **类型**：参考分析 | **源文件**：`scratchv/standalone/cache_model.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
 
-Cache 模型（`cache_model.py`）模拟 **L1 指令缓存（I$）和数据缓存（D$）** 的行为。它是 RV32IM 仿真器的"附件"——每条访存指令都经过 cache 模型，统计命中/缺失次数。
+Cache 模型模拟 L1 指令缓存（I$）和数据缓存（D$）的行为。它是 RV32IM 仿真器的附件——每条访存指令都经过 cache 模型，统计命中/缺失次数。理解 Cache 行为是解释"为什么相同指令数下性能不同"的关键。
+
+---
+
+## 理解背景
+
+### 是什么？
+
+Cache 模型（`cache_model.py`）模拟 **L1 指令缓存（I$）和数据缓存（D$）** 的行为。
 
 ```
 CPU 执行指令
@@ -19,20 +28,16 @@ CPU 执行指令
     主内存 (无限容量，固定延迟)
 ```
 
----
-
-## 为什么？
+### 为什么？
 
 只统计动态指令数不够——两条指令序列可能指令数相同但 cache 行为截然不同。Cache 模型让你看到：
 - 内存访问模式是否友好（空间局部性、时间局部性）
 - ScratchV 和 LLVM 的缓存效率差距
 - 为什么相同指令数下某个版本更快
 
----
+### 核心概念
 
-## 核心概念
-
-### 组相联 Cache 参数
+#### 组相联 Cache 参数
 
 | 参数 | I$ | D$ | 含义 |
 |------|-----|-----|------|
@@ -41,18 +46,18 @@ CPU 执行指令
 | block_size | 32B | 32B | 每块 8 个 32-bit 字 |
 | **总容量** | **4KB** | **16KB** | sets × ways × block_size |
 
-### 地址分解（32 位）
+#### 地址分解（32 位）
 
 ```
 |     tag (剩余位)    | index (log2 sets) | offset (log2 block_size) |
 |     20 位 (I$)      |      6 位 (64)    |        5 位 (32B)       |
 ```
 
-### LRU 替换策略
+#### LRU 替换策略
 
 每组有 `ways` 个位置。当所有位置都满了又有新数据要进来时，淘汰**最久没被访问**的那个（Least Recently Used）。
 
-### Miss 分类
+#### Miss 分类
 
 | 类型 | 含义 | 能优化吗？ |
 |------|------|----------|
@@ -61,45 +66,21 @@ CPU 执行指令
 
 ---
 
-## 一步步
+## 理解要点
 
-### 使用
+1. 理解组相联 Cache 的三段地址分解（tag / index / offset）
+2. 掌握 LRU 替换策略的实现（时间戳方式）
+3. 区分 Compulsory miss 和 Conflict miss，知道哪种可优化
+4. 能够独立运行 Cache 仿真并解读 hit_rate、MPKI 等指标
+5. 理解 I$ 和 D$ 参数差异的原因（指令访问 vs 数据访问模式不同）
 
-```python
-from scratchv.standalone.cache_model import CacheSim
+---
 
-# 创建 I-cache 和 D-cache
-icache = CacheSim(name="I$", sets=64, ways=2, block_size=32)
-dcache = CacheSim(name="D$", sets=128, ways=4, block_size=32)
+## 交付产物
 
-# 每次取指
-icache.access(addr=pc, is_read=True)
-
-# 每次数据访问
-dcache.access(addr=mem_addr, is_read=True)    # load
-dcache.access(addr=mem_addr, is_read=False)   # store
-
-# 查看统计
-icache.print_stats()
-dcache.print_stats()
-```
-
-输出：
-```
-I$: hits=3220000000, misses=16000000, hit_rate=99.50%
-D$: hits=2860000000, misses=748000000, hit_rate=79.27%
-```
-
-### 指标速查
-
-```python
-stats = dcache.stats
-print(f"Hit rate: {stats.hit_rate:.2%}")
-print(f"Miss rate: {stats.miss_rate:.2%}")
-print(f"MPKI: {stats.mpki:.1f}")     # Misses Per 1000 accesses
-print(f"Compulsory: {stats.compulsory_misses}")
-print(f"Conflict: {stats.conflict_misses}")
-```
+- Cache 地址分解示意图（标注 tag/index/offset 位宽）
+- CNN 模型的 Cache 分析报告（I$ 和 D$ 命中率、miss 分类）
+- ScratchV vs LLVM 的 Cache 对比分析
 
 ---
 
@@ -178,4 +159,13 @@ def access(self, addr, is_read):
 
 - Hennessy & Patterson: Computer Architecture, 附录 B（Cache 原理）
 - [03-指标解读指南](../03-指标解读指南.md) — 如何解读 Cache 指标
-- 相关 topic: [Topic 19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md) | [Topic 25 — LLVM vs ScratchV 对比](25-LLVM对比工具.md)
+- 相关 topic: [课题19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md) | [课题25 — LLVM vs ScratchV 对比](25-LLVM对比工具.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：阅读 `cache_model.py` 全文，理解 `CacheLine` 数据结构和 `access()` 的核心逻辑。用纸笔模拟一个 4 组 × 2 路的小 cache，手动跟踪几次访问的命中/缺失。
+- **第 2 周**：运行 `llvm_cache_compare.py`，收集 ScratchV 和 LLVM 的 I$/D$ 命中率数据。分析两者差异最大的访问模式（是 Conv 的 weight 访问还是 input/output 访问？）。
+- **第 3 周**：尝试修改 cache 参数（ways=8, block_size=64），观察命中率变化。实验不同的替换策略（LRU vs FIFO vs Random），对比命中率差异。
+- **第 4 周**：为 Cache 模型添加写策略选项（write-through vs write-back），实现并对比两种策略在 CNN 推理场景下的差异。撰写分析报告。

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLVM 代码生成后端 — ScratchV 编译器课程 — ScratchV 编译器课程</title>
+<title>函数内联 — ScratchV 编译器课程 — ScratchV 编译器课程</title>
 <meta name="description" content="ScratchV 零基础编译器课程 — 从 ONNX 到 RISC-V 的全流程实战">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -354,7 +354,7 @@ body {
 }
 </style>
 </head>
-<body class="page-doc page-intermediate">
+<body class="page-doc page-planned">
 <div id="app">
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="菜单">☰</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -400,14 +400,14 @@ body {
 <li><a href="27-RV32-全量-Benchmark.html" class="" data-doc="RV32 全量 Benchmark"><span class="sidenav-num">27</span><span class="sidenav-doc-title">RV32 全量 Benchmark</span><span class="sidenav-check" data-check="RV32 全量 Benchmark"></span></a></li>
 <li><a href="30-性能仪表盘-Dashboard.html" class="" data-doc="性能仪表盘 (Dashboard)"><span class="sidenav-num">30</span><span class="sidenav-doc-title">性能仪表盘 (Dashboard)</span><span class="sidenav-check" data-check="性能仪表盘 (Dashboard)"></span></a></li>
 </ul></li>
-<li class="sidenav-section active"><button class="sidenav-section-btn" aria-expanded="true"><span>📗 中级模块</span><span class="sidenav-count">9</span></button><ul class="sidenav-sub">
+<li class="sidenav-section "><button class="sidenav-section-btn" aria-expanded="false"><span>📗 中级模块</span><span class="sidenav-count">9</span></button><ul class="sidenav-sub">
 <li><a href="01-DSL-前端增强器.html" class="" data-doc="DSL 前端增强器"><span class="sidenav-num">01</span><span class="sidenav-doc-title">DSL 前端增强器</span><span class="sidenav-check" data-check="DSL 前端增强器"></span></a></li>
 <li><a href="02-ONNX-解析器.html" class="" data-doc="ONNX 解析器"><span class="sidenav-num">02</span><span class="sidenav-doc-title">ONNX 解析器</span><span class="sidenav-check" data-check="ONNX 解析器"></span></a></li>
 <li><a href="03-IR-中间表示系统.html" class="" data-doc="IR 中间表示系统"><span class="sidenav-num">03</span><span class="sidenav-doc-title">IR 中间表示系统</span><span class="sidenav-check" data-check="IR 中间表示系统"></span></a></li>
 <li><a href="04-IR-优化器框架.html" class="" data-doc="IR 优化器框架"><span class="sidenav-num">04</span><span class="sidenav-doc-title">IR 优化器框架</span><span class="sidenav-check" data-check="IR 优化器框架"></span></a></li>
 <li><a href="08-后端指令选择.html" class="" data-doc="后端指令选择"><span class="sidenav-num">08</span><span class="sidenav-doc-title">后端指令选择</span><span class="sidenav-check" data-check="后端指令选择"></span></a></li>
 <li><a href="14-常量加载合并优化.html" class="" data-doc="常量加载合并优化"><span class="sidenav-num">14</span><span class="sidenav-doc-title">常量加载合并优化</span><span class="sidenav-check" data-check="常量加载合并优化"></span></a></li>
-<li><a href="16-LLVM-代码生成后端.html" class="active" data-doc="LLVM 代码生成后端"><span class="sidenav-num">16</span><span class="sidenav-doc-title">LLVM 代码生成后端</span><span class="sidenav-check" data-check="LLVM 代码生成后端"></span></a></li>
+<li><a href="16-LLVM-代码生成后端.html" class="" data-doc="LLVM 代码生成后端"><span class="sidenav-num">16</span><span class="sidenav-doc-title">LLVM 代码生成后端</span><span class="sidenav-check" data-check="LLVM 代码生成后端"></span></a></li>
 <li><a href="17-寄存器分配.html" class="" data-doc="寄存器分配"><span class="sidenav-num">17</span><span class="sidenav-doc-title">寄存器分配</span><span class="sidenav-check" data-check="寄存器分配"></span></a></li>
 <li><a href="19-Standalone-RISC-V-编译器.html" class="" data-doc="Standalone RISC-V 编译器"><span class="sidenav-num">19</span><span class="sidenav-doc-title">Standalone RISC-V 编译器</span><span class="sidenav-check" data-check="Standalone RISC-V 编译器"></span></a></li>
 </ul></li>
@@ -416,9 +416,9 @@ body {
 <li><a href="22-Standalone-LLVM-编译器.html" class="" data-doc="Standalone LLVM 编译器"><span class="sidenav-num">22</span><span class="sidenav-doc-title">Standalone LLVM 编译器</span><span class="sidenav-check" data-check="Standalone LLVM 编译器"></span></a></li>
 <li><a href="28-扩展指令选择-F-D-abs-sqrt.html" class="" data-doc="扩展指令选择 (F/D/abs/sqrt)"><span class="sidenav-num">28</span><span class="sidenav-doc-title">扩展指令选择 (F/D/abs/sqrt)</span><span class="sidenav-check" data-check="扩展指令选择 (F/D/abs/sqrt)"></span></a></li>
 </ul></li>
-<li class="sidenav-section "><button class="sidenav-section-btn" aria-expanded="false"><span>⬜ 规划中</span><span class="sidenav-count">3</span></button><ul class="sidenav-sub">
+<li class="sidenav-section active"><button class="sidenav-section-btn" aria-expanded="true"><span>⬜ 规划中</span><span class="sidenav-count">3</span></button><ul class="sidenav-sub">
 <li><a href="10-循环展开优化.html" class="" data-doc="循环展开优化"><span class="sidenav-num">10</span><span class="sidenav-doc-title">循环展开优化</span><span class="sidenav-check" data-check="循环展开优化"></span></a></li>
-<li><a href="15-函数内联.html" class="" data-doc="函数内联"><span class="sidenav-num">15</span><span class="sidenav-doc-title">函数内联</span><span class="sidenav-check" data-check="函数内联"></span></a></li>
+<li><a href="15-函数内联.html" class="active" data-doc="函数内联"><span class="sidenav-num">15</span><span class="sidenav-doc-title">函数内联</span><span class="sidenav-check" data-check="函数内联"></span></a></li>
 <li><a href="29-SIMD-向量化.html" class="" data-doc="SIMD 向量化"><span class="sidenav-num">29</span><span class="sidenav-doc-title">SIMD 向量化</span><span class="sidenav-check" data-check="SIMD 向量化"></span></a></li>
 </ul></li>
 </ul>
@@ -433,7 +433,7 @@ body {
 
   <main class="main">
     <div class="topbar">
-      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="intermediate.html">中级模块</a> <span class="bc-sep">›</span> <a href="16-LLVM-代码生成后端.html">LLVM 代码生成后端</a></div>
+      <div class="breadcrumbs"><a href="index.html">首页</a> <span class="bc-sep">›</span> <a href="planned.html">规划中</a> <span class="bc-sep">›</span> <a href="15-函数内联.html">函数内联</a></div>
       <div class="topbar-actions">
         <button class="btn-progress" id="btnProgress" title="学习进度">📊</button>
       </div>
@@ -444,225 +444,52 @@ body {
       <div class="progress-bar-fill" id="progressBarFill"></div>
       <span class="progress-bar-text" id="progressBarText"></span>
     </div>
-      <h1>课题16：LLVM 代码生成后端</h1>
+      <h1>课题15：函数内联</h1>
 <blockquote>
-<p><strong>难度</strong>：中 | <strong>类型</strong>：项目实战 | <strong>源文件</strong>：<code>scratchv/backend/llvm_codegen.py</code>, <code>scratchv/standalone/onnx_to_llvm_standalone.py</code>
-<strong>状态</strong>：✅ 已完成</p>
+<p><strong>难度</strong>：中 | <strong>类型</strong>：项目实战 | <strong>源文件</strong>：待创建
+<strong>状态</strong>：⬜ 规划中</p>
 </blockquote>
 <hr />
 <h2>概述
-<p>LLVM 代码生成器将 ScratchV IR / ONNX 模型翻译为 LLVM IR 文本（<code>.ll</code> 文件）。这是 ScratchV 的 float32 路径，使用硬件浮点指令（<code>fmul</code>, <code>fadd</code>）+ GEP 地址计算 + phi 节点循环结构，每条 MAC 约 2 条指令（vs Q16.16 的 ~12 条）。生成的 LLVM IR 可接入 LLVM 全套工具链（<code>opt</code>, <code>llc</code>, <code>lli</code>）进行优化和多目标编译。</p>
+<p>函数内联（Function Inlining）将函数调用替换为函数体的副本，消除调用开销（JAL/JALR + 栈帧管理）并暴露更多优化机会（常量传播、死代码消除）。对 ScratchV 而言，将每个 CNN 算子的代码内联到主函数中，可以减少函数调用指令数并改善 I$ 局部性。</p>
 <hr />
 <h2>理解背景
-<h3>是什么？
-<p>LLVM 代码生成器将 ScratchV IR / ONNX 模型翻译为 <strong>LLVM IR 文本</strong>（<code>.ll</code> 文件）。这是 ScratchV 的 <strong>float32 路径</strong>，与 Q16.16 定点路径互补。</p>
-<div class="codehilite"><pre><span></span><code>ONNX 模型
-    │
-    ├─→ 原生路径: RV32IM 定点机器码 (.bin)
-    │
-    └─→ LLVM 路径: LLVM IR (.ll) → llc → RISC-V 64 浮点汇编 (.s)
-                    这条就是你正在看的
-</code></pre></div>
-
-<h3>为什么？
-<ol>
-<li><strong>基准对比</strong>: LLVM 路径使用 float32 + 硬件浮点指令（<code>fmul</code>, <code>fadd</code>），每条 MAC ~2 条指令；原生路径使用 Q16.16，每条 MAC ~12 条。对比两边的差距，找到优化方向</li>
-<li><strong>LLVM 全套优化</strong>: 生成的 <code>.ll</code> 可以接 <code>opt -O3</code> 享受 LLVM 的循环展开、向量化、指令合并等</li>
-<li><strong>多目标</strong>: LLVM IR 可以编译到 RV64、x86-64、ARM 等多个平台</li>
-</ol>
-<h3>核心概念
-<h4>两条 LLVM 路径
-<table>
-<thead>
-<tr>
-<th></th>
-<th>路径 A (库路径)</th>
-<th>路径 B (Standalone)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>文件</td>
-<td><code>backend/llvm_codegen.py</code></td>
-<td><code>standalone/onnx_to_llvm_standalone.py</code></td>
-</tr>
-<tr>
-<td>输入</td>
-<td>IR Program</td>
-<td>ONNXModel (手工解析)</td>
-</tr>
-<tr>
-<td>状态</td>
-<td>框架完整，NN 算子占位</td>
-<td>完整的 float32 循环生成</td>
-</tr>
-<tr>
-<td>依赖</td>
-<td>可选 llvmlite</td>
-<td>Python stdlib only</td>
-</tr>
-</tbody>
-</table>
-<h4>LLVM IR 关键特性
-<table>
-<thead>
-<tr>
-<th>特性</th>
-<th>LLVM IR</th>
-<th>ScratchV 原生</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>地址计算</td>
-<td><code>getelementptr</code> 单指令</td>
-<td>手动 <code>MUL + ADD</code> 链 (~5条)</td>
-</tr>
-<tr>
-<td>浮点运算</td>
-<td><code>fmul</code>, <code>fadd</code> 原生</td>
-<td><code>MUL + SRAI 16</code> (Q16.16)</td>
-</tr>
-<tr>
-<td>循环结构</td>
-<td><code>phi</code> 节点 + <code>icmp</code> + <code>br</code></td>
-<td>手动 label + jump</td>
-</tr>
-<tr>
-<td>类型系统</td>
-<td>LLVM 类型系统</td>
-<td>原始 32-bit 整数</td>
-</tr>
-<tr>
-<td>优化</td>
-<td><code>opt -O3</code> 全套 pass</td>
-<td>无后优化</td>
-</tr>
-</tbody>
-</table>
+<p>待补充。</p>
 <hr />
 <h2>详细任务
-<ol>
-<li>学习 LLVM IR 基础语法：类型系统、指令格式、phi 节点、基本块结构。</li>
-<li>实现 LLVMIRBuilder 辅助类：new_register(), emit_fmul(), emit_fadd(), emit_gep(), emit_header()。</li>
-<li>实现简单算术算子的 LLVM IR 生成：ADD, SUB, MUL, DIV 映射为 fadd/fsub/fmul/fdiv。</li>
-<li>实现激活函数的 LLVM IR 生成：ReLU（fcmp ogt + select）、Sigmoid（call @expf）。</li>
-<li>实现 Conv2D 的 LLVM IR 生成：6 层 phi 嵌套循环 + GEP 地址计算 + fmul/fadd MAC。</li>
-<li>实现 Gemm 的 LLVM IR 生成：3 层循环 + transB 支持。</li>
-<li>实现 MaxPool 的 LLVM IR 生成：5 层循环 + 边界检查 + fcmp ogt。</li>
-<li>实现 Reshape 和其他算子的生成。</li>
-<li>实现 --compare 模式：估算 LLVM 和 ScratchV 的动态操作数差距。</li>
-<li>用 LLVM 工具链（opt -O3, llc, lli）验证生成的 IR 的正确性和优化效果。</li>
-</ol>
+<p>待补充。</p>
 <hr />
 <h2>交付产物
-<ul>
-<li><code>scratchv/backend/llvm_codegen.py</code> — 库路径 LLVM IR 生成器</li>
-<li><code>scratchv/standalone/onnx_to_llvm_standalone.py</code> — Standalone 路径 LLVM 编译器</li>
-<li>生成的 <code>.ll</code> 示例文件（CNN 模型全量）</li>
-<li>LLVM vs ScratchV 对比报告（--compare 模式）</li>
-</ul>
+<p>待补充。</p>
 <hr />
 <h2>代码走读
-<h3>LLVMIRBuilder 辅助类
-<div class="codehilite"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LLVMIRBuilder</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reg_counter</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_output</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">new_register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reg_counter</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;%</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_reg_counter</span><span class="si">}</span><span class="s2">&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">emit_fmul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_register</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2"> = fmul float </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">emit_gep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_register</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2"> = getelementptr float, float* </span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">, i32 </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>
-</code></pre></div>
-
-<h3>Conv2D 的 LLVM IR 生成
-<p>与原生路径的差异：
-- 用 <code>phi</code> 节点实现循环（无需手动 <code>br</code> + label）
-- 用 <code>getelementptr</code> 做地址计算（替代 MUL+ADD 链）
-- 用 <code>fmul</code>/<code>fadd</code> 做浮点乘加（替代 Q16.16 的 MUL+SRAI）</p>
+<p>待补充。</p>
 <hr />
 <h2>动手练习
-<h3>练习 1: 阅读 LLVM IR
-<p>生成 CNN 模型的 LLVM IR，找到 Conv2D 的最内层循环代码，和 Q16.16 版本对比指令数。</p>
-<h3>练习 2: 体验 opt -O3 的效果
-<p>对一个 LLVM IR 文件分别用 <code>-O0</code>、<code>-O2</code>、<code>-O3</code> 优化，用 <code>diff</code> 对比优化后的 IR 有什么不同。</p>
-<h3>练习 3: 多目标编译
-<p>用 <code>llc -march=x86-64</code> 把 LLVM IR 编译为 x86 汇编，看看和 RISC-V 版本有什么不同。</p>
+<p>待补充。</p>
 <hr />
 <h2>常见坑
-<table>
-<thead>
-<tr>
-<th>坑</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>llvmlite 安装</strong></td>
-<td>路径 A 需要 <code>llvmlite</code>，在某些平台可能安装失败。路径 B 不需要</td>
-</tr>
-<tr>
-<td><strong>Target triple</strong></td>
-<td>当前是 <code>riscv64-unknown-elf</code>，如果要编译到其他平台需要修改</td>
-</tr>
-<tr>
-<td><strong>float32 vs Q16.16 精度差异</strong></td>
-<td>LLVM 路径用原生 float32，和 Q16.16 路径结果有微小差异（~1.5e-5 相对误差）</td>
-</tr>
-<tr>
-<td><strong>phi 节点的复杂性</strong></td>
-<td>写 phi 节点比写 label+jump 更难，循环嵌套深时容易写错</td>
-</tr>
-</tbody>
-</table>
+<p>待补充。</p>
 <hr />
 <h2>进阶阅读
 <ul>
-<li><a href="https://llvm.org/docs/LangRef.html" target="_blank" rel="noopener">LLVM Language Reference</a> — LLVM IR 完整语法</li>
-<li><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE</a> — 双路径对比详解</li>
-<li><a href="03-指标解读指南.html">03-指标解读指南</a> — 如何解读 LLVM vs ScratchV 的性能差距</li>
-<li>相关 topic: <a href="08-后端指令选择.html">课题8 — 指令选择</a> | <a href="19-Standalone-RISC-V-编译器.html">课题19 — Standalone RISC-V 编译器</a> | <a href="22-Standalone-LLVM-编译器.html">课题22 — Standalone LLVM 编译器</a></li>
+<li>龙书第 9 章：Interprocedural Analysis</li>
+<li>相关 topic: <a href="04-IR-优化器框架.html">课题4 — IR 优化器框架</a></li>
 </ul>
 <hr />
 <h2>12周每周目标
-<ul>
-<li><strong>W1</strong>：学习 LLVM IR 基础语法：类型系统（i32, float, pointer）、指令格式、基本块和 phi 节点。阅读 <a href="https://llvm.org/docs/LangRef.html" target="_blank" rel="noopener">LLVM Language Reference</a> 前 3 章。</li>
-<li><strong>W2</strong>：阅读 <code>backend/llvm_codegen.py</code> 和 <code>standalone/onnx_to_llvm_standalone.py</code> 全文。理解两条路径的架构差异。</li>
-<li><strong>W3</strong>：实现 LLVMIRBuilder 辅助类：new_register(), emit_fmul(), emit_fadd(), emit_load(), emit_store(), emit_gep(), emit_header(), emit_br(), emit_icmp()。</li>
-<li><strong>W4</strong>：实现简单算术算子的 LLVM IR 生成：ADD→fadd, SUB→fsub, MUL→fmul, DIV→fdiv。编写测试：手工 IR → LLVM IR → lli 执行验证。</li>
-<li><strong>W5</strong>：实现激活函数的 LLVM IR 生成：ReLU（fcmp ogt + select 选择 max(x, 0)）、Sigmoid（声明 @expf、call 调用）。</li>
-<li><strong>W6</strong>：实现 Conv2D 的 LLVM IR 生成框架：6 层 phi 嵌套循环 + 循环变量 icmp + br 跳转。先实现不完整版本（只有循环骨架）。</li>
-<li><strong>W7</strong>：完善 Conv2D：添加 GEP 地址计算（input_ptr, weight_ptr, output_ptr 的偏移计算）、fmul/fadd MAC 操作、bias add。</li>
-<li><strong>W8</strong>：实现 Gemm 的 LLVM IR 生成：3 层 phi 循环 + transB 支持（if transB: 交换 weight 行列索引）。</li>
-<li><strong>W9</strong>：实现 MaxPool 的 LLVM IR 生成：5 层循环 + 边界检查 + fcmp ogt 比较 + 条件 select。</li>
-<li><strong>W10</strong>：实现 Reshape 和其他算子的 LLVM IR 生成。实现 --compare 模式：同时估算 LLVM 和 ScratchV 的动态操作数。</li>
-<li><strong>W11</strong>：用 LLVM 工具链（opt -O3 → llc -O3 → lli）完整验证生成的 IR。对比优化前后的 IR 差异。</li>
-<li><strong>W12</strong>：撰写文档（LLVM IR 示例、与原生路径的对比表、phi 节点使用指南），准备演示。</li>
-</ul>
+<p>待补充。</p>
     </article>
 
     <footer class="content-footer">
       <nav class="page-nav-row">
-        <a class="page-nav prev" href="14-常量加载合并优化.html">
+        <a class="page-nav prev" href="10-循环展开优化.html">
             <span class="pn-label">← 上一节</span>
-            <span class="pn-title">常量加载合并优化</span>
+            <span class="pn-title">循环展开优化</span>
         </a>
-        <a class="page-nav next" href="17-寄存器分配.html">
+        <a class="page-nav next" href="29-SIMD-向量化.html">
             <span class="pn-label">下一节 →</span>
-            <span class="pn-title">寄存器分配</span>
+            <span class="pn-title">SIMD 向量化</span>
         </a>
       </nav>
       <div class="footer-info">

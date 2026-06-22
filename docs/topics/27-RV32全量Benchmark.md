@@ -1,12 +1,21 @@
-# Topic 27 — RV32 全量 Benchmark
+# 课题27：RV32 全量 Benchmark
 
-> **难度**: 中级 | **源文件**: `scratchv/standalone/rv32_bench.py`
+> **难度**：中 | **类型**：参考分析 | **源文件**：`scratchv/standalone/rv32_bench.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
 
-RV32 全量 Benchmark（`rv32_bench.py`）将 ScratchV 和 LLVM **统一到 RV32IMF 目标**进行公平对比。流程：
+RV32 全量 Benchmark（`rv32_bench.py`）将 ScratchV 和 LLVM 统一到 RV32IMF 目标进行公平对比。两边都通过 TinyFive 真实执行，零分析估算——所有指标来自 TinyFive 的 ops 计数器。这是消除 ISA 差异后最公平的性能对比方式。
+
+---
+
+## 理解背景
+
+### 是什么？
+
+RV32 全量 Benchmark 将 ScratchV 和 LLVM **统一到 RV32IMF 目标**进行公平对比：
 
 ```
 ONNX 模型
@@ -22,19 +31,15 @@ ONNX 模型
 
 与 `llvm_cache_compare.py` 的不同：这里**两边都通过 TinyFive 真实执行**，零分析估算——所有指标都来自 TinyFive 的 ops 计数器。
 
----
-
-## 为什么？
+### 为什么？
 
 - **公平对比**：之前的对比是 "RV32IM Q16.16 vs RV64FD float32"——ISA 不同、数值格式不同。这里统一到**同一个 RV32IMF 目标**
 - **零估算**：所有指标来自 TinyFive 真实仿真，不是分析公式
 - **发现真实差距**：消除 ISA 差异后，ScratchV 和 LLVM 的差距到底有多大？
 
----
+### 核心概念
 
-## 核心概念
-
-### 四步流水线
+#### 四步流水线
 
 | 步骤 | ScratchV 路径 | LLVM 路径 |
 |------|-------------|----------|
@@ -43,7 +48,7 @@ ONNX 模型
 | 3. 仿真 | TinyFive ProfiledMachine | TinyFive ProfiledMachine |
 | 4. 统计 | TinyFive ops 计数器 | TinyFive ops 计数器 |
 
-### TinyFive ops 计数器
+#### TinyFive ops 计数器
 
 TinyFive 的 `ProfiledMachine` 提供精确的指令分类：
 - `total`: 总执行指令数
@@ -54,7 +59,7 @@ TinyFive 的 `ProfiledMachine` 提供精确的指令分类：
 - `madd`: 融合乘加次数（RV32IMF 的 `fmadd.s`）
 - `branch`: 分支/跳转次数
 
-### 统一对比的意义
+#### 统一对比的意义
 
 在相同 ISA 下对比，差距主要来自：
 1. **数值格式**：Q16.16 定点 vs float32（~12 vs ~2 指令/MAC）
@@ -63,40 +68,21 @@ TinyFive 的 `ProfiledMachine` 提供精确的指令分类：
 
 ---
 
-## 一步步
+## 理解要点
 
-```bash
-# 运行全量 RV32 Benchmark
-python scratchv/standalone/rv32_bench.py models/graph/cnn.onnx \
-    --output-dir benchmark_reports/ \
-    --html report.html \
-    --json report.json
+1. 理解"统一 ISA 对比"的意义——消除 ISA 差异后定位真正的代码生成质量差距
+2. 掌握 ScratchV 和 LLVM 两条编译路径在 RV32IMF 目标下的完整流程
+3. 能够独立运行 `rv32_bench.py` 并解读 TinyFive ops 计数器输出
+4. 理解 Q16.16 vs float32 在相同 ISA 下的 per-MAC 指令数差异根源
+5. 了解 TinyFive 全模型仿真的性能限制（只适合小模型或限制指令数）
 
-# 查看报告
-cat benchmark_reports/report.json | python -m json.tool | head -50
-```
+---
 
-### Python API
+## 交付产物
 
-```python
-from scratchv.standalone.rv32_bench import compile_scratchv, compile_llvm_rv32
-
-# 编译 ScratchV
-scratchv_result = compile_scratchv(
-    "models/graph/cnn.onnx",
-    output_bin="/tmp/scratchv.bin",
-    output_asm="/tmp/scratchv.s",
-)
-
-# 编译 LLVM（目标 RV32IMF）
-llvm_result = compile_llvm_rv32(
-    "models/graph/cnn.onnx",
-    output_asm="/tmp/llvm_rv32.s",
-)
-
-print(f"ScratchV: {scratchv_result['static_insns']} static insns")
-print(f"LLVM RV32: {llvm_result['static_insns']} static insns")
-```
+- 一次完整的 RV32 统一对比报告（HTML + JSON）
+- Gap 分析笔记（按指令类别：mul/add/load/store/branch 的差距分布）
+- Q16.16 vs float32 的精度对比（同一输入下的输出误差）
 
 ---
 
@@ -175,4 +161,13 @@ def compile_llvm_rv32(onnx_path, output_asm):
 
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — 双路径架构
 - [llvmlite 文档](https://llvmlite.readthedocs.io/)
-- 相关 topic: [Topic 25 — LLVM 对比工具](25-LLVM对比工具.md) | [Topic 26 — TinyFive 对比](26-TinyFive对比.md) | [Topic 19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+- 相关 topic: [课题25 — LLVM 对比工具](25-LLVM对比工具.md) | [课题26 — TinyFive 对比](26-TinyFive对比.md) | [课题19 — Standalone RISC-V](19-Standalone-RISC-V编译器.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：运行 `rv32_bench.py`，生成统一对比报告。理解四步流水线（编译→后端→仿真→统计）的每一步做了什么。对比统一 ISA 下的 ScratchV vs LLVM 指令数差异。
+- **第 2 周**：阅读 `rv32_bench.py` 源码。理解 `compile_scratchv()` 和 `compile_llvm_rv32()` 的实现差异。特别注意 LLVM IR → RV32IMF 的 llvmlite 调用链。
+- **第 3 周**：从 TinyFive ops 统计中提取详细的指令分类数据。画出 ScratchV vs LLVM 在每个指令类别（mul/add/load/store/branch）上的对比柱状图。定位最大瓶颈（是 MUL 太多还是 ADD 太多？）。
+- **第 4 周**：调整 LLVM 优化级别（-O0, -O1, -O2, -O3），观察对 RV32IMF 代码的影响。撰写统一 ISA 对比分析报告，总结 Q16.16 定点运算在 RV32IM 上的固有劣势和可能的弥补方向。

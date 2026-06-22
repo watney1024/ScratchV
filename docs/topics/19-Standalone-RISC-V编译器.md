@@ -1,23 +1,29 @@
-# Topic 19 — Standalone RISC-V 编译器
+# 课题19：Standalone RISC-V 编译器
 
-> **难度**: 中级 | **源文件**: `scratchv/standalone/onnx_to_riscv_standalone.py` | **行数**: ~2800
+> **难度**：中 | **类型**：参考分析 | **源文件**：`scratchv/standalone/onnx_to_riscv_standalone.py` | **行数**：~2800
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
 
-Standalone RISC-V 编译器是 ScratchV 的**核心产物**——一个完全自包含的 ONNX→RISC-V 编译器，零外部依赖（只用 Python 标准库）。
+Standalone RISC-V 编译器是 ScratchV 的核心产物——一个完全自包含的 ONNX→RISC-V 编译器，零外部依赖（只用 Python 标准库）。理解它的五大组件（ProtoReader、ONNXModel、MemoryPlan、CNNRISCVGenerator、RISCVEmitter）是理解 ScratchV 架构全貌的关键。
 
-它手工实现了：
+---
+
+## 理解背景
+
+### 是什么？
+
+Standalone RISC-V 编译器手工实现了完整的 ONNX→RISC-V 编译管线：
+
 - **Protobuf 解析器**（不需 `protobuf` 包）
 - **ONNX 模型加载**（不需 `onnx` 包）
 - **内存规划 + Q16.16 定点转换**
 - **CNN 算子 RISC-V 代码生成**（内联循环）
 - **RV32IM 指令编码**（两遍扫描 + label fixup）
 
----
-
-## 为什么？
+### 为什么？
 
 为什么要"重新发明轮子"而不是直接用 `onnx` 包 + `llvmlite`？
 
@@ -26,11 +32,9 @@ Standalone RISC-V 编译器是 ScratchV 的**核心产物**——一个完全自
 3. **教学价值**：从 protobuf 解析到机器码编码，全流程透明
 4. **RV32IM 定点优化**：LLVM 不支持 Q16.16 定点运算，必须自己实现
 
----
+### 核心概念
 
-## 核心概念
-
-### 1. 五大组件
+#### 1. 五大组件
 
 ```
 onnx_to_riscv_standalone.py
@@ -41,7 +45,7 @@ onnx_to_riscv_standalone.py
 └── RISCVEmitter         ← RV32IM 指令编码 + label fixup
 ```
 
-### 2. Q16.16 定点运算
+#### 2. Q16.16 定点运算
 
 ```
 32-bit 整数的高 16 位 = 整数部分
@@ -52,7 +56,7 @@ Q16.16 乘法: MUL a, b → 64-bit → SRAI 16 (截断回 32-bit)
 Q16.16 加法: ADD a, b (直接加，小数点已对齐)
 ```
 
-### 3. Conv2D 代码生成
+#### 3. Conv2D 代码生成
 
 6 层嵌套循环的 RISC-V 内联代码：
 ```
@@ -70,33 +74,21 @@ for oh in 0..OH:           ← 输出高度
 
 ---
 
-## 一步步
+## 理解要点
 
-### Step 1: 编译 CNN 模型
+1. 掌握五大组件的职责和数据流向（ProtoReader → ONNXModel → MemoryPlan → CNNRISCVGenerator → RISCVEmitter）
+2. 理解 Q16.16 定点运算原理：float→定点转换、乘法的 64 位中间结果 + 右移截断
+3. 理解 Conv2D 内联循环生成的 6 层嵌套结构和指针步进优化
+4. 理解两遍扫描的 label fixup 机制（第一遍记录位置，第二遍回填偏移）
+5. 能够独立运行编译器并解读输出报告（--estimate, --report, --tinyfive）
 
-```bash
-python scratchv/standalone/onnx_to_riscv_standalone.py models/graph/cnn.onnx \
-    -o output.bin \
-    --asm output.s \
-    --estimate \
-    --report
-```
+---
 
-### Step 2: 只用估算，不仿真
+## 交付产物
 
-```bash
-# --estimate: 瞬间完成，给出动态指令估算
-python scratchv/standalone/onnx_to_riscv_standalone.py models/graph/cnn.onnx \
-    -o output.bin --estimate --report
-```
-
-### Step 3: 使用 TinyFive 仿真验证
-
-```bash
-# --tinyfive: 用 TinyFive 仿真器实际执行（慢但准确）
-python scratchv/standalone/onnx_to_riscv_standalone.py models/graph/cnn.onnx \
-    -o output.bin --tinyfive --tinyfive-max-instr 200000
-```
+- 五大组件的数据流图（手绘或工具绘制）
+- CNN 模型编译输出（output.bin + output.s + 估算报告）
+- Conv2D 最内层循环的指令序列分析（标注每条指令作用）
 
 ---
 
@@ -193,6 +185,15 @@ class CNNRISCVGenerator:
 ## 进阶阅读
 
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — 完整架构文档，包含双路径对比
-- [03-指标解读指南.md](../03-指标解读指南.md) — 如何解读动态指令数和缓存指标
+- [03-指标解读指南](../03-指标解读指南.md) — 如何解读动态指令数和缓存指标
 - Protobuf wire format: [Encoding](https://protobuf.dev/programming-guides/encoding/)
-- 相关 topic: [Topic 22 — Standalone LLVM 编译器](22-Standalone-LLVM编译器.md) | [Topic 03 — IR 系统](03-IR系统.md)
+- 相关 topic: [课题22 — Standalone LLVM 编译器](22-Standalone-LLVM编译器.md) | [课题3 — IR 系统](03-IR系统.md)
+
+---
+
+## 自学路线
+
+- **第 1 周**：运行 `make bench-cnn`，阅读五大组件源码（从 ProtoReader 到 RISCVEmitter 逐组件阅读）。画出数据流图：每个组件的输入/输出分别是什么。
+- **第 2 周**：深入 Conv2D 代码生成。打开 `output.s`，手动标注最内层循环的每条指令。理解 Q16.16 乘法的 mul→srai→add 三步模式。计算每个 MAC 需要多少条指令。
+- **第 3 周**：对比 ScratchV Standalone 和 LLVM Standalone（课题 22）的代码生成策略差异。使用 `llvm_cache_compare.py` 和 `tinyfive_compare.py` 对比两者的静态/动态指令数和 Cache 行为。
+- **第 4 周**：尝试修改 CNNRISCVGenerator，为一个新算子（如 AveragePool）添加代码生成支持。编写完整测试：ONNX 模型 → 编译 → 汇编 → TinyFive 仿真验证。

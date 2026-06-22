@@ -1,10 +1,19 @@
-# Topic 01 — DSL 前端增强器（if/else + while）
+# 课题1：DSL前端增强器（if/else + while）
 
-> **难度**: 中级 | **源文件**: `scratchv/frontend/dsl_extended.py`
+> **难度**：中 | **类型**：项目实战 | **源文件**：`scratchv/frontend/dsl_extended.py`
+> **状态**：✅ 已完成
 
 ---
 
-## 是什么？
+## 概述
+
+为现有 DSL 增加条件判断（`if/else`）和循环（`while`）语法，扩展解析器并生成对应的三地址码（IR）。这是 ScratchV 从"表达式计算器"升级为"图灵完备编译器"的关键一步。
+
+---
+
+## 理解背景
+
+### 是什么？
 
 DSL 前端增强器（`dsl_extended.py`）在基础 DSL 解析器之上扩展了**控制流**能力——新增 `if/else` 条件分支和 `while` 循环。它用**递归下降**方式解析新语法，生成带有标签和条件跳转的 IR。
 
@@ -26,25 +35,21 @@ endif
 return c
 ```
 
----
-
-## 为什么？
+### 为什么？
 
 真实世界的程序都有分支和循环。没有 `if/else`，你只能写死计算路径；没有 `while`，你只能写固定次数的 `for`。
 
 这个模块让 ScratchV 从"表达式计算器"升级为"图灵完备的编译器"——可以表达任意算法。
 
----
+### 核心概念
 
-## 核心概念
-
-### 1. 语法设计
+#### 1. 语法设计
 
 ```
-if_stmt   → 'if' '(' cond ')' ':' block ('else' ':' block)? 'endif'
+if_stmt    → 'if' '(' cond ')' ':' block ('else' ':' block)? 'endif'
 while_stmt → 'while' '(' cond ')' ':' block 'endwhile'
-cond      → operand ('==' | '!=' | '<' | '>' | '<=' | '>=') operand
-block     → (statement)+
+cond       → operand ('==' | '!=' | '<' | '>' | '<=' | '>=') operand
+block      → (statement)+
 ```
 
 `CondExpr` 类封装条件表达式：
@@ -56,7 +61,7 @@ class CondExpr:
         self.rhs = rhs.strip()   # 右操作数
 ```
 
-### 2. IR 生成模式
+#### 2. IR 生成模式
 
 **if/else**:
 ```
@@ -87,7 +92,7 @@ entry:
     ret acc
 ```
 
-### 3. 嵌套处理
+#### 3. 嵌套处理
 
 `if` 和 `while` 可以任意嵌套。用全局计数器确保标签唯一：
 ```python
@@ -100,50 +105,22 @@ def _new_label(self, prefix):
 
 ---
 
-## 一步步
+## 详细任务
 
-### Step 1: 写一个带 if 的 DSL 程序
+1. 理解现有 `dsl_parser.py`（递归下降解析）和 `ir_builder.py`。
+2. 设计新语法的 BNF 规则：`if_stmt -> 'if' '(' cond ')' block ('else' block)?`，`while_stmt -> 'while' '(' cond ')' block`。
+3. 修改解析器，增加 `parse_if()` 和 `parse_while()` 方法，构建 AST 节点（`IfNode`, `WhileNode`）。
+4. 扩展 IR 生成：为 `IfNode` 生成条件跳转（`BR cond, label_then, label_else`）和标签；为 `WhileNode` 生成循环结构。
+5. 处理嵌套语句，确保标签编号唯一。
+6. 编写至少 3 个完整的 DSL 程序（含分支和循环），使用后端生成汇编并用模拟器验证。
 
-```bash
-cat > my_examples/branch.dsl << 'EOF'
-a = const(3)
-b = const(5)
-if (a > b):
-    c = add(a, b)
-else:
-    c = mul(a, b)
-endif
-return c
-EOF
-```
+---
 
-### Step 2: 编译并查看 IR
+## 交付产物
 
-```python
-from scratchv.frontend.dsl_extended import ExtendedDSLParser
-
-parser = ExtendedDSLParser()
-program = parser.parse_file("my_examples/branch.dsl")
-
-from scratchv.ir.printer import IRPrinter
-print(IRPrinter().print(program))
-```
-
-### Step 3: 写一个 while 循环
-
-```bash
-cat > my_examples/sum.dsl << 'EOF'
-i = const(0)
-acc = const(0)
-while (i < 10):
-    acc = add(acc, i)
-    i = add(i, const(1))
-endwhile
-return acc
-EOF
-```
-
-编译并检查 IR 输出，确认循环结构正确。
+- 增强后的 `dsl_parser.py` 和 `ir_builder.py`
+- 示例 DSL 程序（`if_else.dsl`, `while_sum.dsl`, `nested_loop.dsl`）
+- 文档：新增语法说明、使用示例
 
 ---
 
@@ -245,4 +222,21 @@ def parse_while(self):
 
 - 龙书第 4 章：Syntax Analysis（递归下降解析原理）
 - DSL 语法参考：[ScratchV DSL 文档](../developer_guide.md)
-- 相关 topic: [Topic 09 — DSL 错误提示美化器](09-DSL错误提示美化器.md) | [Topic 03 — IR 系统](03-IR系统.md) | [Topic 11 — 控制流图生成器](11-控制流图生成器.md)
+- 相关 topic: [课题9 — DSL 错误提示美化器](09-DSL错误提示美化器.md) | [课题3 — IR 系统](03-IR系统.md) | [课题11 — 控制流图生成器](11-控制流图生成器.md)
+
+---
+
+## 12周每周目标
+
+- **W1**：搭建环境，运行现有 DSL 示例。阅读 `dsl_parser.py` 和 `ir_builder.py`，画出现有流程思维导图。
+- **W2**：学习递归下降解析原理，为 `if` 语法设计 BNF 规则，编写伪代码。
+- **W3**：添加 `parse_if()` 方法，识别 `if` 关键字和括号，构建 `IfNode`（简单存储条件、then 块、else 块）。
+- **W4**：实现条件表达式的解析（支持 `==, <, >` 等），输出 AST 结构。
+- **W5**：学习项目 IR 表示（三地址码，含 `BR`, `LABEL`）。为 `IfNode` 编写 IR 生成函数。
+- **W6**：实现 `if-else` 完整 IR 生成（两个分支，汇合标签）。测试简单 `if` 程序。
+- **W7**：添加 `while` 语法，解析为 `WhileNode`。设计 IR 模式：条件判断→循环体→跳回。
+- **W8**：实现 `while` 的 IR 生成，确保退出条件正确。测试 `while` 求和程序。
+- **W9**：处理嵌套 `if` 和 `while`，确保标签编号不冲突（使用计数器）。测试嵌套例子。
+- **W10**：增加错误恢复（可结合课题 9 的成果），完善注释。
+- **W11**：编写 3 个完整 DSL 程序，使用后端生成汇编，用 `tinyfive.py` 验证结果。
+- **W12**：撰写文档（使用说明、新增语法示例、内部设计图），准备演示。
