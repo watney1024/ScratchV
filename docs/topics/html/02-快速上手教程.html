@@ -447,7 +447,7 @@ body {
       <h1>02 — 快速上手教程</h1>
 <blockquote>
 <p><strong>目标</strong>: 30 分钟内，亲自动手编译一个 AI 模型，看懂每一步发生了什么。
-<strong>前置要求</strong>: 环境已搭建（<a href="00-环境搭建指南.html">00-环境搭建指南</a>）</p>
+<strong>前置要求</strong>: 环境已搭建（<a href="00-环境搭建指南.html">00-环境搭建指南</a>），虚拟环境已激活。</p>
 </blockquote>
 <hr />
 <h2>目录
@@ -462,120 +462,193 @@ body {
 </ol>
 <hr />
 <h2 id="1-hello-world-你的第一个-dsl-程序">1. Hello World: 你的第一个 DSL 程序
-<p>ScratchV 有自己的迷你编程语言（DSL），用来描述张量计算。我们先写一个最简单的：</p>
+<p>ScratchV 有自己的迷你编程语言（DSL），用来描述张量计算。我们先写一个最简单的：两个数相加。</p>
 <h3>1.1 创建 DSL 文件
-<div class="codehilite"><pre><span></span><code><span class="c1"># 在项目根目录下</span>
-mkdir<span class="w"> </span>-p<span class="w"> </span>my_examples
+<div class="codehilite"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>my_examples
+
 cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
 <span class="s"># 我的第一个 DSL 程序: 两个数相加</span>
-<span class="s">a = const(3)</span>
-<span class="s">b = const(5)</span>
-<span class="s">c = add(a, b)</span>
-<span class="s">return c</span>
+<span class="s">a = add(3, 5)</span>
+<span class="s">return a</span>
 <span class="s">EOF</span>
 </code></pre></div>
 
+<blockquote>
+<p>💡 <strong>DSL 语法要点</strong>: 数字可以直接内联使用（如 <code>3</code>, <code>5</code>），不需要 <code>const()</code> 包装。支持的算子：<code>add</code>, <code>mul</code>, <code>relu</code>, <code>matmul</code>, <code>dot</code>, <code>gelu</code>, <code>softmax</code>, <code>maxpool</code> 等。</p>
+</blockquote>
 <h3>1.2 编译为 IR（中间表示）
 <p>DSL 程序第一步是翻译成 ScratchV 的中间表示（IR）：</p>
 <div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
 <span class="s2">from scratchv.frontend.dsl_parser import DSLParser</span>
+
 <span class="s2">parser = DSLParser()</span>
-<span class="s2">program = parser.parse_file(&#39;my_examples/hello.dsl&#39;)</span>
-<span class="s2">program.print()</span>
+<span class="s2">program = parser.parse(open(&#39;my_examples/hello.dsl&#39;).read())</span>
+<span class="s2">print(program.dump())</span>
 <span class="s2">&quot;</span>
 </code></pre></div>
 
-<p>预期输出：</p>
-<div class="codehilite"><pre><span></span><code><span class="n">Function</span><span class="w"> </span><span class="n">main</span><span class="p">:</span>
-<span class="w">  </span><span class="o">%</span><span class="mi">0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">  </span><span class="o">%</span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="mi">5</span>
-<span class="w">  </span><span class="o">%</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">%</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">%</span><span class="mi">1</span>
-<span class="w">  </span><span class="n">ret</span><span class="w"> </span><span class="o">%</span><span class="mi">2</span>
+<p>实际输出：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">fun</span><span class="w"> </span><span class="o">$</span><span class="n">main</span><span class="p">(</span>
+<span class="w">  </span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+<span class="w">    </span><span class="o">$</span><span class="n">v_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="o">=</span><span class="mf">3.0</span><span class="p">]</span>
+<span class="w">    </span><span class="o">$</span><span class="n">v_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">load_const</span><span class="w"> </span><span class="p">[</span><span class="n">value</span><span class="o">=</span><span class="mf">5.0</span><span class="p">]</span>
+<span class="w">    </span><span class="o">$</span><span class="n">v_3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="o">$</span><span class="n">v_1</span><span class="w"> </span><span class="o">$</span><span class="n">v_2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">$</span><span class="n">v_3</span>
 </code></pre></div>
 
-<p>这就是 <strong>三地址码 IR</strong>。每一行是一个操作，最多三个参与者（两个输入，一个输出）。</p>
+<p>这就是 <strong>三地址码 IR</strong>。每一行是一个操作，<code>$v_1</code>, <code>$v_2</code>, <code>$v_3</code> 是虚拟寄存器。</p>
 <h3>1.3 编译为 RISC-V 汇编
+<p>接下来把 IR 一步步变成 RISC-V 汇编：</p>
 <div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
 <span class="s2">from scratchv.frontend.dsl_parser import DSLParser</span>
 <span class="s2">from scratchv.backend.instruction_select import InstructionSelector</span>
 <span class="s2">from scratchv.backend.register_alloc import RegisterAllocator</span>
 <span class="s2">from scratchv.backend.asm_emit import AsmEmitter</span>
 
-<span class="s2"># 解析 DSL</span>
+<span class="s2"># 1. 解析 DSL → IR</span>
+<span class="s2">code = open(&#39;my_examples/hello.dsl&#39;).read()</span>
 <span class="s2">parser = DSLParser()</span>
-<span class="s2">program = parser.parse_file(&#39;my_examples/hello.dsl&#39;)</span>
+<span class="s2">program = parser.parse(code)</span>
 
-<span class="s2"># 指令选择 + 寄存器分配 + 汇编发射</span>
-<span class="s2">selector = InstructionSelector()</span>
-<span class="s2">instrs = selector.select(program)</span>
+<span class="s2"># 2. 指令选择: IR → RISC-V 伪指令</span>
+<span class="s2">selector = InstructionSelector(program)</span>
+<span class="s2">instrs = selector.run()</span>
 
-<span class="s2">allocator = RegisterAllocator()</span>
-<span class="s2">allocated = allocator.allocate(instrs)</span>
+<span class="s2"># 3. 寄存器分配: 虚拟寄存器 → 物理寄存器</span>
+<span class="s2">allocator = RegisterAllocator(instrs, mode=&#39;greedy&#39;)</span>
+<span class="s2">allocated = allocator.run()</span>
 
-<span class="s2">emitter = AsmEmitter()</span>
-<span class="s2">asm = emitter.emit(allocated)</span>
-<span class="s2">print(asm)</span>
+<span class="s2"># 4. 汇编发射: 输出文本</span>
+<span class="s2">emitter = AsmEmitter(allocated)</span>
+<span class="s2">print(emitter.emit())</span>
 <span class="s2">&quot;</span>
 </code></pre></div>
 
-<p>预期输出（类似）：</p>
-<div class="codehilite"><pre><span></span><code><span class="nl">main:</span>
-<span class="w">    </span><span class="nf">li</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">    </span><span class="nf">li</span><span class="w"> </span><span class="no">a1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span>
-<span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="no">a2</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span>
-<span class="w">    </span><span class="nf">mv</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a2</span>
-<span class="w">    </span><span class="nf">ret</span>
+<p>实际输出：</p>
+<div class="codehilite"><pre><span></span><code><span class="na">.text</span>
+<span class="na">.align</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">  </span><span class="na">.globl</span><span class="w"> </span><span class="no">main</span>
+<span class="w">  </span><span class="na">.type</span><span class="w"> </span><span class="no">main</span><span class="p">,</span><span class="w"> </span><span class="na">@function</span>
+<span class="nl">main:</span>
+<span class="nl">.entry:</span>
+<span class="w">    </span><span class="nf">li</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">    </span><span class="nf">li</span><span class="w"> </span><span class="no">t1</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span>
+<span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="no">t2</span><span class="p">,</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">t1</span>
+<span class="w">    </span><span class="nf">mv</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">t2</span>
+<span class="w">    </span><span class="nf">jalr</span><span class="w"> </span><span class="no">zero</span><span class="p">,</span><span class="w"> </span><span class="no">ra</span>
 </code></pre></div>
 
 <blockquote>
-<p>💡 这就是你写的 <code>c = add(a, b)</code> 变出来的 RISC-V 汇编。<code>li</code> = 加载常数，<code>add</code> = 加法，<code>mv</code> = 移动数据，<code>ret</code> = 返回结果。</p>
+<p>💡 这就是 <code>a = add(3, 5)</code> 变出来的 RISC-V 汇编。<code>li</code> = 加载常数，<code>add</code> = 加法，<code>mv</code> = 移动数据，<code>jalr zero, ra</code> = 返回。</p>
 </blockquote>
 <hr />
 <h2 id="2-理解编译产物">2. 理解编译产物
 <h3>2.1 指令长什么样？
 <p>RISC-V 汇编的格式是：<code>操作码 目标寄存器, 源寄存器1, 源寄存器2</code></p>
-<div class="codehilite"><pre><span></span><code><span class="nf">add</span><span class="w"> </span><span class="no">a2</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span><span class="w">    </span><span class="err">←</span><span class="w">  </span><span class="no">a2</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="no">a1</span>
-<span class="nf">mul</span><span class="w"> </span><span class="no">a3</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span><span class="w">    </span><span class="err">←</span><span class="w">  </span><span class="no">a3</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="p">*</span><span class="w"> </span><span class="no">a1</span>
-<span class="nf">lw</span><span class="w">  </span><span class="no">a4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a0</span><span class="p">)</span><span class="w">     </span><span class="err">←</span><span class="w">  </span><span class="no">a4</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">从内存地址</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="err">加载</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span><span class="err">位数据</span>
-<span class="nf">sw</span><span class="w">  </span><span class="no">a4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a0</span><span class="p">)</span><span class="w">     </span><span class="err">←</span><span class="w">  </span><span class="err">把</span><span class="w"> </span><span class="no">a4</span><span class="w"> </span><span class="err">存到内存地址</span><span class="w"> </span><span class="no">a0</span>
+<div class="codehilite"><pre><span></span><code><span class="nf">add</span><span class="w"> </span><span class="no">t2</span><span class="p">,</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">t1</span><span class="w">      </span><span class="err">←</span><span class="w">  </span><span class="no">t2</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">t0</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="no">t1</span>
+<span class="nf">mul</span><span class="w"> </span><span class="no">a3</span><span class="p">,</span><span class="w"> </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">a1</span><span class="w">      </span><span class="err">←</span><span class="w">  </span><span class="no">a3</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="p">*</span><span class="w"> </span><span class="no">a1</span>
+<span class="nf">lw</span><span class="w">  </span><span class="no">a4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a0</span><span class="p">)</span><span class="w">       </span><span class="err">←</span><span class="w">  </span><span class="no">a4</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">从内存地址</span><span class="w"> </span><span class="no">a0</span><span class="w"> </span><span class="err">加载</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span><span class="err">位数据</span>
+<span class="nf">sw</span><span class="w">  </span><span class="no">a4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a0</span><span class="p">)</span><span class="w">       </span><span class="err">←</span><span class="w">  </span><span class="err">把</span><span class="w"> </span><span class="no">a4</span><span class="w"> </span><span class="err">存到内存地址</span><span class="w"> </span><span class="no">a0</span>
+<span class="nf">li</span><span class="w">  </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="w">           </span><span class="err">←</span><span class="w">  </span><span class="no">t0</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="mi">3</span><span class="err">（加载立即数）</span>
+<span class="nf">mv</span><span class="w">  </span><span class="no">a0</span><span class="p">,</span><span class="w"> </span><span class="no">t2</span><span class="w">          </span><span class="err">←</span><span class="w">  </span><span class="no">a0</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="no">t2</span><span class="err">（寄存器间复制）</span>
 </code></pre></div>
 
-<p>寄存器名字 <code>a0-a7</code> 是函数参数/返回值，<code>t0-t6</code> 是临时变量，<code>s0-s11</code> 是保留变量。</p>
+<p>寄存器命名约定：
+- <code>a0-a7</code> — 函数参数 / 返回值
+- <code>t0-t6</code> — 临时变量（函数可以随意改写）
+- <code>s0-s11</code> — 保留变量（函数必须恢复原值）
+- <code>zero</code> — 永远为 0
+- <code>ra</code> — 返回地址
+- <code>sp</code> — 栈指针
+- <code>gp</code> — 全局数据指针</p>
 <h3>2.2 编译流程全景
 <div class="codehilite"><pre><span></span><code><span class="n">my_examples</span><span class="o">/</span><span class="n">hello</span><span class="p">.</span><span class="n">dsl</span><span class="w">     </span><span class="err">←</span><span class="w"> </span><span class="n">你写的</span><span class="w"> </span><span class="n">DSL</span><span class="w"> </span><span class="n">代码</span>
 <span class="w">        </span><span class="err">│</span>
-<span class="w">   </span><span class="n">DSLParser</span><span class="w">               </span><span class="err">←</span><span class="w"> </span><span class="n">解析成</span><span class="w"> </span><span class="n">AST</span>
+<span class="w">   </span><span class="n">DSLParser</span><span class="p">.</span><span class="nf">parse</span><span class="p">()</span><span class="w">       </span><span class="err">←</span><span class="w"> </span><span class="n">解析成</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">Program</span>
 <span class="w">        </span><span class="err">│</span>
-<span class="w">   </span><span class="n">IRBuilder</span><span class="w">               </span><span class="err">←</span><span class="w"> </span><span class="n">生成</span><span class="w"> </span><span class="n">IR</span><span class="err">（</span><span class="n">三地址码</span><span class="err">）</span>
+<span class="w">   </span><span class="n">IR</span><span class="w"> </span><span class="n">Program</span><span class="w"> </span><span class="p">(</span><span class="n">三地址码</span><span class="p">)</span><span class="w">    </span><span class="err">←</span><span class="w"> </span><span class="n">中间表示</span>
 <span class="w">        </span><span class="err">│</span>
 <span class="w">   </span><span class="o">[</span><span class="n">Optimizer</span><span class="o">]</span><span class="w">             </span><span class="err">←</span><span class="w"> </span><span class="p">(</span><span class="n">可选</span><span class="p">)</span><span class="w"> </span><span class="n">优化</span><span class="w"> </span><span class="n">IR</span>
 <span class="w">        </span><span class="err">│</span>
-<span class="w">   </span><span class="n">InstructionSelector</span><span class="w">     </span><span class="err">←</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">伪指令</span>
+<span class="w">   </span><span class="n">InstructionSelector</span><span class="w">     </span><span class="err">←</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">伪指令</span><span class="w"> </span><span class="p">(</span><span class="n">MachineInstr</span><span class="w"> </span><span class="n">列表</span><span class="p">)</span>
 <span class="w">        </span><span class="err">│</span>
 <span class="w">   </span><span class="n">RegisterAllocator</span><span class="w">       </span><span class="err">←</span><span class="w"> </span><span class="n">虚拟寄存器</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">物理寄存器</span>
 <span class="w">        </span><span class="err">│</span>
 <span class="w">   </span><span class="n">AsmEmitter</span><span class="w">              </span><span class="err">←</span><span class="w"> </span><span class="n">输出汇编文本</span>
 <span class="w">        </span><span class="err">│</span>
 <span class="w">   </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">汇编</span><span class="w"> </span><span class="p">(.</span><span class="n">s</span><span class="p">)</span><span class="w">         </span><span class="err">←</span><span class="w"> </span><span class="n">人类可读</span>
-<span class="w">        </span><span class="err">│</span>
-<span class="w">   </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">Encoder</span><span class="w">          </span><span class="err">←</span><span class="w"> </span><span class="n">汇编</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="nc">bit</span><span class="w"> </span><span class="n">机器码</span>
-<span class="w">        </span><span class="err">│</span>
-<span class="w">   </span><span class="k">output</span><span class="p">.</span><span class="n">bin</span><span class="w">              </span><span class="err">←</span><span class="w"> </span><span class="n">CPU</span><span class="w"> </span><span class="n">可直接执行</span>
 </code></pre></div>
 
 <hr />
 <h2 id="3-编译-cnn-模型">3. 编译 CNN 模型
 <p>ScratchV 最核心的功能是把 ONNX 格式的 CNN 模型编译成 RISC-V 机器码。</p>
 <h3>3.1 一条命令编译
-<div class="codehilite"><pre><span></span><code>make<span class="w"> </span>bench-cnn
-</code></pre></div>
-
-<p>这条命令背后执行的是：</p>
 <div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-o<span class="w"> </span>/tmp/cnn_riscv.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
 </code></pre></div>
 
-<h3>3.2 参数说明
+<p>也可以使用 <code>make bench-cnn</code>（效果一样）。</p>
+<h3>3.2 实际输出
+<div class="codehilite"><pre><span></span><code><span class="nl">ScratchV</span><span class="p">:</span><span class="w"> </span><span class="n">Library</span><span class="o">-</span><span class="k">free</span><span class="w"> </span><span class="n">ONNX</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">RV32IM</span><span class="w"> </span><span class="n">Pipeline</span>
+<span class="w">  </span><span class="k">Input</span><span class="err">:</span><span class="w">  </span><span class="n">models</span><span class="o">/</span><span class="n">graph</span><span class="o">/</span><span class="n">cnn</span><span class="p">.</span><span class="n">onnx</span>
+
+<span class="o">[</span><span class="n">1/5</span><span class="o">]</span><span class="w"> </span><span class="n">Parsing</span><span class="w"> </span><span class="n">ONNX</span><span class="w"> </span><span class="n">protobuf</span><span class="w"> </span><span class="p">(</span><span class="n">manual</span><span class="w"> </span><span class="n">wire</span><span class="o">-</span><span class="nf">format</span><span class="w"> </span><span class="n">parser</span><span class="p">)...</span>
+<span class="w">  </span><span class="nl">Graph</span><span class="p">:</span><span class="w"> </span><span class="n">main_graph</span>
+<span class="w">  </span><span class="nl">Nodes</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<span class="w">  </span><span class="nl">Initializers</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
+<span class="w">    </span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"> </span><span class="nl">Conv</span><span class="p">:</span><span class="w">  </span><span class="n">input1</span><span class="p">,</span><span class="w"> </span><span class="n">layer1</span><span class="mf">.0</span><span class="p">.</span><span class="n">weight</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="nl">Relu</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">2</span><span class="o">]</span><span class="w"> </span><span class="nl">MaxPool</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">3</span><span class="o">]</span><span class="w"> </span><span class="nl">Conv</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">4</span><span class="o">]</span><span class="w"> </span><span class="nl">Relu</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">5</span><span class="o">]</span><span class="w"> </span><span class="nl">MaxPool</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">6</span><span class="o">]</span><span class="w"> </span><span class="nl">Conv</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">7</span><span class="o">]</span><span class="w"> </span><span class="nl">Relu</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">8</span><span class="o">]</span><span class="w"> </span><span class="nl">MaxPool</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">9</span><span class="o">]</span><span class="w"> </span><span class="nl">Reshape</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">10</span><span class="o">]</span><span class="w"> </span><span class="nl">Gemm</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">11</span><span class="o">]</span><span class="w"> </span><span class="nl">Relu</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">12</span><span class="o">]</span><span class="w"> </span><span class="nl">Gemm</span><span class="p">:</span><span class="w">  </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">13</span><span class="o">]</span><span class="w"> </span><span class="nl">Sigmoid</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">14</span><span class="o">]</span><span class="w"> </span><span class="nl">Reshape</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+
+<span class="o">[</span><span class="n">2/5</span><span class="o">]</span><span class="w"> </span><span class="n">Converting</span><span class="w"> </span><span class="n">weights</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">Q16</span><span class="mf">.16</span><span class="w"> </span><span class="n">fixed</span><span class="o">-</span><span class="n">point</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">planning</span><span class="w"> </span><span class="n">memory</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Weight</span><span class="w"> </span><span class="k">data</span><span class="err">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="mi">673</span><span class="p">,</span><span class="mi">524</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Input</span><span class="w"> </span><span class="s1">&#39;input1&#39;</span><span class="err">:</span><span class="w"> </span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">250</span><span class="p">,</span><span class="w"> </span><span class="mi">250</span><span class="p">),</span><span class="w"> </span><span class="mi">187</span><span class="p">,</span><span class="mi">500</span><span class="w"> </span><span class="n">elements</span>
+
+<span class="o">[</span><span class="n">3/5</span><span class="o">]</span><span class="w"> </span><span class="n">Generating</span><span class="w"> </span><span class="n">inline</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">RV32IM</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">code</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Code</span><span class="w"> </span><span class="k">size</span><span class="err">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="mi">548</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mi">887</span><span class="w"> </span><span class="n">instructions</span><span class="p">)</span>
+<span class="w">  </span><span class="nl">Workspace</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="mi">963</span><span class="p">,</span><span class="mi">644</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">23.8</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">4/5</span><span class="o">]</span><span class="w"> </span><span class="n">Assembling</span><span class="w"> </span><span class="n">flat</span><span class="w"> </span><span class="nc">binary</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Total</span><span class="w"> </span><span class="nc">binary</span><span class="err">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="mi">677</span><span class="p">,</span><span class="mi">072</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">5/5</span><span class="o">]</span><span class="w"> </span><span class="n">Writing</span><span class="w"> </span><span class="k">output</span><span class="w"> </span><span class="n">files</span><span class="p">...</span>
+<span class="w">  </span><span class="nc">Binary</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cnn_riscv</span><span class="p">.</span><span class="n">bin</span><span class="w"> </span><span class="p">(</span><span class="mi">27</span><span class="p">,</span><span class="mi">677</span><span class="p">,</span><span class="mi">072</span><span class="w"> </span><span class="n">bytes</span><span class="p">)</span>
+<span class="w">  </span><span class="nl">Assembly</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cnn_riscv</span><span class="p">.</span><span class="n">s</span>
+
+<span class="n">Pipeline</span><span class="w"> </span><span class="n">complete</span><span class="err">!</span>
+<span class="w">  </span><span class="nl">Code</span><span class="p">:</span><span class="w">   </span><span class="mi">3</span><span class="p">,</span><span class="mi">548</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mi">887</span><span class="w"> </span><span class="n">instructions</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Data</span><span class="err">:</span><span class="w">   </span><span class="mi">27</span><span class="p">,</span><span class="mi">673</span><span class="p">,</span><span class="mi">524</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+<span class="w">  </span><span class="nl">Total</span><span class="p">:</span><span class="w">  </span><span class="mi">27</span><span class="p">,</span><span class="mi">677</span><span class="p">,</span><span class="mi">072</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">estimate</span><span class="o">]</span><span class="w"> </span><span class="n">Analytical</span><span class="w"> </span><span class="n">instruction</span><span class="w"> </span><span class="nf">count</span><span class="w"> </span><span class="n">estimation</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Estimated</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="nl">instructions</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">799</span><span class="p">,</span><span class="mi">060</span>
+<span class="w">  </span><span class="k">Compute</span><span class="err">:</span><span class="w">  </span><span class="mf">62.8</span><span class="o">%</span><span class="w">  </span><span class="nl">Memory</span><span class="p">:</span><span class="w"> </span><span class="mf">24.8</span><span class="o">%</span><span class="w">  </span><span class="nl">Branch</span><span class="p">:</span><span class="w"> </span><span class="mf">3.8</span><span class="o">%</span>
+
+<span class="w">  </span><span class="n">Layer</span><span class="w">                             </span><span class="n">Instructions</span><span class="w">        </span><span class="o">%</span>
+<span class="w">  </span><span class="err">──────────────────────────────</span><span class="w"> </span><span class="err">───────────────</span><span class="w"> </span><span class="err">────────</span>
+<span class="w">  </span><span class="n">Conv1</span><span class="w">                              </span><span class="mi">425</span><span class="p">,</span><span class="mi">115</span><span class="p">,</span><span class="mi">648</span><span class="w">    </span><span class="mf">19.3</span><span class="o">%</span>
+<span class="w">  </span><span class="n">Conv2</span><span class="w">                            </span><span class="mi">1</span><span class="p">,</span><span class="mi">097</span><span class="p">,</span><span class="mi">367</span><span class="p">,</span><span class="mi">552</span><span class="w">    </span><span class="mf">49.8</span><span class="o">%</span>
+<span class="w">  </span><span class="n">Conv3</span><span class="w">                              </span><span class="mi">513</span><span class="p">,</span><span class="mi">294</span><span class="p">,</span><span class="mi">336</span><span class="w">    </span><span class="mf">23.3</span><span class="o">%</span>
+<span class="w">  </span><span class="n">MaxPool1</span><span class="w">                            </span><span class="mi">23</span><span class="p">,</span><span class="mi">617</span><span class="p">,</span><span class="mi">536</span><span class="w">     </span><span class="mf">1.1</span><span class="o">%</span>
+<span class="w">  </span><span class="n">FC1</span><span class="w">                                </span><span class="mi">103</span><span class="p">,</span><span class="mi">342</span><span class="p">,</span><span class="mi">080</span><span class="w">     </span><span class="mf">4.7</span><span class="o">%</span>
+<span class="w">  </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">其他层</span><span class="p">)</span><span class="w">                        </span><span class="p">...</span><span class="w">            </span><span class="p">...</span>
+<span class="w">  </span><span class="err">──────────────────────────────</span><span class="w"> </span><span class="err">───────────────</span><span class="w"> </span><span class="err">────────</span>
+<span class="w">  </span><span class="n">TOTAL</span><span class="w">                            </span><span class="mi">2</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">799</span><span class="p">,</span><span class="mi">060</span><span class="w">   </span><span class="mf">100.0</span><span class="o">%</span>
+</code></pre></div>
+
+<h3>3.3 参数说明
 <table>
 <thead>
 <tr>
@@ -594,81 +667,103 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>my_examples/hello.dsl<spa
 </tr>
 <tr>
 <td><code>--estimate</code></td>
-<td>开启性能估算（动态指令数）</td>
+<td>开启性能估算（动态指令数、CPI 分析）</td>
 </tr>
 <tr>
 <td><code>--report</code></td>
-<td>生成详细报告（Markdown 格式）</td>
+<td>生成 HTML/JSON/MD 三种格式报告到 <code>benchmark_reports/</code></td>
 </tr>
 <tr>
 <td><code>--asm output.s</code></td>
-<td>(可选) 同时输出汇编文件</td>
+<td>(可选) 同时输出汇编文件到指定路径</td>
 </tr>
 </tbody>
 </table>
-<h3>3.3 查看输出
-<div class="codehilite"><pre><span></span><code><span class="c1"># 查看汇编输出（如果加了 --asm）</span>
-head<span class="w"> </span>-100<span class="w"> </span>output.s
-
-<span class="c1"># 查看性能报告</span>
-cat<span class="w"> </span>benchmark_reports/cnn_riscv_report.md
-</code></pre></div>
-
-<p>报告内容示例：</p>
-<div class="codehilite"><pre><span></span><code>| 层 | 静态指令 | 动态指令 | MAC 数 |
-|----|---------|---------|--------|
-| Conv1 | 245 | 1,234,567,890 | 110,592,000 |
-| Conv2 | 245 | 884,736,000 | 73,728,000 |
-| Conv3 | 167 | 1,105,920,000 | 92,160,000 |
-| MaxPool1 | 48 | 12,582,912 | — |
-| ... | ... | ... | ... |
-| <span class="gs">**总计**</span> | <span class="gs">**749**</span> | <span class="gs">**3,222,000,000**</span> | — |
+<h3>3.4 产出文件
+<div class="codehilite"><pre><span></span><code><span class="c1"># 编译产出的文件</span>
+ls<span class="w"> </span>/tmp/cnn_riscv.bin<span class="w">    </span><span class="c1"># 二进制机器码 (26.4 MB)</span>
+ls<span class="w"> </span>/tmp/cnn_riscv.s<span class="w">      </span><span class="c1"># 汇编源码</span>
+ls<span class="w"> </span>benchmark_reports/<span class="w">    </span><span class="c1"># 性能报告目录</span>
+<span class="c1">#   benchmark.html        - HTML 报告</span>
+<span class="c1">#   benchmark.json        - JSON 数据</span>
+<span class="c1">#   github_summary.md     - Markdown 摘要</span>
 </code></pre></div>
 
 <blockquote>
-<p>💡 <strong>静态指令</strong> = 编译器生成了多少行指令（不管循环执行多少次）。<strong>动态指令</strong> = CPU 实际执行了多少条（循环里的指令每次迭代都算），这个数才是真正影响运行速度的。</p>
+<p>💡 <strong>静态指令</strong> = 编译器生成了多少条指令（887 条，不管循环执行多少次）。
+<strong>动态指令</strong> = CPU 实际执行了多少条（~22 亿条，循环里的指令每次迭代都算），这个数才是真正影响运行速度的。</p>
 </blockquote>
 <hr />
 <h2 id="4-用-llvm-路径编译">4. 用 LLVM 路径编译
 <p>ScratchV 还有一条 LLVM 路径，生成 LLVM IR 而不是直接生成 RISC-V 机器码。</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># 生成 LLVM IR（需要先 pip install llvmlite）</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 需要先安装 llvmlite: pip install llvmlite</span>
 python3<span class="w"> </span>scratchv/standalone/onnx_to_llvm_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-o<span class="w"> </span>output.ll<span class="w"> </span>--compare
+<span class="w">    </span>-o<span class="w"> </span>/tmp/output.ll<span class="w"> </span>--compare
 </code></pre></div>
 
-<p><code>--compare</code> 会让它估算两条路径的动态指令数并对比。</p>
-<p>LLVM IR 长这样（示例片段）：</p>
-<div class="codehilite"><pre><span></span><code><span class="c">; Conv2D 内层循环</span>
-<span class="nv">%in_ptr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">getelementptr</span><span class="w"> </span><span class="kt">float</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">**</span><span class="w"> </span><span class="nv">%input</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%in_offset</span>
-<span class="nv">%in_val</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">float</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%in_ptr</span>
-<span class="nv">%w_val</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">load</span><span class="w"> </span><span class="kt">float</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">*</span><span class="w"> </span><span class="nv">%w_ptr</span>
-<span class="nv">%mul</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">fmul</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="nv">%in_val</span><span class="p">,</span><span class="w"> </span><span class="nv">%w_val</span>
-<span class="nv">%acc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">fadd</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="nv">%acc</span><span class="p">,</span><span class="w"> </span><span class="nv">%mul</span>
+<p>实际输出：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">ScratchV</span><span class="p">:</span><span class="w"> </span><span class="n">Library</span><span class="o">-</span><span class="n">free</span><span class="w"> </span><span class="n">ONNX</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">LLVM</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">Pipeline</span>
+<span class="w">  </span><span class="n">Input</span><span class="p">:</span><span class="w">  </span><span class="n">models</span><span class="o">/</span><span class="n">graph</span><span class="o">/</span><span class="n">cnn</span><span class="o">.</span><span class="n">onnx</span>
+<span class="w">  </span><span class="n">Graph</span><span class="p">:</span><span class="w"> </span><span class="n">main_graph</span>
+<span class="w">  </span><span class="n">Nodes</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<span class="w">  </span><span class="n">Initializers</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="n">Generating</span><span class="w"> </span><span class="n">LLVM</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">real</span><span class="w"> </span><span class="n">nested</span><span class="o">-</span><span class="n">loop</span><span class="w"> </span><span class="n">compute</span><span class="o">...</span>
+<span class="w">  </span><span class="n">LLVM</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="n">to</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">output</span><span class="o">.</span><span class="n">ll</span>
+<span class="w">  </span><span class="n">Lines</span><span class="p">:</span><span class="w"> </span><span class="mi">866172</span>
+<span class="w">  </span><span class="n">Static</span><span class="w"> </span><span class="n">LLVM</span><span class="w"> </span><span class="n">IR</span><span class="w"> </span><span class="n">instructions</span><span class="p">:</span><span class="w"> </span><span class="mi">1102</span>
+<span class="w">  </span><span class="n">Functions</span><span class="p">:</span><span class="w"> </span><span class="mi">17</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">fadd</span><span class="p">:</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w"> </span><span class="n">fmul</span><span class="p">:</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="n">fdiv</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nb">load</span><span class="p">:</span><span class="w"> </span><span class="mi">94</span><span class="p">,</span><span class="w"> </span><span class="n">store</span><span class="p">:</span><span class="w"> </span><span class="mi">129</span><span class="p">,</span><span class="w"> </span><span class="n">alloca</span><span class="p">:</span><span class="w"> </span><span class="mi">57</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">br</span><span class="p">:</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"> </span><span class="n">br_cond</span><span class="p">:</span><span class="w"> </span><span class="mi">51</span><span class="p">,</span><span class="w"> </span><span class="n">icmp</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span>
 </code></pre></div>
 
-<p>对比 ScratchV 原生路径（Q16.16 定点）：</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># 相同逻辑，但用整数指令模拟浮点</span>
-<span class="nf">lw</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a0</span><span class="p">)</span><span class="w">          </span><span class="c1"># load input (Q16.16)</span>
-<span class="nf">lw</span><span class="w"> </span><span class="no">t1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">(</span><span class="no">a1</span><span class="p">)</span><span class="w">          </span><span class="c1"># load weight (Q16.16)</span>
-<span class="nf">mul</span><span class="w"> </span><span class="no">t2</span><span class="p">,</span><span class="w"> </span><span class="no">t0</span><span class="p">,</span><span class="w"> </span><span class="no">t1</span><span class="w">        </span><span class="c1"># 乘法 → 64-bit</span>
-<span class="nf">srai</span><span class="w"> </span><span class="no">t2</span><span class="p">,</span><span class="w"> </span><span class="no">t2</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="w">       </span><span class="c1"># 右移16位还原定点</span>
-<span class="nf">add</span><span class="w"> </span><span class="no">a2</span><span class="p">,</span><span class="w"> </span><span class="no">a2</span><span class="p">,</span><span class="w"> </span><span class="no">t2</span><span class="w">        </span><span class="c1"># 累加</span>
-</code></pre></div>
-
-<p>你会注意到：<strong>LLVM 用 <code>fmul</code> (浮点乘) 一条指令搞定了 ScratchV 的 <code>mul + srai</code> 两条</strong>。</p>
+<p>对比两条路径：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>ScratchV 原生路径</th>
+<th>LLVM 路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>静态指令数</td>
+<td><strong>887</strong></td>
+<td>1102</td>
+</tr>
+<tr>
+<td>数值格式</td>
+<td>Q16.16 定点（整数指令）</td>
+<td>float32（浮点指令）</td>
+</tr>
+<tr>
+<td>动态指令估算</td>
+<td>~22.0 亿</td>
+<td>取决于 LLVM 优化级别</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 ScratchV 用 <strong>Q16.16 定点</strong>（<code>mul + srai</code> 两条整数指令模拟浮点乘法），比 LLVM 的 <code>fmul</code> 单条浮点指令多一条。但 ScratchV 的紧耦合代码生成在循环展开和内存访问模式上更激进，综合静态指令数反而更少（887 vs 1102）。</p>
+</blockquote>
 <hr />
 <h2 id="5-运行基准测试">5. 运行基准测试
-<div class="codehilite"><pre><span></span><code><span class="c1"># 基础功能测试</span>
-make<span class="w"> </span><span class="nb">test</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 基础测试（348 个用例，约 1-2 秒）</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v<span class="w"> </span>--tb<span class="o">=</span>short
 
-<span class="c1"># CNN 模型编译 + 估算</span>
+<span class="c1"># CNN 模型编译 + 估算（约 2-3 秒）</span>
 make<span class="w"> </span>bench-cnn
 
-<span class="c1"># 完整 CI 基准（LLVM + TinyFive + 仪表盘）</span>
+<span class="c1"># DSL 性能基准（约 3-5 秒）</span>
+make<span class="w"> </span>bench
+
+<span class="c1"># 完整 CI 基准（LLVM + Dashboard，约 10-15 秒）</span>
 make<span class="w"> </span>bench-ci
 </code></pre></div>
 
-<p>各命令耗时参考：</p>
+<p>各命令耗时和产出参考：</p>
 <table>
 <thead>
 <tr>
@@ -679,39 +774,40 @@ make<span class="w"> </span>bench-ci
 </thead>
 <tbody>
 <tr>
-<td><code>make test</code></td>
-<td>~1 分钟</td>
+<td><code>python3 -m pytest tests/ -v</code></td>
+<td>~2 秒</td>
 <td>终端测试结果</td>
 </tr>
 <tr>
 <td><code>make bench-cnn</code></td>
+<td>~3 秒</td>
+<td>性能报告 HTML + JSON + MD</td>
+</tr>
+<tr>
+<td><code>make bench</code></td>
 <td>~5 秒</td>
-<td>性能报告 .md</td>
+<td>DSL 基准 HTML + JSON</td>
 </tr>
 <tr>
 <td><code>make bench-ci</code></td>
-<td>~2 分钟</td>
-<td>仪表盘 .html + JSON + MD 报告</td>
+<td>~15 秒</td>
+<td>仪表盘 HTML + JSON + MD 摘要</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="6-查看性能仪表盘">6. 查看性能仪表盘
-<div class="codehilite"><pre><span></span><code><span class="c1"># 生成仪表盘</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 生成静态 HTML 仪表盘（零外部依赖）</span>
 make<span class="w"> </span>bench-dashboard
 
 <span class="c1"># 用浏览器打开</span>
-<span class="c1"># (生成的 HTML 是纯静态的，零依赖)</span>
-firefox<span class="w"> </span>benchmark_reports/dashboard.html
-<span class="c1"># 或</span>
-google-chrome<span class="w"> </span>benchmark_reports/dashboard.html
+xdg-open<span class="w"> </span>benchmark_reports/dashboard.html
 </code></pre></div>
 
-<p>仪表盘展示：
-- <strong>静态指令数对比</strong>：ScratchV vs LLVM，按算子拆分
-- <strong>动态指令数对比</strong>：带百分比差异
-- <strong>缓存命中率</strong>：D-Cache 和综合评分
-- <strong>趋势图</strong>（history.html）：历次提交的性能变化曲线</p>
+<p>仪表盘展示内容：
+- 静态/动态指令数对比（ScratchV vs LLVM）
+- 按算子拆分的代码量分析
+- 缓存命中率估算</p>
 <hr />
 <h2 id="7-下一步学什么">7. 下一步学什么
 <p>根据你的兴趣选择：</p>
@@ -737,17 +833,17 @@ google-chrome<span class="w"> </span>benchmark_reports/dashboard.html
 </tr>
 <tr>
 <td>某个具体模块怎么实现</td>
-<td><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/topics/INDEX.md">topics/INDEX</a> — 选你感兴趣的 topic</td>
+<td><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/topics/INDEX.md">topics/INDEX</a> — 30 个课题</td>
 </tr>
 <tr>
 <td>想参与优化、贡献代码</td>
-<td><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/CONTRIBUTING.md">CONTRIBUTING</a> 和 <a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/developer_guide.md">developer_guide</a></td>
+<td><a href="https://github.com/ScratchV-Compiler/ScratchV/blob/main/docs/developer_guide.md">developer_guide</a></td>
 </tr>
 </tbody>
 </table>
 <hr />
 <blockquote>
-<p>🎉 <strong>恭喜！你已经完成了 ScratchV 的快速上手。</strong> 你刚才做的事情：手写 DSL → 看到 IR → 生成汇编 → 编译完整 CNN 模型。这就是编译器工程师的日常工作。</p>
+<p>🎉 <strong>恭喜！你已经完成了 ScratchV 的快速上手。</strong> 你刚才做的事情：手写 DSL → 看到 IR → 生成汇编 → 编译完整 CNN 模型 → 查看 LLVM 对比。这就是编译器工程师的日常工作。</p>
 </blockquote>
     </article>
 

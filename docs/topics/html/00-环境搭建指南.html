@@ -475,7 +475,7 @@ body {
 <tbody>
 <tr>
 <td>Python</td>
-<td>3.8 或更高（推荐 3.12）</td>
+<td>3.10 或更高（推荐 3.12）</td>
 <td><code>python3 --version</code></td>
 </tr>
 <tr>
@@ -493,7 +493,7 @@ body {
 <h3>如果你还没有安装
 <p><strong>Ubuntu / Debian / WSL</strong>:</p>
 <div class="codehilite"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>git
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git<span class="w"> </span>build-essential
 </code></pre></div>
 
 <p><strong>macOS</strong>:</p>
@@ -511,7 +511,8 @@ brew<span class="w"> </span>install<span class="w"> </span>python@3.12<span clas
 <h2 id="2-克隆代码">2. 克隆代码
 <p>打开终端，进入你放项目的目录：</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 进入你喜欢的目录（比如 ~/workspace）</span>
-<span class="nb">cd</span><span class="w"> </span>~/workspace<span class="w">   </span><span class="c1"># 如果没有这个目录，先 mkdir ~/workspace</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>~/workspace
+<span class="nb">cd</span><span class="w"> </span>~/workspace
 
 <span class="c1"># 克隆 ScratchV 仓库</span>
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kinsomwang/ScratchV.git
@@ -534,82 +535,114 @@ git config http.proxy http://127.0.0.1:7890   # 替换为你的代理地址</cod
 <h2 id="3-创建虚拟环境">3. 创建虚拟环境
 <p>虚拟环境让你的 ScratchV 依赖和系统 Python 隔离开，避免版本冲突。</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># 在 ScratchV 目录下创建虚拟环境</span>
-python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 
 <span class="c1"># 激活虚拟环境</span>
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">    </span><span class="c1"># Linux / macOS / WSL</span>
-<span class="c1"># 或者</span>
-venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class="w">       </span><span class="c1"># Windows CMD</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">    </span><span class="c1"># Linux / macOS / WSL</span>
 </code></pre></div>
 
-<p>激活成功后，你的终端提示符前面会出现 <code>(venv)</code>：</p>
-<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">venv</span><span class="p">)</span><span class="w"> </span><span class="k">user</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">workspace</span><span class="o">/</span><span class="n">ScratchV</span><span class="err">$</span>
+<p>激活成功后，你的终端提示符前面会出现 <code>(.venv)</code>：</p>
+<div class="codehilite"><pre><span></span><code><span class="p">(.</span><span class="n">venv</span><span class="p">)</span><span class="w"> </span><span class="n">kinsomwang</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">workspace</span><span class="o">/</span><span class="n">ScratchV</span><span class="err">$</span>
 </code></pre></div>
 
 <blockquote>
-<p>💡 <strong>怎么退出虚拟环境？</strong> 输入 <code>deactivate</code> 即可。</p>
+<p>💡 <strong>怎么退出虚拟环境？</strong> 输入 <code>deactivate</code> 即可。下次回来时重新执行 <code>source .venv/bin/activate</code>。</p>
 </blockquote>
 <hr />
 <h2 id="4-安装-scratchv">4. 安装 ScratchV
-<div class="codehilite"><pre><span></span><code><span class="c1"># 确保在 ScratchV 目录下，且虚拟环境已激活</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 确保在 ScratchV 目录下，且虚拟环境已激活（提示符前有 (.venv)）</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
 
-<p>预期输出（类似）：</p>
-<div class="codehilite"><pre><span></span><code>Obtaining file:///home/user/workspace/ScratchV
-Installing build dependencies ... done
-...
+<p>实际输出：</p>
+<div class="codehilite"><pre><span></span><code>Obtaining file:///home/kinsomwang/workspace/ScratchV
+  Installing build dependencies ... done
+  Checking if build backend supports build_editable ... done
+  ...
 Successfully installed scratchv-0.3.0
 </code></pre></div>
 
 <p><code>-e</code> 参数是 "editable" 模式，意味着你修改源码后不需要重新安装，直接生效。</p>
 <hr />
 <h2 id="5-验证安装">5. 验证安装
-<p>运行测试，确认一切正常：</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># 快速测试（约 1-2 分钟）</span>
-make<span class="w"> </span><span class="nb">test</span>
-</code></pre></div>
-
-<p>预期输出（类似）：</p>
-<div class="codehilite"><pre><span></span><code>tests/test_frontend.py::test_dsl_basic PASSED
-tests/test_ir_builder.py::test_build_add PASSED
-...
-==================== 50+ passed in 12.34s ====================
-</code></pre></div>
-
-<p>如果测试全部通过（绿色 <code>PASSED</code>），恭喜！环境搭建完成 🎉</p>
-<h3>快速试跑：编译一个 ONNX 模型
-<div class="codehilite"><pre><span></span><code><span class="c1"># 编译 CNN 模型，生成 RISC-V 机器码</span>
-python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-o<span class="w"> </span>/tmp/cnn_test.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
+<h3>5.1 确认导入正常
+<div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import scratchv; print(&#39;scratchv version:&#39;, scratchv.__version__)&quot;</span>
 </code></pre></div>
 
 <p>预期输出：</p>
-<div class="codehilite"><pre><span></span><code>=== ScratchV ONNX → RISC-V Compiler ===
-Model: models/graph/cnn.onnx
-Nodes: 9 (3 Conv + 3 MaxPool + 2 Gemm + 1 Relu)
-Static instructions: 749
-Estimated dynamic instructions: 3,222,000,000
-Report: benchmark_reports/cnn_riscv_report.md
-Done.
+<div class="codehilite"><pre><span></span><code>scratchv version: 0.3.0
+</code></pre></div>
+
+<h3>5.2 运行测试
+<div class="codehilite"><pre><span></span><code><span class="c1"># 运行全部测试（348 个用例，约 1-2 秒）</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v<span class="w"> </span>--tb<span class="o">=</span>short
+</code></pre></div>
+
+<p>实际输出：</p>
+<div class="codehilite"><pre><span></span><code><span class="o">============================</span><span class="p">=</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="nx">session</span><span class="w"> </span><span class="nx">starts</span><span class="w"> </span><span class="o">==============================</span>
+<span class="nx">platform</span><span class="w"> </span><span class="nx">linux</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="nx">Python</span><span class="w"> </span><span class="m m-Double">3.12.3</span><span class="p">,</span><span class="w"> </span><span class="nx">pytest</span><span class="o">-</span><span class="m m-Double">9.0.3</span><span class="p">,</span><span class="w"> </span><span class="nx">pluggy</span><span class="o">-</span><span class="m m-Double">1.6.0</span>
+<span class="nx">rootdir</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="nx">home</span><span class="o">/</span><span class="nx">kinsomwang</span><span class="o">/</span><span class="nx">workspace</span><span class="o">/</span><span class="nx">ScratchV</span>
+<span class="nx">configfile</span><span class="p">:</span><span class="w"> </span><span class="nx">pyproject</span><span class="p">.</span><span class="nx">toml</span>
+<span class="nx">collected</span><span class="w"> </span><span class="mi">348</span><span class="w"> </span><span class="nx">items</span>
+
+<span class="nx">tests</span><span class="o">/</span><span class="nx">test_asm_beautifier</span><span class="p">.</span><span class="nx">py</span><span class="o">::</span><span class="nx">TestAsmBeautifier</span><span class="o">::...</span><span class="w"> </span><span class="nx">PASSED</span><span class="w">        </span><span class="p">[</span><span class="w">  </span><span class="mi">1</span><span class="o">%</span><span class="p">]</span>
+<span class="nx">tests</span><span class="o">/</span><span class="nx">test_parser</span><span class="p">.</span><span class="nx">py</span><span class="o">::</span><span class="nx">TestDSLParser</span><span class="o">::</span><span class="nx">test_parse_simple_add</span><span class="w"> </span><span class="nx">PASSED</span><span class="w">  </span><span class="p">[</span><span class="w">  </span><span class="mi">5</span><span class="o">%</span><span class="p">]</span>
+<span class="nx">tests</span><span class="o">/</span><span class="nx">test_ir</span><span class="p">.</span><span class="nx">py</span><span class="o">::</span><span class="nx">TestIRBuilder</span><span class="o">::</span><span class="nx">test_build_simple_add</span><span class="w"> </span><span class="nx">PASSED</span><span class="w">      </span><span class="p">[</span><span class="w"> </span><span class="mi">42</span><span class="o">%</span><span class="p">]</span>
+<span class="nx">tests</span><span class="o">/</span><span class="nx">test_backend</span><span class="p">.</span><span class="nx">py</span><span class="o">::</span><span class="nx">TestInstructionSelect</span><span class="o">::</span><span class="nx">test_select_add</span><span class="w"> </span><span class="nx">PASSED</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mi">73</span><span class="o">%</span><span class="p">]</span>
+<span class="o">...</span>
+<span class="o">======================</span><span class="p">=</span><span class="w"> </span><span class="mi">348</span><span class="w"> </span><span class="nx">passed</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m m-Double">1.23</span><span class="nx">s</span><span class="w"> </span><span class="o">========================</span>
+</code></pre></div>
+
+<p>全部绿色 <code>PASSED</code> 就是环境 OK 了 🎉</p>
+<h3>5.3 快速试跑：编译一个 CNN 模型
+<div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>scratchv/standalone/onnx_to_riscv_standalone.py<span class="w"> </span>models/graph/cnn.onnx<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-o<span class="w"> </span>/tmp/cnn_test.bin<span class="w"> </span>--estimate<span class="w"> </span>--report
+</code></pre></div>
+
+<p>实际输出（关键行）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nl">ScratchV</span><span class="p">:</span><span class="w"> </span><span class="n">Library</span><span class="o">-</span><span class="k">free</span><span class="w"> </span><span class="n">ONNX</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">RV32IM</span><span class="w"> </span><span class="n">Pipeline</span>
+<span class="w">  </span><span class="k">Input</span><span class="err">:</span><span class="w">  </span><span class="n">models</span><span class="o">/</span><span class="n">graph</span><span class="o">/</span><span class="n">cnn</span><span class="p">.</span><span class="n">onnx</span>
+<span class="w">  </span><span class="nl">Graph</span><span class="p">:</span><span class="w"> </span><span class="n">main_graph</span>
+<span class="w">  </span><span class="nl">Nodes</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<span class="w">  </span><span class="nl">Initializers</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
+
+<span class="o">[</span><span class="n">1/5</span><span class="o">]</span><span class="w"> </span><span class="n">Parsing</span><span class="w"> </span><span class="n">ONNX</span><span class="w"> </span><span class="n">protobuf</span><span class="w"> </span><span class="p">(</span><span class="n">manual</span><span class="w"> </span><span class="n">wire</span><span class="o">-</span><span class="nf">format</span><span class="w"> </span><span class="n">parser</span><span class="p">)...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">0</span><span class="o">]</span><span class="w"> </span><span class="nl">Conv</span><span class="p">:</span><span class="w"> </span><span class="n">input1</span><span class="p">,</span><span class="w"> </span><span class="n">layer1</span><span class="mf">.0</span><span class="p">.</span><span class="n">weight</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">1</span><span class="o">]</span><span class="w"> </span><span class="nl">Relu</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="o">[</span><span class="n">2</span><span class="o">]</span><span class="w"> </span><span class="nl">MaxPool</span><span class="p">:</span><span class="w"> </span><span class="p">...</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">共</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="n">个算子</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">2/5</span><span class="o">]</span><span class="w"> </span><span class="n">Converting</span><span class="w"> </span><span class="n">weights</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">Q16</span><span class="mf">.16</span><span class="w"> </span><span class="n">fixed</span><span class="o">-</span><span class="n">point</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">planning</span><span class="w"> </span><span class="n">memory</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Weight</span><span class="w"> </span><span class="k">data</span><span class="err">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="mi">673</span><span class="p">,</span><span class="mi">524</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">3/5</span><span class="o">]</span><span class="w"> </span><span class="n">Generating</span><span class="w"> </span><span class="n">inline</span><span class="w"> </span><span class="n">RISC</span><span class="o">-</span><span class="n">V</span><span class="w"> </span><span class="n">RV32IM</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">code</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Code</span><span class="w"> </span><span class="k">size</span><span class="err">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="mi">548</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mi">887</span><span class="w"> </span><span class="n">instructions</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">4/5</span><span class="o">]</span><span class="w"> </span><span class="n">Assembling</span><span class="w"> </span><span class="n">flat</span><span class="w"> </span><span class="nc">binary</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Total</span><span class="w"> </span><span class="nc">binary</span><span class="err">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="mi">677</span><span class="p">,</span><span class="mi">072</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">5/5</span><span class="o">]</span><span class="w"> </span><span class="n">Writing</span><span class="w"> </span><span class="k">output</span><span class="w"> </span><span class="n">files</span><span class="p">...</span>
+<span class="w">  </span><span class="nc">Binary</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cnn_test</span><span class="p">.</span><span class="n">bin</span><span class="w"> </span><span class="p">(</span><span class="mi">27</span><span class="p">,</span><span class="mi">677</span><span class="p">,</span><span class="mi">072</span><span class="w"> </span><span class="n">bytes</span><span class="p">)</span>
+<span class="w">  </span><span class="nl">Assembly</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cnn_test</span><span class="p">.</span><span class="n">s</span>
+
+<span class="n">Pipeline</span><span class="w"> </span><span class="n">complete</span><span class="err">!</span>
+<span class="w">  </span><span class="nl">Code</span><span class="p">:</span><span class="w">   </span><span class="mi">3</span><span class="p">,</span><span class="mi">548</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mi">887</span><span class="w"> </span><span class="n">instructions</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Data</span><span class="err">:</span><span class="w">   </span><span class="mi">27</span><span class="p">,</span><span class="mi">673</span><span class="p">,</span><span class="mi">524</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="p">(</span><span class="mf">26.4</span><span class="w"> </span><span class="n">MB</span><span class="p">)</span>
+
+<span class="o">[</span><span class="n">estimate</span><span class="o">]</span><span class="w"> </span><span class="n">Analytical</span><span class="w"> </span><span class="n">instruction</span><span class="w"> </span><span class="nf">count</span><span class="w"> </span><span class="n">estimation</span><span class="p">...</span>
+<span class="w">  </span><span class="n">Estimated</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="nl">instructions</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="mi">203</span><span class="p">,</span><span class="mi">799</span><span class="p">,</span><span class="mi">060</span>
+<span class="w">  </span><span class="k">Compute</span><span class="err">:</span><span class="w">  </span><span class="mf">62.8</span><span class="o">%</span><span class="w">  </span><span class="nl">Memory</span><span class="p">:</span><span class="w"> </span><span class="mf">24.8</span><span class="o">%</span><span class="w">  </span><span class="nl">Branch</span><span class="p">:</span><span class="w"> </span><span class="mf">3.8</span><span class="o">%</span>
+
+<span class="o">[</span><span class="n">report</span><span class="o">]</span><span class="w"> </span><span class="n">Generating</span><span class="w"> </span><span class="n">CI</span><span class="w"> </span><span class="n">benchmark</span><span class="w"> </span><span class="n">reports</span><span class="p">...</span>
+<span class="w">  </span><span class="nl">HTML</span><span class="p">:</span><span class="w"> </span><span class="n">benchmark_reports</span><span class="o">/</span><span class="n">benchmark</span><span class="p">.</span><span class="n">html</span>
+<span class="w">  </span><span class="nl">JSON</span><span class="p">:</span><span class="w"> </span><span class="n">benchmark_reports</span><span class="o">/</span><span class="n">benchmark</span><span class="p">.</span><span class="n">json</span>
+<span class="w">  </span><span class="nl">Summary</span><span class="p">:</span><span class="w"> </span><span class="n">benchmark_reports</span><span class="o">/</span><span class="n">github_summary</span><span class="p">.</span><span class="n">md</span>
 </code></pre></div>
 
 <hr />
 <h2 id="6-安装可选依赖">6. 安装可选依赖
 <p>ScratchV 的核心编译器<strong>零外部依赖</strong>（只用 Python 标准库）。以下依赖是可选的，按需安装：</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># 基础安装（核心编译器，零外部依赖）</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-
-<span class="c1"># TinyFive — RISC-V 仿真器，用来实际&quot;跑&quot;编译出的代码</span>
-pip<span class="w"> </span>install<span class="w"> </span>tinyfive
-
-<span class="c1"># llvmlite — LLVM IR 生成和 JIT 执行</span>
-pip<span class="w"> </span>install<span class="w"> </span>llvmlite
-
-<span class="c1"># onnxruntime — 用来验证 ScratchV 编译结果的正确性</span>
-pip<span class="w"> </span>install<span class="w"> </span>onnxruntime
-
-<span class="c1"># 一键安装全部可选依赖</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 安装全部可选依赖</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
 </code></pre></div>
 
@@ -642,25 +675,6 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </table>
 <hr />
 <h2 id="7-平台特定说明">7. 平台特定说明
-<h3>Ubuntu 22.04 / 24.04
-<div class="codehilite"><pre><span></span><code><span class="c1"># 确保系统包齐全</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git<span class="w"> </span>build-essential
-</code></pre></div>
-
-<h3>macOS (Apple Silicon / Intel)
-<div class="codehilite"><pre><span></span><code><span class="c1"># Xcode Command Line Tools（提供 git、make 等）</span>
-xcode-select<span class="w"> </span>--install
-
-<span class="c1"># 后续步骤同上</span>
-</code></pre></div>
-
-<h3>WSL2 (Windows)
-<div class="codehilite"><pre><span></span><code><span class="c1"># WSL 里的 Ubuntu 和原生 Ubuntu 几乎一样</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3<span class="w"> </span>python3-pip<span class="w"> </span>python3-venv<span class="w"> </span>python3-dev<span class="w"> </span>git<span class="w"> </span>build-essential
-</code></pre></div>
-
 <h3>国内用户加速 pip
 <div class="codehilite"><pre><span></span><code><span class="c1"># 临时使用清华镜像</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-i<span class="w"> </span>https://pypi.tuna.tsinghua.edu.cn/simple
@@ -673,12 +687,13 @@ pip<span class="w"> </span>config<span class="w"> </span><span class="nb">set</s
 <h2 id="8-检查清单">8. 检查清单
 <p>完成以下所有项，你的环境就准备好了：</p>
 <ul>
-<li>[ ] Python 版本 ≥ 3.8（<code>python3 --version</code> 确认）</li>
+<li>[ ] Python 版本 ≥ 3.10（<code>python3 --version</code> 确认）</li>
 <li>[ ] 代码已克隆到本地（<code>git status</code> 正常）</li>
-<li>[ ] 虚拟环境已创建并激活（终端提示有 <code>(venv)</code>）</li>
+<li>[ ] 虚拟环境已创建并激活（终端提示有 <code>(.venv)</code>）</li>
 <li>[ ] <code>pip install -e .</code> 成功</li>
-<li>[ ] <code>make test</code> 全部通过</li>
-<li>[ ] 能成功编译 CNN 模型（<code>make bench-cnn</code>）</li>
+<li>[ ] <code>python3 -c "import scratchv"</code> 正常</li>
+<li>[ ] <code>python3 -m pytest tests/ -v --tb=short</code> 全部通过</li>
+<li>[ ] 能成功编译 CNN 模型（上一节的命令）</li>
 </ul>
 <hr />
 <h2>遇到问题？
