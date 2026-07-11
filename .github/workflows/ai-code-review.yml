@@ -22,7 +22,9 @@ jobs:
       - name: Get changed files
         id: changed
         run: |
-          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          BASE_REF="${GITHUB_BASE_REF:-main}"
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+          CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
           echo "$CHANGED" > changed_files.txt
           COUNT=$(echo "$CHANGED" | wc -l)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
@@ -34,6 +36,8 @@ jobs:
         env:
           SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
         run: |
+          BASE_REF="${GITHUB_BASE_REF:-main}"
+
           # ── Inline system prompt ──
           SYSTEM_PROMPT=$(cat .github/prompts/code-review-prompt.md)
 
@@ -51,7 +55,7 @@ jobs:
               echo "Reviewing: $FILE"
 
               # ── Get per-file diff ──
-              DIFF=$(git diff "origin/${{ github.base_ref }}...HEAD" -- "$FILE" 2>/dev/null || true)
+              DIFF=$(git diff "origin/$BASE_REF...HEAD" -- "$FILE" 2>/dev/null || true)
               if [ -z "$DIFF" ]; then
                 echo "  [SKIP] $FILE — no diff (binary or unchanged)"
                 continue
