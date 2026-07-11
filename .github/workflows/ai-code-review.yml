@@ -158,10 +158,17 @@ jobs:
               return;
             }
 
+            // Skip comment for cross-repo PRs (fork → upstream): GITHUB_TOKEN lacks write access
+            const pr = context.payload.pull_request;
+            if (pr && pr.head.repo.full_name !== pr.base.repo.full_name) {
+              console.log('Cross-repo PR detected, skipping comment (GITHUB_TOKEN cannot write to upstream).');
+              return;
+            }
+
             // For pull_request events, get the PR number
             let issueNumber;
-            if (context.payload.pull_request) {
-              issueNumber = context.payload.pull_request.number;
+            if (pr) {
+              issueNumber = pr.number;
             } else {
               console.log('Not a pull request event, skipping comment.');
               return;
