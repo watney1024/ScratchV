@@ -158,7 +158,6 @@ jobs:
               return;
             }
 
-            const context = github.context;
             // For pull_request events, get the PR number
             let issueNumber;
             if (context.payload.pull_request) {
