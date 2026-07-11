@@ -8,9 +8,6 @@ permissions:
   contents: read
   pull-requests: write
 
-env:
-  # Node version managed by actions/setup-node
-
 jobs:
   ai-code-review:
     runs-on: ubuntu-latest
