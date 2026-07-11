@@ -26,7 +26,7 @@ jobs:
           echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
           CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
           echo "$CHANGED" > changed_files.txt
-          COUNT=$(echo "$CHANGED" | wc -l)
+          COUNT=$(echo -n "$CHANGED" | grep -c . || true)
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Changed files ($COUNT):"
           echo "$CHANGED"
