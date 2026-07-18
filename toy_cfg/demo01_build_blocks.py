@@ -287,6 +287,26 @@ def demo_empty() -> Program:
     return builder.program
 
 
+def demo_unreachable_return() -> Program:
+    """Build a program with dead code after RETURN — creates an unreachable block.
+
+    The 'entry' block ends with RETURN, so 'dead' block after it has no
+    incoming edges and is unreachable from entry.
+    """
+    builder = IRBuilder()
+    builder.new_function("unreachable_demo")
+
+    builder.new_block("entry")
+    v = builder.make_value("v", is_constant=True, const_value=1)
+    builder.ret(v)
+
+    # After RETURN — this block is unreachable
+    builder.new_block("dead")
+    builder.ret(v)
+
+    return builder.program
+
+
 def demo_nested_for() -> Program:
     """Build a nested-for program: outer FOR → inner FOR → ENDFOR → ENDFOR."""
     builder = IRBuilder()
@@ -333,6 +353,7 @@ DEMOS: dict[str, Program] = {
     "while_loop": demo_while_loop(),
     "empty": demo_empty(),
     "nested_for": demo_nested_for(),
+    "unreachable": demo_unreachable_return(),
 }
 
 
