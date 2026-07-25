@@ -9,6 +9,15 @@ from .types import (
 )
 from .builder import IRBuilder
 from .printer import IRPrinter
+from .cfg import (
+    CFGBuilder,
+    CFG,
+    CFGNode,
+    CFGEdge,
+    EdgeType,
+    NaturalLoop,
+    to_dot,
+)
 
 __all__ = [
     "OpCode",
@@ -20,4 +29,11 @@ __all__ = [
     "Program",
     "IRBuilder",
     "IRPrinter",
+    "CFGBuilder",
+    "CFG",
+    "CFGNode",
+    "CFGEdge",
+    "EdgeType",
+    "NaturalLoop",
+    "to_dot",
 ]
