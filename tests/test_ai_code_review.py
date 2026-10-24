@@ -323,25 +323,37 @@ def write_review_inputs(tmp_path, p, prompt="prompt"):
 
 def test_inline_blocker_is_located_and_stripped_from_review():
     patch = "@@ -1,2 +1,3 @@\n context\n+added line\n+another line"
-    content = 'Review text.\n\n```json\n{"blockers": [{"quote": "added line", "body": "Fix **this**."}]}\n```'
+    content = 'Review text.\n\n```json\n{"findings": [{"severity": "blocker", "quote": "added line", "body": "Fix **this**."}]}\n```'
     review_text, findings = review.inline_findings(content, patch)
     assert review_text == "Review text."
-    assert findings == [{"line": 2, "side": "RIGHT", "body": "Fix **this**."}]
+    assert findings == [{"line": 2, "side": "RIGHT", "severity": "blocker", "body": "🔴 Fix **this**."}]
 
 
-def test_inline_blocker_quote_must_exist_in_patch():
-    content = 'Review.\n```json\n{"blockers": [{"quote": "missing", "body": "x"}]}\n```'
+def test_inline_suggestion_gets_yellow_marker_without_duplication():
+    content = 'Review.\n```json\n{"findings": [{"severity": "suggestion", "quote": "new", "body": "🟡 already marked"}]}\n```'
+    _, findings = review.inline_findings(content, "@@ -1 +1 @@\n-old\n+new")
+    assert findings == [{"line": 1, "side": "RIGHT", "severity": "suggestion", "body": "🟡 already marked"}]
+
+
+def test_inline_finding_quote_must_exist_in_patch():
+    content = 'Review.\n```json\n{"findings": [{"severity": "blocker", "quote": "missing", "body": "x"}]}\n```'
     review_text, findings = review.inline_findings(content, "@@ -1 +1 @@\n-old\n+new")
     assert review_text == "Review." and findings == []
 
 
-def test_review_file_records_inline_blockers():
-    content = 'No issue.\n```json\n{"blockers": [{"quote": "new", "body": "Bug."}]}\n```'
+def test_inline_finding_unknown_severity_is_dropped():
+    content = 'Review.\n```json\n{"findings": [{"severity": "nit", "quote": "new", "body": "x"}]}\n```'
+    _, findings = review.inline_findings(content, "@@ -1 +1 @@\n-old\n+new")
+    assert findings == []
+
+
+def test_review_file_records_inline_findings():
+    content = 'No issue.\n```json\n{"findings": [{"severity": "blocker", "quote": "new", "body": "Bug."}]}\n```'
     def request(*_):
         return content, 200, ""
     result = review.review_file(file(), "prompt", "test-key", request=request, sleep=lambda _: None)
     assert result["status"] == "reviewed" and result["findings"] == [
-        {"line": 1, "side": "RIGHT", "body": "Bug."}]
+        {"line": 1, "side": "RIGHT", "severity": "blocker", "body": "🔴 Bug."}]
     assert "```json" not in result["review"]
 
 

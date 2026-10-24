@@ -17,6 +17,7 @@ API_URL = "https://token.sensenova.cn/v1/chat/completions"
 BATCH_SIZE = 10
 HUNK_HEADER = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 INLINE_BLOCK = re.compile(r"```json\s*(.*?)\s*```", re.S | re.I)
+SEVERITY_MARKERS = {"blocker": "🔴", "suggestion": "🟡"}
 REQUEST_TIMEOUT_SECONDS = 90
 SLOW_REVIEW_SECONDS = 60  # Warn before the timeout cliff, not at it.
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
@@ -137,7 +138,7 @@ def patch_line_index(patch: str) -> dict[str, int]:
 
 
 def inline_findings(content: str, patch: str) -> tuple[str, list[dict]]:
-    """Split the optional JSON blocker block; keep only quotes present in the patch."""
+    """Split the optional JSON findings block; keep only quotes present in the patch."""
     match = INLINE_BLOCK.search(content)
     if not match:
         return content, []
@@ -145,20 +146,27 @@ def inline_findings(content: str, patch: str) -> tuple[str, list[dict]]:
         payload = json.loads(match.group(1))
     except ValueError:
         return content, []
-    blockers = payload.get("blockers") if isinstance(payload, dict) else None
+    items = payload.get("findings") if isinstance(payload, dict) else None
     index = patch_line_index(patch)
     findings = []
-    for item in blockers if isinstance(blockers, list) else []:
+    for item in items if isinstance(items, list) else []:
         if not isinstance(item, dict):
             continue
-        quote, body = item.get("quote"), item.get("body")
+        severity, quote, body = item.get("severity"), item.get("quote"), item.get("body")
+        marker = SEVERITY_MARKERS.get(severity) if isinstance(severity, str) else None
         if isinstance(quote, str):
             quote = quote.strip()
             quote = quote[1:].strip() if quote.startswith("+") else quote
         line = index.get(quote) if isinstance(quote, str) and quote else None
-        if line is None or not isinstance(body, str) or not body.strip():
+        if marker is None or line is None or not isinstance(body, str) or not body.strip():
             continue
-        findings.append({"line": line, "side": "RIGHT", "body": body.strip()})
+        body = body.strip()
+        for known in ("🔴", "🟡", "💭"):
+            if body.startswith(known):
+                body = body[len(known):].lstrip()
+                break
+        findings.append({"line": line, "side": "RIGHT", "severity": severity,
+                         "body": f"{marker} {body}"})
         if len(findings) == 3:
             break
     text = (content[:match.start()] + content[match.end():]).strip()
