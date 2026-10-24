@@ -21,6 +21,9 @@ SEVERITY_MARKERS = {"blocker": "🔴", "suggestion": "🟡"}
 REQUEST_TIMEOUT_SECONDS = 90
 SLOW_REVIEW_SECONDS = 60  # Warn before the timeout cliff, not at it.
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
+PRIORITY_MARKERS = ("🔴", "🟡", "💭")
+COMMENT_LIMIT_BYTES = 60000
+REVIEW_LIMIT_BYTES = 8000
 
 
 def write_json(path: Path, value: object) -> None:
@@ -301,6 +304,79 @@ def summarize(plan: dict, batches: list[dict], current_head: str | None = None) 
     }
 
 
+def finding_counts(review: str) -> tuple[int, int, int]:
+    return tuple(review.count(marker) for marker in PRIORITY_MARKERS)
+
+
+def clip_review(text: str, limit: int = REVIEW_LIMIT_BYTES) -> str:
+    """Keep one comment block bounded; the artifact always holds the full text."""
+    body = text.strip()
+    data = body.encode("utf-8")
+    if len(data) <= limit:
+        return body
+    clipped = data[:limit].decode("utf-8", errors="ignore")
+    cut = clipped.rfind("\n")
+    if cut > 0:
+        clipped = clipped[:cut]
+    return clipped.rstrip() + "\n\n…truncated; full text in the artifact."
+
+
+def review_block(record: dict, counts: tuple[int, int, int]) -> str:
+    name = json.dumps(record["filename"], ensure_ascii=False)
+    body = clip_review(record["review"])
+    if counts[0]:
+        return f"### {name}\n\n{body}\n\n"
+    marks = " · ".join(f"{marker} {number}" for marker, number in zip(PRIORITY_MARKERS, counts) if number)
+    label = f"{name} — {marks}" if marks else name
+    return f"<details><summary>{label}</summary>\n\n{body}\n\n</details>\n\n"
+
+
+def build_comment(header: str, errors: str, unavailable: str, files: list[dict], run_url: str) -> str:
+    ranked = []
+    for index, record in enumerate(files):
+        if record["status"] == "reviewed":
+            ranked.append((finding_counts(record["review"]), index, record))
+    ranked.sort(key=lambda item: (-item[0][0], -item[0][1], -item[0][2], item[1]))
+    flagged = [item for item in ranked if any(item[0])]
+    clean = [item for item in ranked if not any(item[0])]
+
+    tail = ""
+    if errors:
+        tail += "### Coverage errors\n" + errors + "\n"
+    if unavailable:
+        tail += "### Files without a review\n" + unavailable
+    else:
+        tail += "Every fetched file has a review response.\n"
+    if clean:
+        names = ", ".join(json.dumps(item[2]["filename"], ensure_ascii=False) for item in clean)
+        tail += f"\n<details><summary>✅ {len(clean)} file(s) with no findings</summary>\n\n{names}\n\n</details>\n"
+
+    findings = ""
+    if flagged:
+        totals = " · ".join(
+            f"{marker} {sum(item[0][index] for item in flagged)}"
+            for index, marker in enumerate(PRIORITY_MARKERS)
+        )
+        findings = f"> Findings: {totals} across {len(flagged)} file(s).\n\n"
+    omitted = 0
+    for index, (counts, _, record) in enumerate(flagged):
+        block = review_block(record, counts)
+        if len((header + findings + block + tail).encode("utf-8")) + 400 > COMMENT_LIMIT_BYTES:
+            omitted = len(flagged) - index
+            break
+        findings += block
+    if omitted:
+        tail += (f"\n> {omitted} file(s) with findings omitted to stay within the comment limit; "
+                 f"full report in the [artifact]({run_url}).\n")
+
+    comment = header + findings + tail
+    if len(comment.encode("utf-8")) > COMMENT_LIMIT_BYTES:
+        cut = comment.encode("utf-8")[:COMMENT_LIMIT_BYTES - 120].decode("utf-8", errors="ignore")
+        line = cut.rfind("\n")
+        comment = (cut[:line] if line > 0 else cut) + "\n\nComment truncated here; consult the complete artifact.\n"
+    return comment
+
+
 def render_report(summary: dict, run_url: str) -> tuple[str, str]:
     counts = summary["counts"]
     header = (
@@ -319,11 +395,7 @@ def render_report(summary: dict, run_url: str) -> tuple[str, str]:
         f"- {json.dumps(record['filename'], ensure_ascii=False)}: {record['status']} — {record.get('reason', '')}\n"
         for record in summary["files"] if record["status"] != "reviewed"
     )
-    comment = header + (("### Coverage errors\n" + errors + "\n") if errors else "")
-    comment += ("### Files without a review\n" + unavailable) if unavailable else "Every fetched file has a review response.\n"
-    # GitHub issue comments have a size limit. Full JSON/Markdown stay in the artifact.
-    if len(comment.encode("utf-8")) > 60000:
-        comment = comment.encode("utf-8")[:59000].decode("utf-8", errors="ignore") + "\n\nList truncated here; consult the complete artifact.\n"
+    comment = build_comment(header, errors, unavailable, summary["files"], run_url)
     report = header + errors + "\n" + unavailable
     for record in summary["files"]:
         if record["status"] == "reviewed":

@@ -233,9 +233,36 @@ def test_comment_is_bounded_and_full_report_is_not_truncated():
         item["filename"] += "文" * 1000
     summary = review.summarize(p, [])
     report, comment = review.render_report(summary, "https://example.test/run")
-    assert len(comment.encode()) < 65000 and "List truncated" in comment
+    assert len(comment.encode()) < 65000 and "Comment truncated" in comment
     assert summary["files"][-1]["filename"] in report
     assert "failed/missing: **100**" in comment
+
+
+def test_comment_shows_findings_and_collapses_clean_files():
+    batch = {"head": "abc", "batch": 0, "files": [
+        {"filename": "0.py", "status": "reviewed", "review": "🔴 **Bug** — boom.", "elapsed": 1.0},
+        {"filename": "1.py", "status": "reviewed", "review": "🟡 **Suggestion** — maybe.", "elapsed": 1.0},
+        {"filename": "2.py", "status": "reviewed", "review": "No concrete issue found.", "elapsed": 1.0},
+    ]}
+    summary = review.summarize(plan(3), [batch])
+    _, comment = review.render_report(summary, "https://example.test/run")
+    assert '### "0.py"' in comment and "🔴 **Bug** — boom." in comment
+    assert '<details><summary>"1.py" — 🟡 1</summary>' in comment
+    assert "🟡 **Suggestion** — maybe." in comment
+    assert "✅ 1 file(s) with no findings" in comment
+    assert "No concrete issue found." not in comment
+
+
+def test_comment_budget_keeps_findings_and_reports_omissions():
+    texts = [f"🔴 **Bug {index}** — " + ("x" * 9000) for index in range(8)]
+    batch = {"head": "abc", "batch": 0, "files": [
+        {"filename": f"{index}.py", "status": "reviewed", "review": text, "elapsed": 1.0}
+        for index, text in enumerate(texts)]}
+    report, comment = review.render_report(review.summarize(plan(8), [batch]),
+                                          "https://example.test/run")
+    assert len(comment.encode()) <= 60000
+    assert "file(s) with findings omitted" in comment
+    assert all(f"Bug {index}" in report for index in range(8))
 
 
 def test_cli_publishes_partial_coverage_without_failing_gate(tmp_path):
