@@ -68,7 +68,8 @@ def test_workflow_keeps_failed_batch_artifacts_and_checks_staleness():
     assert "pr.head.sha !== summary.head" in post
     assert "summary.complete = false" in post
     assert "summary.errors.push('PR head changed" in post
-    assert "pulls.createReviewComment" in post and "pulls.listReviewComments" in post
+    assert "pulls.createReview" in post and "event: 'COMMENT'" in post
+    assert "pulls.createReviewComment" not in post and "pulls.listReviewComments" in post
     assert summary["steps"][-1]["run"].endswith("gate --summary review-summary/summary.json")
 
 
