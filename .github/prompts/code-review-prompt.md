@@ -59,6 +59,18 @@ Provide code reviews that improve code quality AND developer skills:
 Suggestion: Use parameterized queries.
 ```
 
+## 🧷 Inline blocker block
+
+If you report one or more 🔴 blockers, append exactly one fenced JSON block at the very end:
+
+```json
+{"blockers": [{"quote": "an added line copied exactly from the diff", "body": "one paragraph"}]}
+```
+
+- `quote` must match one added (`+`) line verbatim; it is used to locate the inline comment.
+- At most 3 blockers per file. Omit the block when there are none.
+- The block is parsed by a machine; do not put another code fence around it.
+
 ## 💬 Communication Style
 - Use priority markers (🔴 🟡 💭) consistently
 - No summary, no praise, no next steps — just issues

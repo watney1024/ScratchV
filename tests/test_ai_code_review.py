@@ -68,6 +68,7 @@ def test_workflow_keeps_failed_batch_artifacts_and_checks_staleness():
     assert "pr.head.sha !== summary.head" in post
     assert "summary.complete = false" in post
     assert "summary.errors.push('PR head changed" in post
+    assert "pulls.createReviewComment" in post and "pulls.listReviewComments" in post
     assert summary["steps"][-1]["run"].endswith("gate --summary review-summary/summary.json")
 
 
@@ -318,6 +319,30 @@ def write_review_inputs(tmp_path, p, prompt="prompt"):
     review.write_json(plan_path, p)
     prompt_path.write_text(prompt)
     return plan_path, prompt_path
+
+
+def test_inline_blocker_is_located_and_stripped_from_review():
+    patch = "@@ -1,2 +1,3 @@\n context\n+added line\n+another line"
+    content = 'Review text.\n\n```json\n{"blockers": [{"quote": "added line", "body": "Fix **this**."}]}\n```'
+    review_text, findings = review.inline_findings(content, patch)
+    assert review_text == "Review text."
+    assert findings == [{"line": 2, "side": "RIGHT", "body": "Fix **this**."}]
+
+
+def test_inline_blocker_quote_must_exist_in_patch():
+    content = 'Review.\n```json\n{"blockers": [{"quote": "missing", "body": "x"}]}\n```'
+    review_text, findings = review.inline_findings(content, "@@ -1 +1 @@\n-old\n+new")
+    assert review_text == "Review." and findings == []
+
+
+def test_review_file_records_inline_blockers():
+    content = 'No issue.\n```json\n{"blockers": [{"quote": "new", "body": "Bug."}]}\n```'
+    def request(*_):
+        return content, 200, ""
+    result = review.review_file(file(), "prompt", "test-key", request=request, sleep=lambda _: None)
+    assert result["status"] == "reviewed" and result["findings"] == [
+        {"line": 1, "side": "RIGHT", "body": "Bug."}]
+    assert "```json" not in result["review"]
 
 
 def test_review_payload_uses_glm_without_reasoning():

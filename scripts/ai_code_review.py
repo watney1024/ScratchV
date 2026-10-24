@@ -7,6 +7,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import re
 import socket
 import time
 import urllib.error
@@ -14,6 +15,8 @@ import urllib.request
 
 API_URL = "https://token.sensenova.cn/v1/chat/completions"
 BATCH_SIZE = 10
+HUNK_HEADER = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
+INLINE_BLOCK = re.compile(r"```json\s*(.*?)\s*```", re.S | re.I)
 REQUEST_TIMEOUT_SECONDS = 90
 SLOW_REVIEW_SECONDS = 60  # Warn before the timeout cliff, not at it.
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
@@ -109,6 +112,59 @@ def is_timeout(exc: BaseException) -> bool:
     return isinstance(exc, kinds) or isinstance(getattr(exc, "reason", None), kinds)
 
 
+def patch_line_index(patch: str) -> dict[str, int]:
+    """Map exact added/context line text to its new-file line number (RIGHT side)."""
+    index: dict[str, int] = {}
+    number = None
+    for line in patch.splitlines():
+        hunk = HUNK_HEADER.match(line)
+        if hunk:
+            number = int(hunk.group(1))
+            continue
+        if number is None:
+            continue
+        if line.startswith("+"):
+            text = line[1:].strip()
+            if text:
+                index.setdefault(text, number)
+            number += 1
+        elif line.startswith(" "):
+            text = line[1:].strip()
+            if text:
+                index.setdefault(text, number)
+            number += 1
+    return index
+
+
+def inline_findings(content: str, patch: str) -> tuple[str, list[dict]]:
+    """Split the optional JSON blocker block; keep only quotes present in the patch."""
+    match = INLINE_BLOCK.search(content)
+    if not match:
+        return content, []
+    try:
+        payload = json.loads(match.group(1))
+    except ValueError:
+        return content, []
+    blockers = payload.get("blockers") if isinstance(payload, dict) else None
+    index = patch_line_index(patch)
+    findings = []
+    for item in blockers if isinstance(blockers, list) else []:
+        if not isinstance(item, dict):
+            continue
+        quote, body = item.get("quote"), item.get("body")
+        if isinstance(quote, str):
+            quote = quote.strip()
+            quote = quote[1:].strip() if quote.startswith("+") else quote
+        line = index.get(quote) if isinstance(quote, str) and quote else None
+        if line is None or not isinstance(body, str) or not body.strip():
+            continue
+        findings.append({"line": line, "side": "RIGHT", "body": body.strip()})
+        if len(findings) == 3:
+            break
+    text = (content[:match.start()] + content[match.end():]).strip()
+    return (text or content.strip()), findings
+
+
 def review_file(file: dict, prompt: str, key: str, request=request_review,
                 sleep=time.sleep, clock=time.monotonic) -> dict:
     record = {"filename": file["filename"], "status": "pending", "attempts": 0}
@@ -140,7 +196,9 @@ def review_file(file: dict, prompt: str, key: str, request=request_review,
         try:
             content, status, retry_after = request(payload, key)
             if status == 200:
-                record.update(status="reviewed", review=content, elapsed=round(clock() - started, 1))
+                review, findings = inline_findings(content, file["patch"])
+                record.update(status="reviewed", review=review, findings=findings,
+                              elapsed=round(clock() - started, 1))
                 return record
             record["reason"] = f"HTTP {status}"
             retry = status == 429 or 500 <= status <= 599

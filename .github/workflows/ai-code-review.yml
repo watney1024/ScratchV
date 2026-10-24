@@ -148,6 +148,32 @@ jobs:
               core.setFailed('Stale review results; not overwriting the current PR comment.');
               return;
             }
+            const inlineMarker = '<!-- ai-code-review-inline -->';
+            const oldInline = await github.paginate(github.rest.pulls.listReviewComments, {
+              ...context.repo, pull_number, per_page: 100,
+            });
+            for (const comment of oldInline) {
+              if (comment.user.type === 'Bot' && comment.body.includes(inlineMarker)) {
+                try {
+                  await github.rest.pulls.deleteReviewComment({...context.repo, comment_id: comment.id});
+                } catch (error) {
+                  core.warning(`Could not delete stale inline comment ${comment.id}: ${error.message}`);
+                }
+              }
+            }
+            for (const file of summary.files || []) {
+              for (const finding of file.findings || []) {
+                try {
+                  await github.rest.pulls.createReviewComment({
+                    ...context.repo, pull_number, commit_id: summary.head,
+                    path: file.filename, line: finding.line, side: finding.side || 'RIGHT',
+                    body: inlineMarker + '\n' + finding.body,
+                  });
+                } catch (error) {
+                  core.warning(`Inline comment failed for ${file.filename}:${finding.line}: ${error.message}`);
+                }
+              }
+            }
             const body = fs.readFileSync('review-summary/review_comment.md', 'utf8');
             const comments = await github.paginate(github.rest.issues.listComments, {
               ...context.repo, issue_number: pull_number, per_page: 100,
