@@ -152,25 +152,43 @@ jobs:
             const oldInline = await github.paginate(github.rest.pulls.listReviewComments, {
               ...context.repo, pull_number, per_page: 100,
             });
-            for (const comment of oldInline) {
-              if (comment.user.type === 'Bot' && comment.body.includes(inlineMarker)) {
-                try {
-                  await github.rest.pulls.deleteReviewComment({...context.repo, comment_id: comment.id});
-                } catch (error) {
-                  core.warning(`Could not delete stale inline comment ${comment.id}: ${error.message}`);
-                }
-              }
-            }
+            const oldIds = oldInline
+              .filter(comment => comment.user.type === 'Bot' && comment.body.includes(inlineMarker))
+              .map(comment => comment.id);
+            const inline = [];
             for (const file of summary.files || []) {
               for (const finding of file.findings || []) {
+                inline.push({file, finding});
+              }
+            }
+            const rank = {blocker: 0, suggestion: 1};
+            inline.sort((a, b) => (rank[a.finding.severity] ?? 2) - (rank[b.finding.severity] ?? 2));
+            const reviewComments = inline.slice(0, 50).map(({file, finding}) => ({
+              path: file.filename, line: finding.line, side: finding.side || 'RIGHT',
+              body: inlineMarker + '\n' + finding.body,
+            }));
+            let reviewPosted = false;
+            if (reviewComments.length) {
+              const omitted = inline.length - reviewComments.length;
+              const reviewBody = omitted
+                ? `Automated review with ${reviewComments.length} inline findings; ${omitted} more are in the artifact.`
+                : `Automated review with ${reviewComments.length} inline findings.`;
+              try {
+                await github.rest.pulls.createReview({
+                  ...context.repo, pull_number, commit_id: summary.head,
+                  event: 'COMMENT', body: reviewBody, comments: reviewComments,
+                });
+                reviewPosted = true;
+              } catch (error) {
+                core.warning(`Inline review failed: ${error.message}`);
+              }
+            }
+            if (!reviewComments.length || reviewPosted) {
+              for (const id of oldIds) {
                 try {
-                  await github.rest.pulls.createReviewComment({
-                    ...context.repo, pull_number, commit_id: summary.head,
-                    path: file.filename, line: finding.line, side: finding.side || 'RIGHT',
-                    body: inlineMarker + '\n' + finding.body,
-                  });
+                  await github.rest.pulls.deleteReviewComment({...context.repo, comment_id: id});
                 } catch (error) {
-                  core.warning(`Inline comment failed for ${file.filename}:${finding.line}: ${error.message}`);
+                  core.warning(`Could not delete stale inline comment ${id}: ${error.message}`);
                 }
               }
             }
